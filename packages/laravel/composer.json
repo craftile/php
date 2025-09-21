@@ -1,0 +1,44 @@
+{
+    "name": "craftile/laravel",
+    "description": "Craftile Laravel Package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eldo Magan",
+            "email": "magan.eldo@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Craftile\\Laravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Craftile\\Laravel\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0",
+        "craftile/core": "self.version"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "phpstan/phpstan": "^1.0",
+        "orchestra/testbench": "^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Craftile\\Laravel\\CraftileServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

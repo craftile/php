@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Ask a question
+    url: https://github.com/craftile/php/discussions/new?category=q-a
+    about: new?category=q-a
+  - name: 📖 Request a feature
+    url: https://github.com/craftile/php/new?category=ideas
+    about: Share ideas for new features
+  - name: 🔒 Security Issues
+    url: mailto:magan.eldo@gmail.com
+    about: Report security vulnerabilities privately via email

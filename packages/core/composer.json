@@ -1,0 +1,33 @@
+{
+    "name": "craftile/core",
+    "description": "Craftile Core Package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eldo Magan",
+            "email": "magan.eldo@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Craftile\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Craftile\\Core\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "pestphp/pest": "^2.0",
+        "phpstan/phpstan": "^1.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,12 @@
+# Split package configuration
+packages/core export-subst
+packages/laravel export-subst
+
+# Exclude development files from archives
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/monorepo-builder.php export-ignore
+/README.md export-ignore
+/phpstan.neon export-ignore
+/composer.lock export-ignore

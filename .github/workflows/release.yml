@@ -1,0 +1,32 @@
+name: Create Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Create new release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Conventional Changelog Action
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ github.token }}
+          output-file: "CHANGELOG.md"
+          version-file: "false"
+          tag-prefix: 'v'
+          release-count: '0'
+          skip-on-empty: true
+          skip-version-file: true
+          git-message: 'docs: update CHANGELOG.md for {version} [skip ci]'
+          pre-release: false

@@ -1,0 +1,43 @@
+name: Split Packages
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ released ]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  split_packages:
+    runs-on: ubuntu-latest
+    name: Split Packages
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - local_path: 'packages/core'
+            split_repository: 'core'
+          - local_path: 'packages/laravel'
+            split_repository: 'laravel'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Split ${{ matrix.package.split_repository }}
+        uses: danharrin/monorepo-split-github-action@v2.3.0
+        with:
+          package_directory: ${{ matrix.package.local_path }}
+          repository_organization: 'craftile'
+          repository_name: ${{ matrix.package.split_repository }}
+          user_name: "craftile"
+          user_email: "hello@craftile.com"
+          branch: ${{ github.ref_name }}
+          tag: ${{ github.event.release.tag_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

@@ -1,0 +1,19 @@
+# Dependencies
+/vendor/
+node_modules/
+
+# Composer
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+
+# PHPStan
+phpstan.neon.dist
+.phpstan/
+
+
+# IDE and Editor files
+.idea/
+.DS_Store
+Thumbs.db

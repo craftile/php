@@ -1,0 +1,50 @@
+{
+    "config": "captainhook.json",
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\Ramsey\\CaptainHook\\ValidateConventionalCommit",
+                "options": {
+                    "config": {
+                        "typeCase": null,
+                        "types": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "chore"],
+                        "scopeCase": null,
+                        "scopeRequired": false,
+                        "scopes": [],
+                        "descriptionCase": null,
+                        "descriptionEndMark": null,
+                        "bodyRequired": false,
+                        "bodyWrapWidth": 72,
+                        "requiredFooters": []
+                    }
+                }
+            }
+        ]
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer format",
+                "options": {},
+                "conditions": []
+            },
+            {
+                "action": "composer analyse",
+                "options": {},
+                "conditions": []
+            }
+        ]
+    },
+    "pre-push": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "composer test",
+                "options": {},
+                "conditions": []
+            }
+        ]
+    }
+}
