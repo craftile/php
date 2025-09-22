@@ -39,8 +39,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Craftile\\Core\\Tests\\": "packages/core/tests/",
-            "Craftile\\Laravel\\Tests\\": "packages/laravel/tests/"
+            "Tests\\": "tests/"
         }
     },
     "config": {
@@ -64,11 +63,11 @@
         ],
         "format": "pint",
         "test": [
-            "pest packages/core/tests",
-            "pest packages/laravel/tests"
+            "pest tests/core",
+            "pest tests/laravel"
         ],
-        "test:core": "pest packages/core/tests",
-        "test:laravel": "pest packages/laravel/tests",
+        "test:core": "pest tests/core",
+        "test:laravel": "pest tests/laravel",
         "analyse": "phpstan analyse",
         "validate-monorepo": "vendor/bin/monorepo-builder validate"
     }

@@ -15,11 +15,6 @@
             "Craftile\\Laravel\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Craftile\\Laravel\\Tests\\": "tests/"
-        }
-    },
     "require": {
         "php": "^8.1",
         "illuminate/support": "^10.0",

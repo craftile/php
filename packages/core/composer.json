@@ -15,11 +15,6 @@
             "Craftile\\Core\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Craftile\\Core\\Tests\\": "tests/"
-        }
-    },
     "require": {
         "php": "^8.1"
     },

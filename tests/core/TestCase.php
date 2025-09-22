@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Craftile\Core\Tests;
+namespace Tests\Core;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

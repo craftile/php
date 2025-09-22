@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Craftile\Laravel\Tests;
+namespace Tests\Laravel;
 
 use Craftile\Laravel\CraftileServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
