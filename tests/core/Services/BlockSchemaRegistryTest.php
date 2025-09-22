@@ -7,7 +7,7 @@ use Craftile\Core\Services\BlockSchemaRegistry;
 
 describe('BlockSchemaRegistry', function () {
     beforeEach(function () {
-        $this->registry = new BlockSchemaRegistry();
+        $this->registry = new BlockSchemaRegistry;
     });
 
     it('can register a schema', function () {

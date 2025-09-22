@@ -26,13 +26,13 @@ class BlockSchemaRegistry extends CoreBlockSchemaRegistry
         foreach ($this->getAllSchemas() as $schema) {
             $category = $schema->category ?? 'default';
 
-            if (!isset($grouped[$category])) {
+            if (! isset($grouped[$category])) {
                 $grouped[$category] = [];
             }
 
             $grouped[$category][] = $schema;
         }
 
-        return collect($grouped)->map(fn($schemas) => collect($schemas));
+        return collect($grouped)->map(fn ($schemas) => collect($schemas));
     }
 }

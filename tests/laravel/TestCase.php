@@ -15,4 +15,16 @@ abstract class TestCase extends Orchestra
             CraftileServiceProvider::class,
         ];
     }
+
+    /**
+     * Mock the craftile() helper function for testing
+     */
+    protected function mockCraftileHelper(bool $inPreview = false, $blockSchema = null, bool $throwOnSchema = false): void
+    {
+        // For now, just note that this would require a proper mocking framework
+        // In a real implementation, we'd mock the craftile() global helper
+        $this->craftileInPreview = $inPreview;
+        $this->craftileBlockSchema = $blockSchema;
+        $this->craftileThrowOnSchema = $throwOnSchema;
+    }
 }

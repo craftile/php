@@ -35,7 +35,10 @@
         "psr-4": {
             "Craftile\\Core\\": "packages/core/src/",
             "Craftile\\Laravel\\": "packages/laravel/src/"
-        }
+        },
+        "files": [
+            "packages/laravel/src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -53,7 +56,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Craftile\\Laravel\\CraftileLaravelServiceProvider"
+                "Craftile\\Laravel\\CraftileLaravelServiceProvider",
+                "Craftile\\Laravel\\CraftileServiceProvider"
             ]
         }
     },

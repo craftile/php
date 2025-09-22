@@ -19,7 +19,7 @@ describe('BlockData', function () {
             static: true,
             repeated: true,
             semanticId: 'hero-text',
-            resolveChildData: fn($id) => "child-$id"
+            resolveChildData: fn ($id) => "child-$id"
         );
 
         expect($block->id)->toBe('test-block-1');
@@ -56,14 +56,14 @@ describe('BlockData', function () {
             'type' => 'text',
             'properties' => [
                 'content' => 'Hello World',
-                'fontSize' => 16
+                'fontSize' => 16,
             ],
             'parentId' => 'section-1',
             'children' => ['image-1', 'button-1'],
             'disabled' => false,
             'static' => true,
             'repeated' => false,
-            'semanticId' => 'main-heading'
+            'semanticId' => 'main-heading',
         ];
 
         $block = BlockData::make($data);
@@ -84,7 +84,7 @@ describe('BlockData', function () {
     it('handles missing array fields with defaults when using make', function () {
         $data = [
             'id' => 'simple-block',
-            'type' => 'text'
+            'type' => 'text',
         ];
 
         $block = BlockData::make($data);
@@ -102,13 +102,13 @@ describe('BlockData', function () {
 
     it('can resolve child data using callback', function () {
         $resolveChildData = function () {
-            return "Resolved child data";
+            return 'Resolved child data';
         };
 
         $block = BlockData::make([
             'id' => 'parent',
             'type' => 'container',
-            'children' => ['child-1', 'child-2']
+            'children' => ['child-1', 'child-2'],
         ], $resolveChildData);
 
         $childData = $block->getChildData();
@@ -119,7 +119,7 @@ describe('BlockData', function () {
     it('returns null when no resolver provided', function () {
         $block = BlockData::make([
             'id' => 'single',
-            'type' => 'text'
+            'type' => 'text',
         ]);
 
         expect($block->getChildData())->toBeNull();
@@ -129,7 +129,7 @@ describe('BlockData', function () {
         $block = BlockData::make([
             'id' => 'parent',
             'type' => 'container',
-            'children' => ['child-1', 'child-2']
+            'children' => ['child-1', 'child-2'],
         ]);
 
         expect($block->hasChildren())->toBeTrue();
@@ -147,7 +147,7 @@ describe('BlockData', function () {
             'disabled' => true,
             'static' => false,
             'repeated' => true,
-            'semanticId' => 'test-semantic'
+            'semanticId' => 'test-semantic',
         ];
 
         $block = BlockData::make($data);
@@ -169,7 +169,7 @@ describe('BlockData', function () {
         $block = BlockData::make([
             'id' => 'json-test',
             'type' => 'text',
-            'properties' => ['content' => 'JSON Test']
+            'properties' => ['content' => 'JSON Test'],
         ]);
 
         $json = json_encode($block);

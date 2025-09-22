@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Tests\Core\TestCase as CoreTestCase;
-use Tests\Laravel\TestCase as LaravelTestCase;
-use Craftile\Core\Data\BlockSchema;
 use Craftile\Core\Concerns\IsBlock;
 use Craftile\Core\Contracts\BlockInterface;
+use Craftile\Core\Data\BlockSchema;
+use Tests\Core\TestCase as CoreTestCase;
+use Tests\Laravel\TestCase as LaravelTestCase;
 
 uses(CoreTestCase::class)->in('core');
 uses(LaravelTestCase::class)->in('laravel/Unit', 'laravel/Feature');

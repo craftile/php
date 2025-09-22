@@ -44,12 +44,12 @@ describe('BlockSchema', function () {
     });
 
     it('throws exception when creating from non-existent class', function () {
-        expect(fn() => BlockSchema::fromClass('NonExistentClass'))
+        expect(fn () => BlockSchema::fromClass('NonExistentClass'))
             ->toThrow(InvalidArgumentException::class, 'Block class NonExistentClass does not exist');
     });
 
     it('throws exception when creating from non-block class', function () {
-        expect(fn() => BlockSchema::fromClass(stdClass::class))
+        expect(fn () => BlockSchema::fromClass(stdClass::class))
             ->toThrow(InvalidArgumentException::class, 'must implement BlockInterface');
     });
 
@@ -176,21 +176,21 @@ describe('BlockSchema', function () {
     it('throws exception when validating with empty type', function () {
         $schema = new BlockSchema('', TestBlock::class, 'Test');
 
-        expect(fn() => $schema->validate())
+        expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block type cannot be empty');
     });
 
     it('throws exception when validating with non-existent class', function () {
         $schema = new BlockSchema('test', 'NonExistentClass', 'Test');
 
-        expect(fn() => $schema->validate())
+        expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block class NonExistentClass does not exist');
     });
 
     it('throws exception when validating with empty label', function () {
         $schema = new BlockSchema('test', TestBlock::class, '');
 
-        expect(fn() => $schema->validate())
+        expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block label cannot be empty');
     });
 

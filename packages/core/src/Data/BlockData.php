@@ -9,7 +9,7 @@ use JsonSerializable;
  */
 class BlockData implements JsonSerializable
 {
-    private mixed $resolveChildData;
+    protected mixed $resolveChildData;
 
     public function __construct(
         public readonly string $id,

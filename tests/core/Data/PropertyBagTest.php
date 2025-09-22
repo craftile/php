@@ -16,7 +16,7 @@ describe('PropertyBag', function () {
     });
 
     it('can be created empty', function () {
-        $bag = new PropertyBag();
+        $bag = new PropertyBag;
 
         expect($bag->count())->toBe(0);
         expect($bag->all())->toBe([]);
@@ -61,7 +61,7 @@ describe('PropertyBag', function () {
             'title' => 'Test',
             'content' => 'Content',
             'size' => 'large',
-            'color' => 'blue'
+            'color' => 'blue',
         ]);
 
         $subset = $bag->only(['title', 'content']);
@@ -76,7 +76,7 @@ describe('PropertyBag', function () {
             'title' => 'Test',
             'content' => 'Content',
             'size' => 'large',
-            'color' => 'blue'
+            'color' => 'blue',
         ]);
 
         $subset = $bag->except(['size', 'color']);

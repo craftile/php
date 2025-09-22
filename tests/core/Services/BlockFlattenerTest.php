@@ -6,7 +6,7 @@ use Craftile\Core\Services\BlockFlattener;
 
 describe('BlockFlattener', function () {
     beforeEach(function () {
-        $this->flattener = new BlockFlattener();
+        $this->flattener = new BlockFlattener;
     });
 
     it('can detect nested structure', function () {
@@ -17,10 +17,10 @@ describe('BlockFlattener', function () {
                     'type' => 'container',
                     'children' => [
                         ['id' => 'child1', 'type' => 'text'],
-                        ['id' => 'child2', 'type' => 'image']
-                    ]
-                ]
-            ]
+                        ['id' => 'child2', 'type' => 'image'],
+                    ],
+                ],
+            ],
         ];
 
         expect($this->flattener->hasNestedStructure($nestedTemplate))->toBeTrue();
@@ -30,8 +30,8 @@ describe('BlockFlattener', function () {
         $flatTemplate = [
             'blocks' => [
                 'block1' => ['id' => 'block1', 'type' => 'text'],
-                'block2' => ['id' => 'block2', 'type' => 'image']
-            ]
+                'block2' => ['id' => 'block2', 'type' => 'image'],
+            ],
         ];
 
         expect($this->flattener->hasNestedStructure($flatTemplate))->toBeFalse();
@@ -50,10 +50,10 @@ describe('BlockFlattener', function () {
                     'type' => 'container',
                     'children' => [
                         ['id' => 'child1', 'type' => 'text'],
-                        ['id' => 'child2', 'type' => 'image']
-                    ]
-                ]
-            ]
+                        ['id' => 'child2', 'type' => 'image'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -82,14 +82,14 @@ describe('BlockFlattener', function () {
                 'parent1' => [
                     'id' => 'parent1',
                     'type' => 'container',
-                    'children' => [['id' => 'child', 'type' => 'text']]
+                    'children' => [['id' => 'child', 'type' => 'text']],
                 ],
                 'parent2' => [
                     'id' => 'parent2',
                     'type' => 'container',
-                    'children' => [['id' => 'child', 'type' => 'text']] // Same local ID
-                ]
-            ]
+                    'children' => [['id' => 'child', 'type' => 'text']], // Same local ID
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -114,10 +114,10 @@ describe('BlockFlattener', function () {
                     'type' => 'container',
                     'children' => [
                         'child1' => ['id' => 'child1', 'type' => 'text'],
-                        'child2' => ['id' => 'child2', 'type' => 'image']
-                    ]
-                ]
-            ]
+                        'child2' => ['id' => 'child2', 'type' => 'image'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -134,10 +134,10 @@ describe('BlockFlattener', function () {
                     'id' => 'parent',
                     'type' => 'container',
                     'blocks' => [
-                        ['id' => 'child1', 'type' => 'text']
-                    ]
-                ]
-            ]
+                        ['id' => 'child1', 'type' => 'text'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -155,10 +155,10 @@ describe('BlockFlattener', function () {
                     'id' => 'parent',
                     'type' => 'container',
                     'content' => [
-                        ['id' => 'child1', 'type' => 'text']
-                    ]
-                ]
-            ]
+                        ['id' => 'child1', 'type' => 'text'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -175,10 +175,10 @@ describe('BlockFlattener', function () {
                     'id' => 'parent',
                     'type' => 'container',
                     'children' => [
-                        ['id' => 'child', 'type' => 'text']
-                    ]
-                ]
-            ]
+                        ['id' => 'child', 'type' => 'text'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -197,9 +197,9 @@ describe('BlockFlattener', function () {
                 'static-block' => [
                     'id' => 'static-block',
                     'type' => 'header',
-                    'static' => true
-                ]
-            ]
+                    'static' => true,
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -213,8 +213,8 @@ describe('BlockFlattener', function () {
         $nested = [
             'blocks' => [
                 'block1' => ['id' => 'block1', 'type' => 'text'],
-                'block2' => ['id' => 'block2', 'type' => 'image']
-            ]
+                'block2' => ['id' => 'block2', 'type' => 'image'],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -227,12 +227,12 @@ describe('BlockFlattener', function () {
     it('handles custom regions', function () {
         $template = [
             'blocks' => [
-                'block1' => ['id' => 'block1', 'type' => 'text']
+                'block1' => ['id' => 'block1', 'type' => 'text'],
             ],
             'regions' => [
                 ['name' => 'header', 'blocks' => ['block1']],
-                ['name' => 'footer', 'blocks' => []]
-            ]
+                ['name' => 'footer', 'blocks' => []],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($template);
@@ -246,8 +246,8 @@ describe('BlockFlattener', function () {
             'order' => ['block1', 'block2'],
             'blocks' => [
                 'block1' => ['id' => 'block1', 'type' => 'text'],
-                'block2' => ['id' => 'block2', 'type' => 'image']
-            ]
+                'block2' => ['id' => 'block2', 'type' => 'image'],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($template);
@@ -261,13 +261,13 @@ describe('BlockFlattener', function () {
         $invalidNested = [
             'blocks' => [
                 'invalid' => [
-                    'id' => 'invalid'
+                    'id' => 'invalid',
                     // Missing required 'type'
-                ]
-            ]
+                ],
+            ],
         ];
 
-        expect(fn() => $this->flattener->flattenNestedStructure($invalidNested))
+        expect(fn () => $this->flattener->flattenNestedStructure($invalidNested))
             ->toThrow(\InvalidArgumentException::class, 'Block must have both "id" and "type" properties');
     });
 
@@ -278,10 +278,10 @@ describe('BlockFlattener', function () {
                     'id' => 'parent',
                     'type' => 'container',
                     'children' => [
-                        ['id' => 'child', 'type' => 'text']
-                    ]
-                ]
-            ]
+                        ['id' => 'child', 'type' => 'text'],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
@@ -297,10 +297,10 @@ describe('BlockFlattener', function () {
                     'id' => 'parent',
                     'type' => 'container',
                     'children' => [
-                        ['id' => 'child', 'type' => 'text']
-                    ]
-                ]
-            ]
+                        ['id' => 'child', 'type' => 'text'],
+                    ],
+                ],
+            ],
         ]);
 
         expect($this->flattener->getIdMappings())->not->toBeEmpty();
@@ -321,12 +321,12 @@ describe('BlockFlattener', function () {
                             'id' => 'level2',
                             'type' => 'container',
                             'children' => [
-                                ['id' => 'level3', 'type' => 'text']
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                ['id' => 'level3', 'type' => 'text'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->flattener->flattenNestedStructure($nested);
