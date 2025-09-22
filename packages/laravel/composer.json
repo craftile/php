@@ -34,7 +34,10 @@
         "laravel": {
             "providers": [
                 "Craftile\\Laravel\\CraftileServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Craftile": "Craftile\\Laravel\\Facades\\Craftile"
+            }
         }
     },
     "minimum-stability": "dev",

@@ -10,11 +10,12 @@ class CraftileServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/craftile.php', 'craftile');
+        $this->mergeConfigFrom(__DIR__ . '/../config/craftile.php', 'craftile');
 
         $this->app->singleton('craftile', Craftile::class);
         $this->app->singleton(BlockSchemaRegistry::class);
         $this->app->singleton(PropertyTransformerRegistry::class);
+        $this->app->singleton(BlockDiscovery::class);
     }
 
     public function boot(): void

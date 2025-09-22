@@ -14,7 +14,16 @@ class Craftile
     public function __construct(
         protected BlockSchemaRegistry $schemaRegistry,
         protected PropertyTransformerRegistry $transformerRegistry,
+        protected BlockDiscovery $blockDiscovery
     ) {}
+
+    /**
+     * Discover blocks in a directory.
+     */
+    public function discoverBlocksIn(string $namespace, string $directory): void
+    {
+        $this->blockDiscovery->scan($namespace, $directory);
+    }
 
     /**
      * Register a custom preview mode detector.
