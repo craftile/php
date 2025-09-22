@@ -3,7 +3,6 @@
 namespace Craftile\Laravel;
 
 use Craftile\Core\Data\BlockData as CoreBlockData;
-use Craftile\Core\Data\PropertyBag;
 
 class BlockData extends CoreBlockData
 {

@@ -14,6 +14,7 @@ class CraftileServiceProvider extends ServiceProvider
 
         $this->app->singleton('craftile', Craftile::class);
         $this->app->singleton(BlockSchemaRegistry::class);
+        $this->app->singleton(PropertyTransformerRegistry::class);
     }
 
     public function boot(): void

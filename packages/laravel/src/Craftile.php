@@ -3,6 +3,7 @@
 namespace Craftile\Laravel;
 
 use Craftile\Core\Data\BlockSchema;
+use Craftile\Laravel\Contracts\PropertyTransformerInterface;
 
 class Craftile
 {
@@ -12,6 +13,7 @@ class Craftile
 
     public function __construct(
         protected BlockSchemaRegistry $schemaRegistry,
+        protected PropertyTransformerRegistry $transformerRegistry,
     ) {}
 
     /**
@@ -48,5 +50,13 @@ class Craftile
     public function getBlockSchema(string $type): ?BlockSchema
     {
         return $this->schemaRegistry->get($type);
+    }
+
+    /**
+     * Register a property transformer for a given type.
+     */
+    public function registerPropertyTransformer(string $type, PropertyTransformerInterface|callable $transformer): void
+    {
+        $this->transformerRegistry->register($type, $transformer);
     }
 }
