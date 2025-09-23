@@ -68,4 +68,14 @@ class Craftile
     {
         $this->transformerRegistry->register($type, $transformer);
     }
+
+    /**
+     * Generate a unique hash-based ID for a child block
+     */
+    public function generateChildId(string $parentId, string $childLocalId): string
+    {
+        $contextHash = substr(hash('sha256', $parentId.'.'.$childLocalId), 0, 8);
+
+        return "{$childLocalId}_{$contextHash}";
+    }
 }

@@ -7,12 +7,12 @@ use Craftile\Laravel\BlockSchemaRegistry;
 
 describe('BlockDiscovery', function () {
     beforeEach(function () {
-        $this->registry = new BlockSchemaRegistry();
+        $this->registry = new BlockSchemaRegistry;
         $this->discovery = new BlockDiscovery($this->registry);
     });
 
     it('discovers and registers block classes', function () {
-        $stubsDir = __DIR__ . '/../../Stubs/Discovery';
+        $stubsDir = __DIR__.'/../../Stubs/Discovery';
 
         $this->discovery->scan('Tests\Stubs\Discovery', $stubsDir);
 
@@ -25,7 +25,7 @@ describe('BlockDiscovery', function () {
     });
 
     it('handles missing directories gracefully', function () {
-        $nonExistentDir = __DIR__ . '/../../Stubs/NonExistent';
+        $nonExistentDir = __DIR__.'/../../Stubs/NonExistent';
 
         $this->discovery->scan('Tests\Stubs\NonExistent', $nonExistentDir);
 

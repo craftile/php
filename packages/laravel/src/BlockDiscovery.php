@@ -33,13 +33,13 @@ class BlockDiscovery
             }
 
             // Get the relative path from the base directory
-            $relativePath = str_replace($directory . DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $relativePath = str_replace($directory.DIRECTORY_SEPARATOR, '', $file->getPathname());
             // Remove .php extension
             $relativePath = str_replace('.php', '', $relativePath);
             // Convert path separators to namespace separators
             $relativePath = str_replace(DIRECTORY_SEPARATOR, '\\', $relativePath);
             // Build the full class name
-            $class = $namespace . '\\' . $relativePath;
+            $class = $namespace.'\\'.$relativePath;
 
             if (! class_exists($class)) {
                 continue;

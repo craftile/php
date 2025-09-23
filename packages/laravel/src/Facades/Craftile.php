@@ -6,7 +6,6 @@ namespace Craftile\Laravel\Facades;
 
 use Craftile\Core\Data\BlockSchema;
 use Craftile\Laravel\Contracts\PropertyTransformerInterface;
-use Craftile\Laravel\PropertyTransformerRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -15,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool inPreview()
  * @method static BlockSchema|null getBlockSchema(string $type)
  * @method static void registerPropertyTransformer(string $type, PropertyTransformerInterface|callable $transformer)
- * @method static PropertyTransformerRegistry getPropertyTransformerRegistry()
+ * @method static string generateChildId(string $parentId, string $childLocalId)
  *
  * @see \Craftile\Laravel\Craftile
  */
