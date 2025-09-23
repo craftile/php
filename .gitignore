@@ -17,3 +17,6 @@ phpstan.neon.dist
 .idea/
 .DS_Store
 Thumbs.db
+
+# Test applications
+app-test/
