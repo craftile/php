@@ -12,5 +12,6 @@ return [
     */
     'preview' => [
         'query_parameter' => '_preview',
+        'view' => 'craftile::preview-script',
     ],
 ];

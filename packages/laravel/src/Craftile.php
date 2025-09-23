@@ -14,7 +14,8 @@ class Craftile
     public function __construct(
         protected BlockSchemaRegistry $schemaRegistry,
         protected PropertyTransformerRegistry $transformerRegistry,
-        protected BlockDiscovery $blockDiscovery
+        protected BlockDiscovery $blockDiscovery,
+        protected PreviewDataCollector $previewDataCollector
     ) {}
 
     /**
@@ -51,6 +52,70 @@ class Craftile
         $parameter = config('craftile.preview.query_parameter', '_preview');
 
         return $this->previewModeCache = request()->has($parameter);
+    }
+
+    /**
+     * Start tracking a region (delegates to PreviewDataCollector).
+     */
+    public function startRegion(string $regionName): void
+    {
+        $this->previewDataCollector->startRegion($regionName);
+    }
+
+    /**
+     * End tracking a region (delegates to PreviewDataCollector).
+     */
+    public function endRegion(string $regionName): void
+    {
+        $this->previewDataCollector->endRegion($regionName);
+    }
+
+    /**
+     * Start tracking a block (delegates to PreviewDataCollector).
+     */
+    public function startBlock(string $blockId, $blockContext): void
+    {
+        $this->previewDataCollector->startBlock($blockId, $blockContext);
+    }
+
+    /**
+     * End tracking a block (delegates to PreviewDataCollector).
+     */
+    public function endBlock(string $blockId): void
+    {
+        $this->previewDataCollector->endBlock($blockId);
+    }
+
+    /**
+     * Start tracking content region (page-specific content).
+     */
+    public function startContent(): void
+    {
+        $this->previewDataCollector->startContent();
+    }
+
+    /**
+     * End tracking content region (page-specific content).
+     */
+    public function endContent(): void
+    {
+        $this->previewDataCollector->endContent();
+    }
+
+    /**
+     * Mark the start of main content area.
+     */
+    public function beforeContent(): void
+    {
+        $this->previewDataCollector->beforeContent();
+    }
+
+    /**
+     * Mark the end of main content area.
+     */
+    public function afterContent(): void
+    {
+        $this->previewDataCollector->afterContent();
     }
 
     /**

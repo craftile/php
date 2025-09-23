@@ -36,7 +36,8 @@
                 "Craftile\\Laravel\\CraftileServiceProvider"
             ],
             "aliases": {
-                "Craftile": "Craftile\\Laravel\\Facades\\Craftile"
+                "Craftile": "Craftile\\Laravel\\Facades\\Craftile",
+                "BlockDatastore": "Craftile\\Laravel\\Facades\\BlockDatastore"
             }
         }
     },
