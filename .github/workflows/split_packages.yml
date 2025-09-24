@@ -3,11 +3,8 @@ name: Split Packages
 on:
   push:
     branches: [ main ]
-  release:
-    types: [ released ]
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    tags:
+      - "*"
 
 jobs:
   split_packages:
@@ -29,15 +26,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - id: previous-tag
+        uses: 'WyriHaximus/github-action-get-previous-tag@master'
+
       - name: Split ${{ matrix.package.split_repository }}
         uses: danharrin/monorepo-split-github-action@v2.3.0
         with:
           package_directory: ${{ matrix.package.local_path }}
           repository_organization: 'craftile'
           repository_name: ${{ matrix.package.split_repository }}
-          user_name: "craftile"
-          user_email: "hello@craftile.com"
-          branch: ${{ github.ref_name }}
-          tag: ${{ github.event.release.tag_name }}
+          user_name: "GitHub Action"
+          user_email: "action@github.com"
+          branch: main
+          tag: ${{ steps.previous-tag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
