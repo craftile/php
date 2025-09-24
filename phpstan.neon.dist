@@ -1,0 +1,15 @@
+parameters:
+    level: 5
+    paths:
+        - packages/core/src
+        - packages/laravel/src
+
+    bootstrapFiles:
+        - vendor/autoload.php
+
+    excludePaths:
+        - packages/*/tests/*
+        - packages/*/vendor/*
+
+    tmpDir: .phpstan
+    treatPhpDocTypesAsCertain: false

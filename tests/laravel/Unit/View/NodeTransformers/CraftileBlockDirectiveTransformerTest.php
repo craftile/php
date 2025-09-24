@@ -15,7 +15,7 @@ beforeEach(function () {
 
 function createMockDirectiveNode(string $directive, array $args = []): DirectiveNode
 {
-    $node = new DirectiveNode();
+    $node = new DirectiveNode;
     $node->content = $directive;
     $node->arguments = null;
 
@@ -29,7 +29,7 @@ function createMockDirectiveNode(string $directive, array $args = []): Directive
 }
 
 test('supports configured craftile block directive variants', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     // Test all variants
     expect($transformer->supports(createMockDirectiveNode('craftileBlock')))->toBeTrue();
@@ -38,7 +38,7 @@ test('supports configured craftile block directive variants', function () {
 });
 
 test('does not support non-craftile directives', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     expect($transformer->supports(createMockDirectiveNode('section')))->toBeFalse();
     expect($transformer->supports(createMockDirectiveNode('yield')))->toBeFalse();
@@ -48,7 +48,7 @@ test('does not support non-craftile directives', function () {
 test('supports custom configured directive name', function () {
     config(['craftile.directives.craftileBlock' => 'builderBlock']);
 
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     expect($transformer->supports(createMockDirectiveNode('builderBlock')))->toBeTrue();
     expect($transformer->supports(createMockDirectiveNode('builderblock')))->toBeTrue();
@@ -56,9 +56,8 @@ test('supports custom configured directive name', function () {
     expect($transformer->supports(createMockDirectiveNode('craftileBlock')))->toBeFalse();
 });
 
-
 test('can parse arguments from directive node', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"', '[]']);
 
@@ -68,7 +67,7 @@ test('can parse arguments from directive node', function () {
 });
 
 test('handles nodes without arguments', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     $nodeNoArgs = createMockDirectiveNode('craftileBlock');
 
@@ -77,7 +76,7 @@ test('handles nodes without arguments', function () {
 });
 
 test('can extract directive content', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     $node = createMockDirectiveNode('craftileBlock');
 
@@ -85,7 +84,7 @@ test('can extract directive content', function () {
 });
 
 test('directive transformer implements node transformer interface', function () {
-    $transformer = new CraftileBlockDirectiveTransformer();
+    $transformer = new CraftileBlockDirectiveTransformer;
 
     expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
 });

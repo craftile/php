@@ -14,23 +14,6 @@ Install dependencies:
 composer install
 ```
 
-## Monorepo Commands
-
-Merge package dependencies to root:
-```bash
-vendor/bin/monorepo-builder merge
-```
-
-Validate package versions:
-```bash
-vendor/bin/monorepo-builder validate
-```
-
-Propagate dependencies to packages:
-```bash
-vendor/bin/monorepo-builder propagate
-```
-
 ## Package Structure
 
 ```
@@ -53,7 +36,7 @@ vendor/bin/monorepo-builder propagate
 
 This monorepo automatically splits packages into separate repositories:
 
-- **craftile/core** → [craftile/core](https://github.com/craftile/core)
+- **craftile/core** → [craftile/core](https://github.com/craftile/core-php)
 - **craftile/laravel** → [craftile/laravel](https://github.com/craftile/laravel)
 
 Each package can be installed independently:
@@ -62,21 +45,3 @@ Each package can be installed independently:
 composer require craftile/core
 composer require craftile/laravel
 ```
-
-### Setup Split Repositories
-
-1. Create the target repositories on GitHub:
-   - `craftile/core`
-   - `craftile/laravel`
-
-2. Create a Personal Access Token with repo permissions:
-   - Go to GitHub Settings → Developer settings → Personal access tokens
-   - Generate new token with `repo` scope
-
-3. Add the token as a repository secret:
-   - Go to repository Settings → Secrets and variables → Actions
-   - Add new secret named `ACCESS_TOKEN` with your token value
-
-The workflow will automatically run on:
-- Push to `main` branch
-- New releases

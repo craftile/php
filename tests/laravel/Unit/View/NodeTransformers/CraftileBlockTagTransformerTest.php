@@ -12,13 +12,13 @@ beforeEach(function () {
 
 function createMockComponentNode(string $prefix, string $tagName, array $parameters = []): ComponentNode
 {
-    $node = new ComponentNode();
+    $node = new ComponentNode;
     $node->componentPrefix = $prefix;
     $node->tagName = $tagName;
     $node->parameters = [];
 
     foreach ($parameters as $name => $value) {
-        $param = new ParameterNode();
+        $param = new ParameterNode;
         $param->name = $name;
         $param->value = $value;
         $node->parameters[] = $param;
@@ -28,7 +28,7 @@ function createMockComponentNode(string $prefix, string $tagName, array $paramet
 }
 
 test('supports craftile block component tags', function () {
-    $transformer = new CraftileBlockTagTransformer();
+    $transformer = new CraftileBlockTagTransformer;
 
     expect($transformer->supports(createMockComponentNode('craftile', 'block')))->toBeTrue();
     expect($transformer->supports(createMockComponentNode('other', 'block')))->toBeFalse();
@@ -38,21 +38,21 @@ test('supports craftile block component tags', function () {
 test('uses custom configured component namespace', function () {
     config(['craftile.components.namespace' => 'builder']);
 
-    $transformer = new CraftileBlockTagTransformer();
+    $transformer = new CraftileBlockTagTransformer;
 
     expect($transformer->supports(createMockComponentNode('builder', 'block')))->toBeTrue();
     expect($transformer->supports(createMockComponentNode('craftile', 'block')))->toBeFalse();
 });
 
 test('implements node transformer interface', function () {
-    $transformer = new CraftileBlockTagTransformer();
+    $transformer = new CraftileBlockTagTransformer;
 
     expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
 });
 
 test('returns original node for non-component nodes', function () {
-    $transformer = new CraftileBlockTagTransformer();
-    $nonComponentNode = new \Stillat\BladeParser\Nodes\DirectiveNode();
+    $transformer = new CraftileBlockTagTransformer;
+    $nonComponentNode = new \Stillat\BladeParser\Nodes\DirectiveNode;
 
     $result = $transformer->transform($nonComponentNode, null);
 
@@ -74,7 +74,7 @@ test('can access component parameters', function () {
 });
 
 test('handles block component without closing tag', function () {
-    $transformer = new CraftileBlockTagTransformer();
+    $transformer = new CraftileBlockTagTransformer;
     $node = createMockComponentNode('craftile', 'block');
     $node->isClosingTag = false;
 
@@ -82,7 +82,7 @@ test('handles block component without closing tag', function () {
 });
 
 test('handles empty parameter list', function () {
-    $transformer = new CraftileBlockTagTransformer();
+    $transformer = new CraftileBlockTagTransformer;
     $node = createMockComponentNode('craftile', 'block');
 
     expect($transformer->supports($node))->toBeTrue();

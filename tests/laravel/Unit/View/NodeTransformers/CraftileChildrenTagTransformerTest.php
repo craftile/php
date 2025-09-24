@@ -8,13 +8,13 @@ use Stillat\BladeParser\Nodes\Position;
 
 function createMockChildrenComponentNode(string $prefix, array $parameters = []): ComponentNode
 {
-    $node = new ComponentNode();
+    $node = new ComponentNode;
     $node->componentPrefix = $prefix;
     $node->tagName = 'children';
     $node->parameters = [];
 
     foreach ($parameters as $name => $value) {
-        $param = new ParameterNode();
+        $param = new ParameterNode;
         $param->name = $name;
         $param->value = $value;
         $node->parameters[] = $param;
@@ -24,7 +24,7 @@ function createMockChildrenComponentNode(string $prefix, array $parameters = [])
 }
 
 test('supports craftile children component tags', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     $node = createMockChildrenComponentNode('craftile');
 
@@ -32,7 +32,7 @@ test('supports craftile children component tags', function () {
 });
 
 test('does not support non-craftile component tags', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     $node = createMockChildrenComponentNode('other');
 
@@ -40,9 +40,9 @@ test('does not support non-craftile component tags', function () {
 });
 
 test('does not support non-children tags', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
-    $node = new ComponentNode();
+    $node = new ComponentNode;
     $node->componentPrefix = 'craftile';
     $node->tagName = 'block';
 
@@ -52,7 +52,7 @@ test('does not support non-children tags', function () {
 test('uses custom configured component namespace', function () {
     config(['craftile.components.namespace' => 'custom']);
 
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     $craftileNode = createMockChildrenComponentNode('craftile');
     $customNode = createMockChildrenComponentNode('custom');
@@ -65,7 +65,7 @@ test('uses custom configured component namespace', function () {
 });
 
 test('transforms children tag to PHP code', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     $node = createMockChildrenComponentNode('craftile');
     $result = $transformer->transform($node, null);
@@ -76,12 +76,12 @@ test('transforms children tag to PHP code', function () {
 });
 
 test('throws error when children tag has parameters', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     $node = createMockChildrenComponentNode('craftile', ['invalid' => 'parameter']);
 
     // Mock the position property that HandlesErrors trait expects
-    $position = new Position();
+    $position = new Position;
     $position->startLine = 1;
     $node->position = $position;
 
@@ -90,7 +90,7 @@ test('throws error when children tag has parameters', function () {
 });
 
 test('children transformer implements node transformer interface', function () {
-    $transformer = new CraftileChildrenTagTransformer();
+    $transformer = new CraftileChildrenTagTransformer;
 
     expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
 });

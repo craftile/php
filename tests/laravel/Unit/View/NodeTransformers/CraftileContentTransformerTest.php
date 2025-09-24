@@ -18,7 +18,7 @@ beforeEach(function () {
 
 function createContentDirectiveNode(string $directive): DirectiveNode
 {
-    $node = new DirectiveNode();
+    $node = new DirectiveNode;
     $node->content = $directive;
 
     return $node;
@@ -26,7 +26,7 @@ function createContentDirectiveNode(string $directive): DirectiveNode
 
 function createContentComponentNode(string $prefix, string $tagName, bool $isClosing = false): ComponentNode
 {
-    $node = new ComponentNode();
+    $node = new ComponentNode;
     $node->componentPrefix = $prefix;
     $node->tagName = $tagName;
     $node->isClosingTag = $isClosing;
@@ -36,7 +36,7 @@ function createContentComponentNode(string $prefix, string $tagName, bool $isClo
 }
 
 test('supports layout content directive variants', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentDirectiveNode('craftileLayoutContent')))->toBeTrue();
     expect($transformer->supports(createContentDirectiveNode('craftile_layout_content')))->toBeTrue();
@@ -44,7 +44,7 @@ test('supports layout content directive variants', function () {
 });
 
 test('supports layout content component tags', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentComponentNode('craftile', 'layout-content')))->toBeTrue();
     expect($transformer->supports(createContentComponentNode('craftile', 'layoutcontent')))->toBeTrue();
@@ -52,7 +52,7 @@ test('supports layout content component tags', function () {
 });
 
 test('supports content directive variants', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentDirectiveNode('craftileContent')))->toBeTrue();
     expect($transformer->supports(createContentDirectiveNode('craftilecontent')))->toBeTrue();
@@ -60,7 +60,7 @@ test('supports content directive variants', function () {
 });
 
 test('supports content component tags', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentComponentNode('craftile', 'content')))->toBeTrue();
     expect($transformer->supports(createContentComponentNode('craftile', 'content', true)))->toBeTrue(); // closing tag
@@ -68,7 +68,7 @@ test('supports content component tags', function () {
 });
 
 test('supports end content directive variants', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentDirectiveNode('endCraftileContent')))->toBeTrue();      // camelCase
     expect($transformer->supports(createContentDirectiveNode('EndCraftileContent')))->toBeTrue();      // PascalCase
@@ -77,7 +77,7 @@ test('supports end content directive variants', function () {
 });
 
 test('does not support unrelated directives', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentDirectiveNode('section')))->toBeFalse();
     expect($transformer->supports(createContentDirectiveNode('yield')))->toBeFalse();
@@ -85,7 +85,7 @@ test('does not support unrelated directives', function () {
 });
 
 test('transforms layout content directive correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentDirectiveNode('craftileLayoutContent');
 
     $result = $transformer->transform($node, null);
@@ -96,7 +96,7 @@ test('transforms layout content directive correctly', function () {
 });
 
 test('transforms layout content tag correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentComponentNode('craftile', 'layout-content');
 
     $result = $transformer->transform($node, null);
@@ -105,7 +105,7 @@ test('transforms layout content tag correctly', function () {
 });
 
 test('transforms content directive correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentDirectiveNode('craftileContent');
 
     $result = $transformer->transform($node, null);
@@ -114,7 +114,7 @@ test('transforms content directive correctly', function () {
 });
 
 test('transforms content tag correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentComponentNode('craftile', 'content');
 
     $result = $transformer->transform($node, null);
@@ -123,7 +123,7 @@ test('transforms content tag correctly', function () {
 });
 
 test('transforms end content directive correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentDirectiveNode('endCraftileContent');
 
     $result = $transformer->transform($node, null);
@@ -132,7 +132,7 @@ test('transforms end content directive correctly', function () {
 });
 
 test('transforms end content tag correctly', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $node = createContentComponentNode('craftile', 'content', true);
 
     $result = $transformer->transform($node, null);
@@ -143,7 +143,7 @@ test('transforms end content tag correctly', function () {
 test('uses custom configured component namespace', function () {
     config(['craftile.components.namespace' => 'custom']);
 
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentComponentNode('custom', 'content')))->toBeTrue();
     expect($transformer->supports(createContentComponentNode('craftile', 'content')))->toBeFalse();
@@ -155,16 +155,15 @@ test('uses custom configured directive names', function () {
         'craftile.directives.craftileLayoutContent' => 'builderLayoutContent',
     ]);
 
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
 
     expect($transformer->supports(createContentDirectiveNode('builderContent')))->toBeTrue();
     expect($transformer->supports(createContentDirectiveNode('builderLayoutContent')))->toBeTrue();
     expect($transformer->supports(createContentDirectiveNode('craftileContent')))->toBeFalse();
 });
 
-
 test('returns original node for unsupported nodes', function () {
-    $transformer = new CraftileContentTransformer();
+    $transformer = new CraftileContentTransformer;
     $unsupportedNode = createContentDirectiveNode('section');
 
     $result = $transformer->transform($unsupportedNode, null);

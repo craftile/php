@@ -213,15 +213,15 @@ test('handles order-only format', function () {
             'header' => [
                 'id' => 'header',
                 'type' => 'test',
-                'properties' => ['content' => 'Header']
+                'properties' => ['content' => 'Header'],
             ],
             'footer' => [
                 'id' => 'footer',
                 'type' => 'test',
-                'properties' => ['content' => 'Footer']
-            ]
+                'properties' => ['content' => 'Footer'],
+            ],
         ],
-        'order' => ['header', 'footer']
+        'order' => ['header', 'footer'],
     ];
 
     $compiled = $this->compiler->compileTemplateData($templateData);
@@ -238,14 +238,14 @@ test('handles blocks-only format with auto-computed order', function () {
             'header' => [
                 'id' => 'header',
                 'type' => 'test',
-                'properties' => ['content' => 'Header']
+                'properties' => ['content' => 'Header'],
             ],
             'description' => [
                 'id' => 'description',
                 'type' => 'test',
-                'properties' => ['content' => 'Description']
-            ]
-        ]
+                'properties' => ['content' => 'Description'],
+            ],
+        ],
         // No order or regions - should auto-compute from block keys
     ];
 

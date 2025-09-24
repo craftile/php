@@ -21,7 +21,7 @@ class TestHandlesLiterals
 }
 
 beforeEach(function () {
-    $this->handler = new TestHandlesLiterals();
+    $this->handler = new TestHandlesLiterals;
 });
 
 test('creates literal node with content', function () {
