@@ -19,7 +19,7 @@ jobs:
       matrix:
         package:
           - local_path: 'packages/core'
-            split_repository: 'core'
+            split_repository: 'core-php'
           - local_path: 'packages/laravel'
             split_repository: 'laravel'
 

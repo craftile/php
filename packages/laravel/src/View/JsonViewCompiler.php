@@ -106,7 +106,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
             $regionsCode = implode('', $regionsCodes);
 
             // Combine static blocks map with compiled regions
-            return $staticBlocksMapCode."\n".$regionsCode;
+            return $staticBlocksMapCode . "\n" . $regionsCode;
         } catch (Throwable $e) {
             throw new JsonViewException("Template compilation failed: {$e->getMessage()}", '', 0, $e);
         }
@@ -163,7 +163,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
             }
             $regionsCode = implode('', $regionsCodes);
 
-            return "<?php \\Craftile\\Laravel\\Facades\\BlockDatastore::loadFile(\"$path\"); ?>\n".$staticBlocksMapCode."\n".$regionsCode;
+            return "<?php \\Craftile\\Laravel\\Facades\\BlockDatastore::loadFile(\"$path\"); ?>\n" . $staticBlocksMapCode . "\n" . $regionsCode;
         } catch (JsonViewException $e) {
             throw $e;
         } catch (Throwable $e) {
@@ -259,7 +259,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
     protected function compileBlock($blockData, $template, $path): string
     {
         $hash = hash('xxh128', $blockData['id']);
-        $blockDataVar = '$__blockData'.$hash;
+        $blockDataVar = '$__blockData' . $hash;
 
         return <<<PHP
         <?php $blockDataVar = \\Craftile\\Laravel\\Facades\\BlockDatastore::getBlock("{$blockData['id']}"); ?>
@@ -269,7 +269,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
         } ?>
 
 
-        {$this->generateCodeForRenderingBlock($blockData, $hash, $template, $path)}
+        {$this->generateCodeForRenderingBlock($blockData,$hash,$template,$path)}
 
         <?php if (craftile()->inPreview()) {
             craftile()->endBlock("{$blockData['id']}");
@@ -324,7 +324,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
             $compiledBlock = $compiler->compile($blockData['type'], $hash, $childrenClosureCode);
 
             if (! empty($childrenClosureCode)) {
-                $closureVar = '$__children'.$hash;
+                $closureVar = '$__children' . $hash;
                 $compiledBlock .= "\n<?php unset({$closureVar}); ?>";
             }
 
@@ -350,30 +350,54 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
      */
     protected function normalizeTemplate(array $templateData): array
     {
-        // Check if template contains nested block structures
+        $normalized = $this->normalizeTemplateFormat($templateData);
+
         $flattener = app(BlockFlattener::class);
-        if ($flattener->hasNestedStructure($templateData)) {
-            $flattened = $flattener->flattenNestedStructure($templateData);
-
+        if ($flattener->hasNestedStructure($normalized)) {
+            $flattened = $flattener->flattenNestedStructure($normalized);
             unset($flattened['_idMappings']);
-
             return $flattened;
         }
 
-        // Single-region format: { "name": "header", "order": [...] }
-        if (isset($templateData['name']) && isset($templateData['order'])) {
-            return [
-                'blocks' => $templateData['blocks'] ?? [],
-                'regions' => [
-                    [
-                        'name' => $templateData['name'],
-                        'blocks' => $templateData['order'],
-                    ],
-                ],
-            ];
+        return $normalized;
+    }
+
+    /**
+     * Normalize template format to standard structure.
+     */
+    protected function normalizeTemplateFormat(array $templateData): array
+    {
+        if (isset($templateData['regions'])) {
+            return $templateData;
         }
 
-        return $templateData;
+        $blocks = $templateData['blocks'] ?? [];
+
+        // Determine region name and block order based on template format
+        $regionName = match (true) {
+            isset($templateData['name']) => $templateData['name'],
+            default => 'main'
+        };
+
+        $blockOrder = match (true) {
+            isset($templateData['order']) => $templateData['order'],
+            !empty($blocks) => array_keys($blocks),
+            default => []
+        };
+
+        if (empty($blocks) && empty($blockOrder) && !isset($templateData['name']) && !isset($templateData['order'])) {
+            return ['blocks' => [], 'regions' => []];
+        }
+
+        return [
+            'blocks' => $blocks,
+            'regions' => [
+                [
+                    'name' => $regionName,
+                    'blocks' => $blockOrder,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -390,7 +414,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
             $contents .= ' ?>';
         }
 
-        return $contents."<?php /**PATH {$path} ENDPATH**/ ?>";
+        return $contents . "<?php /**PATH {$path} ENDPATH**/ ?>";
     }
 
     /**
