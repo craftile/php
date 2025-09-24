@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Stubs\Discovery\Content;
+namespace Tests\Laravel\Stubs\Discovery\Content;
 
 use Craftile\Core\Concerns\IsBlock;
 use Craftile\Core\Contracts\BlockInterface;

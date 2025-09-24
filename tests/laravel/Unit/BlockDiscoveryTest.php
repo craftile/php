@@ -12,9 +12,9 @@ describe('BlockDiscovery', function () {
     });
 
     it('discovers and registers block classes', function () {
-        $stubsDir = __DIR__.'/../../Stubs/Discovery';
+        $stubsDir = __DIR__.'/../Stubs/Discovery';
 
-        $this->discovery->scan('Tests\Stubs\Discovery', $stubsDir);
+        $this->discovery->scan('Tests\Laravel\Stubs\Discovery', $stubsDir);
 
         // Should find all block classes (including subdirectory)
         expect($this->registry->hasSchema('stub-test-block'))->toBeTrue();

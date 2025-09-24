@@ -32,7 +32,11 @@ jobs:
       - name: Install dependencies
         run: |
           composer install --no-interaction
-          composer update --prefer-dist --no-interaction
+
+      - name: Check composer autoload and class_exists
+        run: |
+          php -r 'require "vendor/autoload.php"; printf("class_exists: %s\n", (int)class_exists("Tests\\\\Core\\\\TestCase"));'
+
 
       - name: Run tests
-        run: vendor/bin/pest --ci
+        run: vendor/bin/pest --ci tests
