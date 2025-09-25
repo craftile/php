@@ -45,6 +45,12 @@ class CraftileServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'craftile');
 
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/craftile.php' => config_path('craftile.php'),
+            ], 'craftile-config');
+        }
+
         $this->bootBladeExtensions();
         $this->bootRegisterBladeComponentBlocks();
         $this->bootAutoDiscovery();
