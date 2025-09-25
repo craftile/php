@@ -1,4 +1,13 @@
-# 0.1.0 (2025-09-24)
+# [0.2.0](https://github.com/craftile/php/compare/v0.1.0...v0.2.0) (2025-09-25)
+
+
+### Features
+
+* add BladeComponentBlockCompiler for Laravel component integration ([c3f3c2b](https://github.com/craftile/php/commit/c3f3c2b97b2d716fe8c7df11d5413b57255ab24e))
+
+
+
+# [0.1.0](https://github.com/craftile/php/compare/69e93be5b9483e8b941b3819301d316c11b741f8...v0.1.0) (2025-09-24)
 
 
 ### Bug Fixes
