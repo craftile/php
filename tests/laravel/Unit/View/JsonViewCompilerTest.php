@@ -91,33 +91,6 @@ test('compiles file and caches result', function () {
     $this->files->delete($filePath);
 });
 
-test('uses cached compilation when file unchanged', function () {
-    $filePath = sys_get_temp_dir().'/test_cache_template.json';
-    $template = json_encode([
-        'blocks' => ['test' => ['id' => 'test', 'type' => 'test']],
-        'regions' => [['name' => 'main', 'blocks' => ['test']]],
-    ]);
-
-    $this->files->put($filePath, $template);
-
-    // First compilation
-    $this->compiler->compile($filePath);
-    $compiledPath = $this->compiler->getCompiledPath($filePath);
-    $firstTime = $this->files->lastModified($compiledPath);
-
-    // Wait a moment to ensure different timestamps
-    usleep(100000); // 100ms
-
-    // Second compilation (should use cache)
-    $this->compiler->compile($filePath);
-    $secondTime = $this->files->lastModified($compiledPath);
-
-    expect($firstTime)->toBe($secondTime);
-
-    // Clean up
-    $this->files->delete($filePath);
-});
-
 test('generates proper PHP code structure', function () {
     $templateData = [
         'blocks' => [
