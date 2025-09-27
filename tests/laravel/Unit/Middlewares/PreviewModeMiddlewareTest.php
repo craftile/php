@@ -1,13 +1,13 @@
 <?php
 
-use Craftile\Laravel\Middlewares\PreviewModeMiddleware;
+use Craftile\Laravel\Middlewares\PreviewScriptMiddleware;
 use Craftile\Laravel\PreviewDataCollector;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 test('injects preview scripts when in preview mode', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     // Mock a request with preview mode
     $request = Request::create('/test', 'GET', ['_preview' => 'true']);
@@ -29,7 +29,7 @@ test('injects preview scripts when in preview mode', function () {
 
 test('does not inject scripts when not in preview mode', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     $request = Request::create('/test', 'GET');
     $this->app->instance('request', $request);
@@ -47,7 +47,7 @@ test('does not inject scripts when not in preview mode', function () {
 
 test('does not inject scripts for non-html responses', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     $request = Request::create('/test', 'GET', ['_preview' => 'true']);
     $this->app->instance('request', $request);
@@ -65,7 +65,7 @@ test('does not inject scripts for non-html responses', function () {
 
 test('does not inject scripts when no body tag present', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     $request = Request::create('/test', 'GET', ['_preview' => 'true']);
     $this->app->instance('request', $request);
@@ -83,7 +83,7 @@ test('does not inject scripts when no body tag present', function () {
 
 test('includes page data in injected scripts', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     $collector->startRegion('content');
     $collector->endRegion('content');
@@ -108,7 +108,7 @@ test('includes page data in injected scripts', function () {
 
 test('handles empty response content gracefully', function () {
     $collector = app(PreviewDataCollector::class);
-    $middleware = new PreviewModeMiddleware($collector);
+    $middleware = new PreviewScriptMiddleware($collector);
 
     $request = Request::create('/test', 'GET', ['_preview' => 'true']);
     $this->app->instance('request', $request);
