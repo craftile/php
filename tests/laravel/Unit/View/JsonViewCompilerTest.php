@@ -53,7 +53,7 @@ test('can compile simple template data', function () {
         ],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('craftile');
@@ -105,7 +105,7 @@ test('generates proper PHP code structure', function () {
         ],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     // Should contain PHP opening tag
     expect($compiled)->toContain('<?php');
@@ -122,7 +122,7 @@ test('generates proper PHP code structure', function () {
 test('handles empty template data', function () {
     $templateData = [];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toBeString();
     expect($compiled)->toContain('// Empty template');
@@ -135,7 +135,7 @@ test('handles template with no regions (now auto-creates main region)', function
         ],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('startRegion');
@@ -150,7 +150,7 @@ test('handles template with empty regions', function () {
         ],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('startRegion');
     expect($compiled)->toContain('endRegion');
@@ -174,7 +174,7 @@ test('handles blocks with properties', function () {
         ],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('$__blockData');
@@ -197,7 +197,7 @@ test('handles order-only format', function () {
         'order' => ['header', 'footer'],
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('startRegion');
@@ -222,7 +222,7 @@ test('handles blocks-only format with auto-computed order', function () {
         // No order or regions - should auto-compute from block keys
     ];
 
-    $compiled = $this->compiler->compileTemplateData($templateData);
+    $compiled = $this->compiler->compileTemplate($templateData);
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('startRegion');
