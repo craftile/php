@@ -231,3 +231,111 @@ test('handles blocks-only format with auto-computed order', function () {
     expect($compiled)->toContain('"header"'); // Should include header block
     expect($compiled)->toContain('"description"'); // Should include description block
 });
+
+test('invalidates parent cache when child block changes', function () {
+    $cacheManager = $this->app[BlockCacheManager::class];
+
+    // Create initial template with original content
+    $template = [
+        'blocks' => [
+            'header' => ['id' => 'header', 'type' => 'test', 'properties' => ['content' => 'Header'], 'children' => ['nav']],
+            'nav' => ['id' => 'nav', 'type' => 'test', 'properties' => ['content' => 'Nav'], 'parentId' => 'header', 'children' => ['menu']],
+            'menu' => ['id' => 'menu', 'type' => 'test', 'properties' => ['content' => 'Menu'], 'parentId' => 'nav', 'children' => ['item1']],
+            'item1' => ['id' => 'item1', 'type' => 'test', 'properties' => ['content' => 'Original Item'], 'parentId' => 'menu'],
+        ],
+    ];
+
+    // Cache all original blocks
+    foreach ($template['blocks'] as $blockData) {
+        $hash = $cacheManager->getCacheKey($blockData);
+        $cacheManager->put($hash, 'cached content');
+        expect($cacheManager->exists($hash))->toBeTrue();
+    }
+
+    // Store original cache keys
+    $originalHeaderKey = $cacheManager->getCacheKey($template['blocks']['header']);
+    $originalNavKey = $cacheManager->getCacheKey($template['blocks']['nav']);
+    $originalMenuKey = $cacheManager->getCacheKey($template['blocks']['menu']);
+    $originalItem1Key = $cacheManager->getCacheKey($template['blocks']['item1']);
+
+    // Now change item1 content - this creates a new cache key naturally
+    $template['blocks']['item1']['properties']['content'] = 'Updated Item';
+    $newItem1Key = $cacheManager->getCacheKey($template['blocks']['item1']);
+
+    // Verify the cache key actually changed
+    expect($newItem1Key)->not->toBe($originalItem1Key);
+    // New cache key has no cache (this makes it a "changed block")
+    expect($cacheManager->exists($newItem1Key))->toBeFalse();
+
+    // Use reflection to test invalidation directly
+    $reflection = new ReflectionClass($this->compiler);
+    $invalidateStaleBlockCaches = $reflection->getMethod('invalidateStaleBlockCaches');
+    $invalidateStaleBlockCaches->setAccessible(true);
+
+    // This should detect item1 as changed (new hash, no cache) and invalidate ancestors
+    $invalidateStaleBlockCaches->invoke($this->compiler, $template);
+
+    // Check that ancestors were invalidated (original caches should be gone)
+    expect($cacheManager->exists($originalHeaderKey))->toBeFalse();
+    expect($cacheManager->exists($originalNavKey))->toBeFalse();
+    expect($cacheManager->exists($originalMenuKey))->toBeFalse();
+    expect($cacheManager->exists($originalItem1Key))->toBeFalse(); // Original cache flushed (changed block gets all versions deleted)
+    expect($cacheManager->exists($newItem1Key))->toBeFalse(); // New item1 has no cache yet
+});
+
+test('finds changed blocks correctly', function () {
+    $compiler = new JsonViewCompiler(
+        $this->app['files'],
+        $this->app['config']['view.compiled'],
+        $this->app['blade.compiler'],
+        $this->app[BlockCacheManager::class]
+    );
+
+    $template = [
+        'blocks' => [
+            'block1' => ['id' => 'block1', 'type' => 'test', 'properties' => ['content' => 'Block 1']],
+            'block2' => ['id' => 'block2', 'type' => 'test', 'properties' => ['content' => 'Block 2']],
+        ],
+    ];
+
+    // Use reflection to access protected method
+    $reflection = new ReflectionClass($compiler);
+    $findChangedBlocks = $reflection->getMethod('findChangedBlocks');
+    $findChangedBlocks->setAccessible(true);
+
+    // Initially, no blocks are cached, so both should be "changed"
+    $changedBlocks = $findChangedBlocks->invoke($compiler, $template);
+
+    expect($changedBlocks)->toContain('block1');
+    expect($changedBlocks)->toContain('block2');
+    expect($changedBlocks)->toHaveCount(2);
+});
+
+test('finds ancestors correctly using parent chain', function () {
+    $compiler = new JsonViewCompiler(
+        $this->app['files'],
+        $this->app['config']['view.compiled'],
+        $this->app['blade.compiler'],
+        $this->app[BlockCacheManager::class]
+    );
+
+    $template = [
+        'blocks' => [
+            'grandparent' => ['id' => 'grandparent', 'type' => 'test'],
+            'parent' => ['id' => 'parent', 'type' => 'test', 'parentId' => 'grandparent'],
+            'child' => ['id' => 'child', 'type' => 'test', 'parentId' => 'parent'],
+        ],
+    ];
+
+    // Use reflection to access protected methods
+    $reflection = new ReflectionClass($compiler);
+    $findBlocksAndAncestors = $reflection->getMethod('findBlocksAndAncestors');
+    $findBlocksAndAncestors->setAccessible(true);
+
+    $blocksToInvalidate = $findBlocksAndAncestors->invoke($compiler, ['child'], $template);
+
+    expect($blocksToInvalidate)->toContain('child');      // The changed block itself
+    expect($blocksToInvalidate)->toContain('parent');     // Immediate parent
+    expect($blocksToInvalidate)->toContain('grandparent'); // Grandparent
+    expect($blocksToInvalidate)->toHaveCount(3);
+});

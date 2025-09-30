@@ -100,6 +100,9 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
         if (empty($template['regions'])) {
             return "<?php // Empty template ?>\n";
         }
+
+        $this->invalidateStaleBlockCaches($template);
+
         $staticBlocksChildren = $this->collectStaticBlockChildren($template, $path);
         $staticBlocksMapCode = $this->generateStaticBlocksMapCode($staticBlocksChildren);
 
@@ -132,6 +135,60 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
         $regionsCode = implode('', $regionsCodes);
 
         return $staticBlocksMapCode."\n".$regionsCode;
+    }
+
+    /**
+     * Invalidate caches for blocks that have changed and all their ancestors.
+     */
+    protected function invalidateStaleBlockCaches(array $template): void
+    {
+        $changedBlocks = $this->findChangedBlocks($template);
+        $blocksToInvalidate = $this->findBlocksAndAncestors($changedBlocks, $template);
+
+        foreach ($blocksToInvalidate as $blockId) {
+            // Flush all cache versions for this block (solves rollback issue)
+            $this->cacheManager->flushBlock($blockId);
+        }
+    }
+
+    /**
+     * Find all blocks that have changed (cache miss).
+     */
+    protected function findChangedBlocks(array $template): array
+    {
+        $changedBlocks = [];
+
+        foreach ($template['blocks'] as $blockData) {
+            $cacheKey = $this->cacheManager->getCacheKey($blockData);
+            if (! $this->cacheManager->exists($cacheKey)) {
+                $changedBlocks[] = $blockData['id'];
+            }
+        }
+
+        return $changedBlocks;
+    }
+
+    /**
+     * Find all blocks and their ancestors that need recompilation.
+     */
+    protected function findBlocksAndAncestors(array $changedBlocks, array $template): array
+    {
+        $blocksToInvalidate = [];
+
+        foreach ($changedBlocks as $blockId) {
+            // Add the changed block itself
+            $blocksToInvalidate[] = $blockId;
+
+            // Follow parent chain to add all ancestors
+            $currentBlockId = $blockId;
+            while (isset($template['blocks'][$currentBlockId]['parentId']) && $template['blocks'][$currentBlockId]['parentId']) {
+                $parentId = $template['blocks'][$currentBlockId]['parentId'];
+                $blocksToInvalidate[] = $parentId;
+                $currentBlockId = $parentId;
+            }
+        }
+
+        return array_unique($blocksToInvalidate);
     }
 
     /**
@@ -204,17 +261,17 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
      */
     protected function compileBlockSelectively($blockData, $template, $path): string
     {
-        $blockHash = $this->cacheManager->generateHash($blockData);
+        $cacheKey = $this->cacheManager->getCacheKey($blockData);
 
-        if ($this->cacheManager->exists($blockHash)) {
-            return $this->cacheManager->get($blockHash);
+        if ($this->cacheManager->exists($cacheKey)) {
+            return $this->cacheManager->get($cacheKey);
         }
 
         $bladeTemplate = $this->compileBlock($blockData, $template, $path);
 
         $fullyCompiledBlock = $this->blade->compileString($bladeTemplate);
 
-        $this->cacheManager->put($blockHash, $fullyCompiledBlock);
+        $this->cacheManager->put($cacheKey, $fullyCompiledBlock);
 
         return $fullyCompiledBlock;
     }
