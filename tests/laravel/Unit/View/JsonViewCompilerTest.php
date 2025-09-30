@@ -339,3 +339,34 @@ test('finds ancestors correctly using parent chain', function () {
     expect($blocksToInvalidate)->toContain('grandparent'); // Grandparent
     expect($blocksToInvalidate)->toHaveCount(3);
 });
+
+test('skips rendering disabled blocks', function () {
+    $templateData = [
+        'blocks' => [
+            'enabled' => [
+                'id' => 'enabled',
+                'type' => 'test',
+                'properties' => ['content' => 'This should render'],
+            ],
+            'disabled' => [
+                'id' => 'disabled',
+                'type' => 'test',
+                'properties' => ['content' => 'This should not render'],
+                'disabled' => true,
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['enabled', 'disabled']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should contain check for shouldRenderBlock
+    expect($compiled)->toContain('craftile()->shouldRenderBlock');
+    expect($compiled)->toContain('endif');
+
+    // Should contain both block IDs in the compiled output
+    expect($compiled)->toContain('enabled');
+    expect($compiled)->toContain('disabled');
+});
