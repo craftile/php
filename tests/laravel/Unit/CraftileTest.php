@@ -125,3 +125,44 @@ test('custom render checker overrides default disabled logic', function () {
     expect($craftile->shouldRenderBlock($disabledButAllowedType))->toBeTrue();
     expect($craftile->shouldRenderBlock($enabledButWrongType))->toBeFalse();
 });
+
+test('createBlockData uses default BlockData class', function () {
+    $craftile = app(Craftile::class);
+
+    $blockData = $craftile->createBlockData([
+        'id' => 'test-block',
+        'type' => 'test',
+    ]);
+
+    expect($blockData)->toBeInstanceOf(\Craftile\Laravel\BlockData::class);
+    expect($blockData->id)->toBe('test-block');
+    expect($blockData->type)->toBe('test');
+});
+
+test('createBlockData uses factory when provided', function () {
+    $craftile = app(Craftile::class);
+
+    // Create a custom factory that adds a prefix to the ID
+    $craftile->createBlockDataUsing(function ($blockData, $resolveChildData) {
+        $blockData['id'] = 'custom-'.$blockData['id'];
+
+        return \Craftile\Laravel\BlockData::make($blockData, $resolveChildData);
+    });
+
+    $blockData = $craftile->createBlockData([
+        'id' => 'test-block',
+        'type' => 'test',
+    ]);
+
+    expect($blockData->id)->toBe('custom-test-block');
+});
+
+test('createBlockData validates custom class extends BlockData', function () {
+    $craftile = app(Craftile::class);
+
+    // Mock config to return invalid class
+    config(['craftile.block_data_class' => \stdClass::class]);
+
+    expect(fn () => $craftile->createBlockData(['id' => 'test', 'type' => 'test']))
+        ->toThrow(\InvalidArgumentException::class, 'BlockData class \'stdClass\' must extend Craftile\Laravel\BlockData');
+});

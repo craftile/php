@@ -11,7 +11,7 @@ class BlockData implements JsonSerializable
 {
     protected mixed $resolveChildData;
 
-    public function __construct(
+    final public function __construct(
         public readonly string $id,
         public readonly string $type,
         public readonly PropertyBag $properties,
@@ -29,11 +29,11 @@ class BlockData implements JsonSerializable
     /**
      * Create BlockData from array data.
      */
-    public static function make(array $data, mixed $resolveChildData = null): self
+    public static function make(array $data, mixed $resolveChildData = null): static
     {
         $properties = self::createPropertyBag($data['properties'] ?? [], $data['type']);
 
-        return new self(
+        return new static(
             id: $data['id'],
             type: $data['type'],
             properties: $properties,
