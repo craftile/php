@@ -15,6 +15,12 @@ class BlockDatastore
      */
     private static array $loadedBlocks = [];
 
+    /**
+     * In-memory cache of parsed file data
+     * Structure: ['filePath' => ['blocks' => [...]]].
+     */
+    private static array $parsedFiles = [];
+
     public function __construct(
         protected BlockFlattener $flattener
     ) {}
@@ -93,15 +99,32 @@ class BlockDatastore
     }
 
     /**
-     * Get all blocks array from the given JSON file (with caching).
+     * Get all blocks array from the given JSON file.
+     * Uses in-memory caching in preview mode, Laravel cache otherwise.
      */
     public function getBlocksArray(string $sourceFilePath): array
     {
-        $cacheKey = 'craftile_blocks_'.md5($sourceFilePath.'_'.filemtime($sourceFilePath));
+        if (isset(self::$parsedFiles[$sourceFilePath])) {
+            return self::$parsedFiles[$sourceFilePath];
+        }
 
-        return Cache::remember($cacheKey, 300, function () use ($sourceFilePath) {
-            return $this->parseBlocksFromFile($sourceFilePath);
-        });
+        $blocks = null;
+
+        // In preview mode, use only in-memory caching
+        if (Craftile::inPreview()) {
+            $blocks = $this->parseBlocksFromFile($sourceFilePath);
+        } else {
+            // In production mode, use Laravel cache
+            $cacheKey = 'craftile_blocks_'.md5($sourceFilePath.'_'.filemtime($sourceFilePath));
+            $cacheTtl = config('craftile.cache.ttl', 3600);
+            $blocks = Cache::remember($cacheKey, $cacheTtl, function () use ($sourceFilePath) {
+                return $this->parseBlocksFromFile($sourceFilePath);
+            });
+        }
+
+        self::$parsedFiles[$sourceFilePath] = $blocks;
+
+        return $blocks;
     }
 
     /**
@@ -145,10 +168,11 @@ class BlockDatastore
     }
 
     /**
-     * Clear all loaded blocks (useful for testing).
+     * Clear all loaded blocks and parsed files (useful for testing).
      */
     public function clear(): void
     {
         self::$loadedBlocks = [];
+        self::$parsedFiles = [];
     }
 }
