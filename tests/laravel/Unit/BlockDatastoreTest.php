@@ -289,3 +289,37 @@ test('defaults to 1 hour cache TTL when not configured', function () {
     $result = $this->datastore->getBlocksArray($filePath);
     expect($result)->toHaveCount(1);
 });
+
+test('binds source file to BlockData instances', function () {
+    $blocksData = [
+        'blocks' => [
+            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => [], 'children' => []],
+        ],
+    ];
+    $filePath = $this->testDir.'/blocks.json';
+    file_put_contents($filePath, json_encode($blocksData));
+
+    $this->datastore->loadFile($filePath);
+    $block = $this->datastore->getBlock('test-block');
+
+    expect($block)->not->toBeNull();
+    expect($block->getSourceFile())->toBe($filePath);
+});
+
+test('preserves source file when getting block with defaults', function () {
+    $blocksData = [
+        'blocks' => [
+            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => ['content' => 'Hello'], 'children' => []],
+        ],
+    ];
+    $filePath = $this->testDir.'/blocks.json';
+    file_put_contents($filePath, json_encode($blocksData));
+
+    $this->datastore->loadFile($filePath);
+    $block = $this->datastore->getBlock('test-block', ['properties' => ['title' => 'Default']]);
+
+    expect($block)->not->toBeNull();
+    expect($block->getSourceFile())->toBe($filePath);
+    expect($block->property('content'))->toBe('Hello');
+    expect($block->property('title'))->toBe('Default');
+});
