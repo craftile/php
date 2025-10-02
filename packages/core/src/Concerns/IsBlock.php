@@ -9,15 +9,36 @@ namespace Craftile\Core\Concerns;
 trait IsBlock
 {
     /**
-     * Generate slug from class name.
+     * Get block type (e.g., "@visual/hero" or "my-block").
+     * Defaults to kebab-cased class name if not defined.
+     */
+    public static function type(): string
+    {
+        if (isset(static::$type)) {
+            return static::$type;
+        }
+
+        $class = (new \ReflectionClass(static::class))->getShortName();
+
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $class));
+    }
+
+    /**
+     * Get block slug (slugified version of type).
+     * Converts "@visual/hero" to "visual-hero".
      */
     public static function slug(): string
     {
-        $class = (new \ReflectionClass(static::class))->getShortName();
+        if (isset(static::$slug)) {
+            return static::$slug;
+        }
 
-        $snakeCase = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $class));
+        $slug = static::type();
+        $slug = strtolower($slug);
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+        $slug = trim($slug, '-');
 
-        return str_replace('_', '-', $snakeCase);
+        return $slug;
     }
 
     /**
@@ -25,6 +46,10 @@ trait IsBlock
      */
     public static function name(): string
     {
+        if (isset(static::$name)) {
+            return static::$name;
+        }
+
         $class = (new \ReflectionClass(static::class))->getShortName();
 
         $words = preg_replace('/(?<!^)[A-Z]/', ' $0', $class);

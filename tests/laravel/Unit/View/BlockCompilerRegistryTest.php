@@ -6,7 +6,7 @@ use Craftile\Laravel\View\BlockCompilerRegistry;
 
 class MockBlockCompiler implements BlockCompilerInterface
 {
-    public function compile(string $blockType, string $hash, string $childrenClosureCode = '', string $customAttributesExpr = ''): string
+    public function compile(BlockSchema $schema, string $hash, string $childrenClosureCode = '', string $customAttributesExpr = ''): string
     {
         return '<div class="mock-block">Mock content</div>';
     }
@@ -19,7 +19,7 @@ class MockBlockCompiler implements BlockCompilerInterface
 
 class AnotherMockCompiler implements BlockCompilerInterface
 {
-    public function compile(string $blockType, string $hash, string $childrenClosureCode = '', string $customAttributesExpr = ''): string
+    public function compile(BlockSchema $schema, string $hash, string $childrenClosureCode = '', string $customAttributesExpr = ''): string
     {
         return '<span class="another-mock">Another mock</span>';
     }
@@ -37,6 +37,7 @@ test('can register and find block compiler', function () {
     $registry->register($compiler);
 
     $schema = new BlockSchema(
+        type: 'mock-block',
         slug: 'mock-block',
         class: 'MockBlock',
         name: 'Mock Block',
@@ -53,6 +54,7 @@ test('returns default compiler for unsupported schema', function () {
     $registry = app(BlockCompilerRegistry::class);
 
     $schema = new BlockSchema(
+        type: 'unsupported-block',
         slug: 'unsupported-block',
         class: 'UnsupportedBlock',
         name: 'Unsupported Block',
@@ -65,8 +67,8 @@ test('returns default compiler for unsupported schema', function () {
     expect($compiler)->toBeInstanceOf(BlockCompilerInterface::class);
 
     // Should use default compiler
-    $compiled = $compiler->compile('unsupported-block', 'test-hash');
-    expect($compiled)->toContain('unsupported-block');
+    $compiled = $compiler->compile($schema, 'test-hash');
+    expect($compiled)->toContain($schema->class);
 });
 
 test('finds most specific compiler', function () {
@@ -79,6 +81,7 @@ test('finds most specific compiler', function () {
     $registry->register($compiler2);
 
     $schema1 = new BlockSchema(
+        type: 'mock-block',
         slug: 'mock-block',
         class: 'MockBlock',
         name: 'Mock Block',
@@ -88,6 +91,7 @@ test('finds most specific compiler', function () {
     );
 
     $schema2 = new BlockSchema(
+        type: 'another-block',
         slug: 'another-block',
         class: 'AnotherBlock',
         name: 'Another Block',

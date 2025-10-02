@@ -29,6 +29,7 @@ class BlockSchema implements JsonSerializable
     public array $accepts = [];
 
     public function __construct(
+        string $type,
         string $slug,
         string $class,
         string $name,
@@ -38,8 +39,8 @@ class BlockSchema implements JsonSerializable
         array $properties = [],
         array $accepts = []
     ) {
-        $this->type = $slug;
-        $this->slug = $slug; // slug is an alias for type
+        $this->type = $type;
+        $this->slug = $slug;
         $this->class = $class;
         $this->name = $name;
         $this->description = $description;
@@ -63,6 +64,7 @@ class BlockSchema implements JsonSerializable
         }
 
         return new self(
+            type: $blockClass::type(),
             slug: $blockClass::slug(),
             class: $blockClass,
             name: $blockClass::name(),

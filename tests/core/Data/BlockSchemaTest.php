@@ -7,6 +7,7 @@ use Craftile\Core\Data\BlockSchema;
 describe('BlockSchema', function () {
     it('can be created with all parameters', function () {
         $schema = new BlockSchema(
+            type: 'text',
             slug: 'text',
             class: TestBlock::class,
             name: 'Text Block',
@@ -25,7 +26,7 @@ describe('BlockSchema', function () {
     });
 
     it('has sensible defaults for optional parameters', function () {
-        $schema = new BlockSchema('text', TestBlock::class, 'Text Block');
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
 
         expect($schema->description)->toBe(null);
         expect($schema->icon)->toBe(null);
@@ -61,6 +62,7 @@ describe('BlockSchema', function () {
 
         $schema = new BlockSchema(
             'test',
+            'test',
             TestBlock::class,
             'Test Block',
             properties: $properties
@@ -85,6 +87,7 @@ describe('BlockSchema', function () {
 
         $schema = new BlockSchema(
             'test',
+            'test',
             TestBlock::class,
             'Test Block',
             properties: [$property]
@@ -95,6 +98,7 @@ describe('BlockSchema', function () {
 
     it('can manage accepted child types via constructor', function () {
         $schema = new BlockSchema(
+            'test',
             'test',
             TestBlock::class,
             'Test Block',
@@ -111,6 +115,7 @@ describe('BlockSchema', function () {
         ];
 
         $schema = new BlockSchema(
+            'test',
             'test',
             TestBlock::class,
             'Test Block',
@@ -141,6 +146,7 @@ describe('BlockSchema', function () {
 
         $schema = new BlockSchema(
             'test',
+            'test',
             TestBlock::class,
             'Test Block',
             properties: [$property]
@@ -151,6 +157,7 @@ describe('BlockSchema', function () {
 
     it('can be converted to array', function () {
         $schema = new BlockSchema(
+            'text',
             'text',
             TestBlock::class,
             'Text Block',
@@ -174,21 +181,21 @@ describe('BlockSchema', function () {
     });
 
     it('throws exception when validating with empty type', function () {
-        $schema = new BlockSchema('', TestBlock::class, 'Test');
+        $schema = new BlockSchema('', '', TestBlock::class, 'Test');
 
         expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block type cannot be empty');
     });
 
     it('throws exception when validating with non-existent class', function () {
-        $schema = new BlockSchema('test', 'NonExistentClass', 'Test');
+        $schema = new BlockSchema('test', 'test', 'NonExistentClass', 'Test');
 
         expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block class NonExistentClass does not exist');
     });
 
     it('throws exception when validating with empty label', function () {
-        $schema = new BlockSchema('test', TestBlock::class, '');
+        $schema = new BlockSchema('test', 'test', TestBlock::class, '');
 
         expect(fn () => $schema->validate())
             ->toThrow(InvalidArgumentException::class, 'Block label cannot be empty');

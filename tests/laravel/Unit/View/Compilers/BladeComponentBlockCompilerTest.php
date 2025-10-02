@@ -29,6 +29,7 @@ describe('BladeComponentBlockCompiler', function () {
     it('supports block schemas with Laravel component classes', function () {
         $schema = new BlockSchema(
             'test-component',
+            'test-component',
             TestBladeComponent::class,
             'Test Component'
         );
@@ -38,6 +39,7 @@ describe('BladeComponentBlockCompiler', function () {
 
     it('does not support block schemas without class', function () {
         $schema = new BlockSchema(
+            'test-block',
             'test-block',
             '', // empty class
             'Test Block'
@@ -49,6 +51,7 @@ describe('BladeComponentBlockCompiler', function () {
     it('does not support block schemas with non-component classes', function () {
         $schema = new BlockSchema(
             'not-component',
+            'not-component',
             NotAComponent::class,
             'Not A Component'
         );
@@ -57,7 +60,13 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('compiles block with basic parameters', function () {
-        $compiled = $this->compiler->compile('hero', 'abc123');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'abc123');
 
         expect($compiled)->toContain('<x-craftile-hero');
         expect($compiled)->toContain(':block="$__blockDataabc123"');
@@ -67,8 +76,14 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('compiles block with children closure', function () {
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
         $childrenClosure = 'function() { return "child content"; }';
-        $compiled = $this->compiler->compile('hero', 'def456', $childrenClosure);
+        $compiled = $this->compiler->compile($schema, 'def456', $childrenClosure);
 
         expect($compiled)->toContain('$__childrendef456 = function() { return "child content"; };');
         expect($compiled)->toContain('<x-craftile-hero');
@@ -76,8 +91,14 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('compiles block with custom attributes', function () {
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
         $customAttributes = "['class' => 'custom-class', 'id' => 'custom-id']";
-        $compiled = $this->compiler->compile('hero', 'ghi789', '', $customAttributes);
+        $compiled = $this->compiler->compile($schema, 'ghi789', '', $customAttributes);
 
         expect($compiled)->toContain('array_merge(');
         expect($compiled)->toContain($customAttributes);
@@ -85,7 +106,13 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('includes context filtering logic', function () {
-        $compiled = $this->compiler->compile('hero', 'jkl012');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'jkl012');
 
         expect($compiled)->toContain('array_filter(get_defined_vars()');
         expect($compiled)->toContain("!str_starts_with(\$key, '__')");
@@ -93,14 +120,26 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('includes variable cleanup', function () {
-        $compiled = $this->compiler->compile('hero', 'mno345');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'mno345');
 
         expect($compiled)->toContain('unset($__childrenmno345, $__contextmno345);');
     });
 
     it('generates unique variable names with hash', function () {
-        $compiled1 = $this->compiler->compile('hero', 'hash1');
-        $compiled2 = $this->compiler->compile('hero', 'hash2');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled1 = $this->compiler->compile($schema, 'hash1');
+        $compiled2 = $this->compiler->compile($schema, 'hash2');
 
         expect($compiled1)->toContain('$__blockDatahash1');
         expect($compiled1)->toContain('$__childrenhash1');
@@ -115,21 +154,39 @@ describe('BladeComponentBlockCompiler', function () {
     });
 
     it('handles empty children closure properly', function () {
-        $compiled = $this->compiler->compile('hero', 'pqr678', '');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'pqr678', '');
 
         expect($compiled)->toContain('$__childrenpqr678 = null;');
         expect($compiled)->not->toContain('$__childrenpqr678 = ;');
     });
 
     it('handles default custom attributes', function () {
-        $compiled = $this->compiler->compile('hero', 'stu901');
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'stu901');
 
         expect($compiled)->toContain('array_merge(');
         expect($compiled)->toContain('[]'); // Default empty array
     });
 
     it('produces valid PHP syntax', function () {
-        $compiled = $this->compiler->compile('hero', 'vwx234', 'function() { return "test"; }', "['attr' => 'value']");
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'vwx234', 'function() { return "test"; }', "['attr' => 'value']");
 
         // Basic syntax checks
         expect($compiled)->toContain('<?php');

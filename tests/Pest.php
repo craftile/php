@@ -58,6 +58,7 @@ function sampleBlockData(): array
 function sampleBlockSchema(): BlockSchema
 {
     return new BlockSchema(
+        type: 'text',
         slug: 'text',
         class: TestBlock::class,
         name: 'Text Block',

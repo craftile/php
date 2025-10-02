@@ -24,7 +24,7 @@ beforeEach(function () {
 
     // Register test block schema
     $registry = app(BlockSchemaRegistry::class);
-    $registry->register(new BlockSchema('test', 'TestClass', 'Test Block'));
+    $registry->register(new BlockSchema('test', 'test', 'TestClass', 'Test Block'));
 
     // Ensure cache directory exists
     if (! $this->files->isDirectory($this->cachePath)) {

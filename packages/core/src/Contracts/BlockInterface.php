@@ -9,7 +9,12 @@ namespace Craftile\Core\Contracts;
 interface BlockInterface
 {
     /**
-     * Get the block's unique slug/type identifier.
+     * Get the block's type identifier (e.g., "@visual/hero" or "my-block").
+     */
+    public static function type(): string;
+
+    /**
+     * Get the block's unique slug identifier (slugified version of type).
      */
     public static function slug(): string;
 

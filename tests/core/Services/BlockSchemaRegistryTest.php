@@ -12,6 +12,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('can register a schema', function () {
         $schema = new BlockSchema(
+            type: 'text',
             slug: 'text',
             class: TestBlock::class,
             name: 'Text Block'
@@ -24,8 +25,8 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('can register multiple schemas', function () {
-        $textSchema = new BlockSchema('text', TestBlock::class, 'Text Block');
-        $imageSchema = new BlockSchema('image', TestBlock::class, 'Image Block');
+        $textSchema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
+        $imageSchema = new BlockSchema('image', 'image', TestBlock::class, 'Image Block');
 
         $this->registry->register($textSchema);
         $this->registry->register($imageSchema);
@@ -37,8 +38,8 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('overwrites existing schema with same type', function () {
-        $firstSchema = new BlockSchema('text', TestBlock::class, 'First Text');
-        $secondSchema = new BlockSchema('text', TestBlock::class, 'Second Text');
+        $firstSchema = new BlockSchema('text', 'text', TestBlock::class, 'First Text');
+        $secondSchema = new BlockSchema('text', 'text', TestBlock::class, 'Second Text');
 
         $this->registry->register($firstSchema);
         expect($this->registry->getSchema('text')->name)->toBe('First Text');
@@ -56,8 +57,8 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('can get all registered schemas', function () {
-        $textSchema = new BlockSchema('text', TestBlock::class, 'Text Block');
-        $imageSchema = new BlockSchema('image', TestBlock::class, 'Image Block');
+        $textSchema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
+        $imageSchema = new BlockSchema('image', 'image', TestBlock::class, 'Image Block');
 
         $this->registry->register($textSchema);
         $this->registry->register($imageSchema);
@@ -74,14 +75,14 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('can get schemas using all alias', function () {
-        $schema = new BlockSchema('test', TestBlock::class, 'Test Block');
+        $schema = new BlockSchema('test', 'test', TestBlock::class, 'Test Block');
         $this->registry->register($schema);
 
         expect($this->registry->all())->toBe($this->registry->getAllSchemas());
     });
 
     it('can clear all schemas', function () {
-        $schema = new BlockSchema('text', TestBlock::class, 'Text Block');
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
         $this->registry->register($schema);
 
         expect($this->registry->getAllSchemas())->toHaveCount(1);
@@ -95,10 +96,10 @@ describe('BlockSchemaRegistry', function () {
     it('can get registered types', function () {
         expect($this->registry->getRegisteredTypes())->toBe([]);
 
-        $this->registry->register(new BlockSchema('text', TestBlock::class, 'Text'));
+        $this->registry->register(new BlockSchema('text', 'text', TestBlock::class, 'Text'));
         expect($this->registry->getRegisteredTypes())->toBe(['text']);
 
-        $this->registry->register(new BlockSchema('image', TestBlock::class, 'Image'));
+        $this->registry->register(new BlockSchema('image', 'image', TestBlock::class, 'Image'));
         expect($this->registry->getRegisteredTypes())->toContain('text');
         expect($this->registry->getRegisteredTypes())->toContain('image');
         expect($this->registry->getRegisteredTypes())->toHaveCount(2);
@@ -106,6 +107,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('preserves schema type and slug relationship', function () {
         $schema = new BlockSchema(
+            type: 'custom-block',
             slug: 'custom-block',
             class: TestBlock::class,
             name: 'Custom Block'
@@ -120,6 +122,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('can register schemas with different properties', function () {
         $textSchema = new BlockSchema(
+            type: 'text',
             slug: 'text',
             class: TestBlock::class,
             name: 'Text Block',
@@ -149,7 +152,7 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('can remove schemas', function () {
-        $schema = new BlockSchema('text', TestBlock::class, 'Text Block');
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
         $this->registry->register($schema);
 
         expect($this->registry->hasSchema('text'))->toBeTrue();
@@ -161,7 +164,7 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('can use get alias for getSchema', function () {
-        $schema = new BlockSchema('text', TestBlock::class, 'Text Block');
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
         $this->registry->register($schema);
 
         expect($this->registry->get('text'))->toBe($schema);

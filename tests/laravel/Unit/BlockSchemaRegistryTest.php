@@ -21,6 +21,7 @@ describe('BlockSchemaRegistry', function () {
         Event::fake();
 
         $schema = new BlockSchema(
+            type: 'test',
             slug: 'test',
             class: TestBlock::class,
             name: 'Test Block'
@@ -35,6 +36,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('calls parent register method', function () {
         $schema = new BlockSchema(
+            type: 'test',
             slug: 'test',
             class: TestBlock::class,
             name: 'Test Block'
@@ -48,6 +50,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('can group schemas by category', function () {
         $contentSchema = new BlockSchema(
+            type: 'text',
             slug: 'text',
             class: TestBlock::class,
             name: 'Text Block',
@@ -55,6 +58,7 @@ describe('BlockSchemaRegistry', function () {
         );
 
         $layoutSchema = new BlockSchema(
+            type: 'container',
             slug: 'container',
             class: TestBlock::class,
             name: 'Container Block',
@@ -62,6 +66,7 @@ describe('BlockSchemaRegistry', function () {
         );
 
         $defaultSchema = new BlockSchema(
+            type: 'basic',
             slug: 'basic',
             class: TestBlock::class,
             name: 'Basic Block'
@@ -89,6 +94,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('handles multiple schemas in same category', function () {
         $textSchema = new BlockSchema(
+            type: 'text',
             slug: 'text',
             class: TestBlock::class,
             name: 'Text Block',
@@ -96,6 +102,7 @@ describe('BlockSchemaRegistry', function () {
         );
 
         $imageSchema = new BlockSchema(
+            type: 'image',
             slug: 'image',
             class: TestBlock::class,
             name: 'Image Block',
@@ -121,6 +128,7 @@ describe('BlockSchemaRegistry', function () {
 
     it('uses default category for schemas without category', function () {
         $schema = new BlockSchema(
+            type: 'test',
             slug: 'test',
             class: TestBlock::class,
             name: 'Test Block'
@@ -137,8 +145,8 @@ describe('BlockSchemaRegistry', function () {
     it('maintains event dispatching when registering multiple schemas', function () {
         Event::fake();
 
-        $schema1 = new BlockSchema('test1', TestBlock::class, 'Test Block 1');
-        $schema2 = new BlockSchema('test2', TestBlock::class, 'Test Block 2');
+        $schema1 = new BlockSchema('test1', 'test1', TestBlock::class, 'Test Block 1');
+        $schema2 = new BlockSchema('test2', 'test2', TestBlock::class, 'Test Block 2');
 
         $this->registry->register($schema1);
         $this->registry->register($schema2);
