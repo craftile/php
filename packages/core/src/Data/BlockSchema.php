@@ -28,6 +28,8 @@ class BlockSchema implements JsonSerializable
 
     public array $accepts = [];
 
+    public ?string $wrapper;
+
     public function __construct(
         string $type,
         string $slug,
@@ -37,7 +39,8 @@ class BlockSchema implements JsonSerializable
         ?string $icon = null,
         ?string $category = null,
         array $properties = [],
-        array $accepts = []
+        array $accepts = [],
+        ?string $wrapper = null
     ) {
         $this->type = $type;
         $this->slug = $slug;
@@ -48,6 +51,7 @@ class BlockSchema implements JsonSerializable
         $this->category = $category;
         $this->properties = $properties;
         $this->accepts = $accepts;
+        $this->wrapper = $wrapper;
     }
 
     /**
@@ -72,7 +76,8 @@ class BlockSchema implements JsonSerializable
             icon: $blockClass::icon(),
             category: $blockClass::category(),
             properties: $blockClass::properties(),
-            accepts: $blockClass::accepts()
+            accepts: $blockClass::accepts(),
+            wrapper: $blockClass::wrapper()
         );
     }
 
@@ -94,6 +99,7 @@ class BlockSchema implements JsonSerializable
                     $prop->toArray() : $prop;
             }, $this->properties),
             'accepts' => $this->accepts,
+            'wrapper' => $this->wrapper,
         ];
     }
 

@@ -51,6 +51,12 @@ interface BlockInterface
     public static function category(): string;
 
     /**
+     * Get the wrapper Emmet syntax for this block.
+     * Return null for no wrapper.
+     */
+    public static function wrapper(): ?string;
+
+    /**
      * Render the block with its current data (and context).
      * Implementation can return HTML string or framework-specific response.
      */

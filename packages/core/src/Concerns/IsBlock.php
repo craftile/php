@@ -66,6 +66,14 @@ trait IsBlock
     }
 
     /**
+     * Get wrapper Emmet syntax from static property.
+     */
+    public static function wrapper(): ?string
+    {
+        return static::$wrapper ?? null;
+    }
+
+    /**
      * Get block properties from static property.
      */
     public static function properties(): array

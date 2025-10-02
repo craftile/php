@@ -370,3 +370,170 @@ test('skips rendering disabled blocks', function () {
     expect($compiled)->toContain('enabled');
     expect($compiled)->toContain('disabled');
 });
+
+test('compiles block with wrapper when schema has wrapper property', function () {
+    $registry = app(BlockSchemaRegistry::class);
+    $registry->register(new BlockSchema(
+        type: 'wrapped-block',
+        slug: 'wrapped-block',
+        class: 'WrappedBlock',
+        name: 'Wrapped Block',
+        wrapper: 'section#hero.container'
+    ));
+
+    $templateData = [
+        'blocks' => [
+            'hero' => [
+                'id' => 'hero',
+                'type' => 'wrapped-block',
+                'properties' => ['title' => 'Hero Section'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['hero']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should contain wrapper opening tag with data-block attribute
+    expect($compiled)->toContain('<section data-block="hero" id="hero" class="container">');
+    // Should contain wrapper closing tag
+    expect($compiled)->toContain('</section>');
+});
+
+test('compiles block without wrapper when schema has no wrapper property', function () {
+    $registry = app(BlockSchemaRegistry::class);
+    $registry->register(new BlockSchema(
+        type: 'no-wrapper',
+        slug: 'no-wrapper',
+        class: 'NoWrapperBlock',
+        name: 'No Wrapper Block'
+    ));
+
+    $templateData = [
+        'blocks' => [
+            'content' => [
+                'id' => 'content',
+                'type' => 'no-wrapper',
+                'properties' => ['text' => 'Content'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['content']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should NOT contain wrapper tags
+    expect($compiled)->not->toContain('data-block="content"');
+});
+
+test('compiles nested wrapper structure correctly', function () {
+    $registry = app(BlockSchemaRegistry::class);
+    $registry->register(new BlockSchema(
+        type: 'nested-wrapper',
+        slug: 'nested-wrapper',
+        class: 'NestedWrapperBlock',
+        name: 'Nested Wrapper Block',
+        wrapper: 'section.outer>div.inner'
+    ));
+
+    $templateData = [
+        'blocks' => [
+            'nested' => [
+                'id' => 'nested',
+                'type' => 'nested-wrapper',
+                'properties' => ['content' => 'Nested Content'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['nested']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should contain opening wrapper with data-block on first tag
+    expect($compiled)->toContain('<section data-block="nested" class="outer"><div class="inner">');
+    // Should contain closing wrapper
+    expect($compiled)->toContain('</div></section>');
+});
+
+test('wrapper auto-appends content placeholder when not present', function () {
+    $registry = app(BlockSchemaRegistry::class);
+    $registry->register(new BlockSchema(
+        type: 'auto-content',
+        slug: 'auto-content',
+        class: 'AutoContentBlock',
+        name: 'Auto Content Block',
+        wrapper: 'div.wrapper'
+    ));
+
+    $templateData = [
+        'blocks' => [
+            'auto' => [
+                'id' => 'auto',
+                'type' => 'auto-content',
+                'properties' => ['text' => 'Auto'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['auto']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should have wrapper opening and closing
+    expect($compiled)->toContain('<div data-block="auto" class="wrapper">');
+    expect($compiled)->toContain('</div>');
+
+    // Block content should be between wrapper tags
+    expect($compiled)->toMatch('/<div data-block="auto" class="wrapper">.*<\/div>/s');
+});
+
+test('multiple blocks with different wrappers compile correctly', function () {
+    $registry = app(BlockSchemaRegistry::class);
+    $registry->register(new BlockSchema(
+        type: 'wrapper-a',
+        slug: 'wrapper-a',
+        class: 'WrapperABlock',
+        name: 'Wrapper A Block',
+        wrapper: 'section#section-a.wrapper-a'
+    ));
+    $registry->register(new BlockSchema(
+        type: 'wrapper-b',
+        slug: 'wrapper-b',
+        class: 'WrapperBBlock',
+        name: 'Wrapper B Block',
+        wrapper: 'article#article-b.wrapper-b'
+    ));
+
+    $templateData = [
+        'blocks' => [
+            'block-a' => [
+                'id' => 'block-a',
+                'type' => 'wrapper-a',
+                'properties' => ['content' => 'A'],
+            ],
+            'block-b' => [
+                'id' => 'block-b',
+                'type' => 'wrapper-b',
+                'properties' => ['content' => 'B'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['block-a', 'block-b']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    // Should contain both wrappers with correct data-block attributes
+    expect($compiled)->toContain('<section data-block="block-a" id="section-a" class="wrapper-a">');
+    expect($compiled)->toContain('</section>');
+    expect($compiled)->toContain('<article data-block="block-b" id="article-b" class="wrapper-b">');
+    expect($compiled)->toContain('</article>');
+});
