@@ -105,17 +105,13 @@ class BlockSchema implements JsonSerializable
             'icon' => $this->icon,
             'category' => $this->category,
             'properties' => array_map(function ($prop) {
-                return is_array($prop) ? $prop : (
-                    is_object($prop) && method_exists($prop, 'toArray') ? $prop->toArray() : $prop
-                );
+                return $prop instanceof Property ? $prop->toArray() : $prop;
             }, $this->properties),
             'accepts' => $this->accepts,
             'wrapper' => $this->wrapper,
             'previewImageUrl' => $this->previewImageUrl,
             'presets' => array_map(function ($preset) {
-                return is_array($preset) ? $preset : (
-                    $preset instanceof BlockPreset ? $preset->toArray() : $preset
-                );
+                return $preset instanceof BlockPreset ? $preset->toArray() : $preset;
             }, $this->presets),
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-use Craftile\Laravel\Property;
+use Craftile\Core\Data\Property;
 
 class TestProperty extends Property
 {
