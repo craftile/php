@@ -212,4 +212,96 @@ describe('BlockSchema', function () {
         $decoded = json_decode($json, true);
         expect($decoded)->toHaveKey('type', 'text');
     });
+
+    it('can be created with presets array', function () {
+        $presets = [
+            [
+                'name' => 'Heading and Text',
+                'description' => 'Container with heading',
+                'properties' => ['gap' => 12],
+                'children' => [
+                    ['type' => 'text', 'id' => 'heading'],
+                    ['type' => 'text', 'id' => 'description'],
+                ],
+            ],
+        ];
+
+        $schema = new BlockSchema(
+            'container',
+            'container',
+            TestBlock::class,
+            'Container Block',
+            presets: $presets
+        );
+
+        expect($schema->presets)->toBe($presets);
+    });
+
+    it('can be created with presets using fluent API', function () {
+        $presets = [
+            \Craftile\Core\Data\BlockPreset::make('Heading and Text')
+                ->description('Container with heading')
+                ->properties(['gap' => 12])
+                ->blocks([
+                    \Craftile\Core\Data\PresetBlock::make('text')->id('heading'),
+                    \Craftile\Core\Data\PresetBlock::make('text')->id('description'),
+                ]),
+        ];
+
+        $schema = new BlockSchema(
+            'container',
+            'container',
+            TestBlock::class,
+            'Container Block',
+            presets: $presets
+        );
+
+        expect($schema->presets)->toBe($presets);
+    });
+
+    it('serializes presets to array correctly', function () {
+        $schema = new BlockSchema(
+            'container',
+            'container',
+            TestBlock::class,
+            'Container Block',
+            presets: [
+                \Craftile\Core\Data\BlockPreset::make('Heading and Text')
+                    ->description('Container with heading')
+                    ->properties(['gap' => 12])
+                    ->blocks([
+                        \Craftile\Core\Data\PresetBlock::make('text')->id('heading'),
+                    ]),
+            ]
+        );
+
+        $array = $schema->toArray();
+
+        expect($array)->toHaveKey('presets');
+        expect($array['presets'])->toHaveLength(1);
+        expect($array['presets'][0])->toHaveKey('name', 'Heading and Text');
+        expect($array['presets'][0])->toHaveKey('description', 'Container with heading');
+        expect($array['presets'][0])->toHaveKey('children');
+        expect($array['presets'][0]['children'][0])->toHaveKey('type', 'text');
+        expect($array['presets'][0]['children'][0])->toHaveKey('id', 'heading');
+    });
+
+    it('handles mixed preset formats (arrays and objects)', function () {
+        $schema = new BlockSchema(
+            'container',
+            'container',
+            TestBlock::class,
+            'Container Block',
+            presets: [
+                ['name' => 'Array Preset', 'properties' => ['gap' => 8]],
+                \Craftile\Core\Data\BlockPreset::make('Object Preset')->properties(['gap' => 16]),
+            ]
+        );
+
+        $array = $schema->toArray();
+
+        expect($array['presets'])->toHaveLength(2);
+        expect($array['presets'][0])->toHaveKey('name', 'Array Preset');
+        expect($array['presets'][1])->toHaveKey('name', 'Object Preset');
+    });
 });

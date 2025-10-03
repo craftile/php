@@ -57,6 +57,13 @@ interface BlockInterface
     public static function wrapper(): ?string;
 
     /**
+     * Define preset configurations for this block.
+     * Presets provide predefined block configurations with custom properties and children.
+     * Return an array of BlockPreset instances or array configurations.
+     */
+    public static function presets(): array;
+
+    /**
      * Render the block with its current data (and context).
      * Implementation can return HTML string or framework-specific response.
      */

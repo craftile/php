@@ -104,4 +104,12 @@ trait IsBlock
     {
         return static::$category ?? '';
     }
+
+    /**
+     * Get block presets from static property.
+     */
+    public static function presets(): array
+    {
+        return static::$presets ?? [];
+    }
 }

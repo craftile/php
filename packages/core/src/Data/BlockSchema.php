@@ -30,6 +30,8 @@ class BlockSchema implements JsonSerializable
 
     public ?string $wrapper;
 
+    public array $presets = [];
+
     public function __construct(
         string $type,
         string $slug,
@@ -40,7 +42,8 @@ class BlockSchema implements JsonSerializable
         ?string $category = null,
         array $properties = [],
         array $accepts = [],
-        ?string $wrapper = null
+        ?string $wrapper = null,
+        array $presets = []
     ) {
         $this->type = $type;
         $this->slug = $slug;
@@ -52,6 +55,7 @@ class BlockSchema implements JsonSerializable
         $this->properties = $properties;
         $this->accepts = $accepts;
         $this->wrapper = $wrapper;
+        $this->presets = $presets;
     }
 
     /**
@@ -77,7 +81,8 @@ class BlockSchema implements JsonSerializable
             category: $blockClass::category(),
             properties: $blockClass::properties(),
             accepts: $blockClass::accepts(),
-            wrapper: $blockClass::wrapper()
+            wrapper: $blockClass::wrapper(),
+            presets: $blockClass::presets()
         );
     }
 
@@ -95,11 +100,17 @@ class BlockSchema implements JsonSerializable
             'icon' => $this->icon,
             'category' => $this->category,
             'properties' => array_map(function ($prop) {
-                return is_object($prop) && method_exists($prop, 'toArray') ?
-                    $prop->toArray() : $prop;
+                return is_array($prop) ? $prop : (
+                    is_object($prop) && method_exists($prop, 'toArray') ? $prop->toArray() : $prop
+                );
             }, $this->properties),
             'accepts' => $this->accepts,
             'wrapper' => $this->wrapper,
+            'presets' => array_map(function ($preset) {
+                return is_array($preset) ? $preset : (
+                    $preset instanceof BlockPreset ? $preset->toArray() : $preset
+                );
+            }, $this->presets),
         ];
     }
 

@@ -20,8 +20,9 @@ describe('BlockDiscovery', function () {
         expect($this->registry->hasSchema('stub-test-block'))->toBeTrue();
         expect($this->registry->hasSchema('discovery-block'))->toBeTrue();
         expect($this->registry->hasSchema('text-block'))->toBeTrue();
+        expect($this->registry->hasSchema('container'))->toBeTrue();
 
-        expect($this->registry->getAllSchemas())->toHaveCount(3);
+        expect($this->registry->getAllSchemas())->toHaveCount(4);
     });
 
     it('handles missing directories gracefully', function () {
