@@ -72,7 +72,8 @@ test('transforms children tag to PHP code', function () {
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
     expect($result->content)->toContain('if(isset($children) && is_callable($children))');
-    expect($result->content)->toContain('echo $children()');
+    expect($result->content)->toContain('$__contextToPass = isset($__craftileContext) ? $__craftileContext : []');
+    expect($result->content)->toContain('echo $children($__contextToPass)');
 });
 
 test('throws error when children tag has parameters', function () {

@@ -100,7 +100,7 @@ describe('BladeComponentBlockCompiler', function () {
         $customAttributes = "['class' => 'custom-class', 'id' => 'custom-id']";
         $compiled = $this->compiler->compile($schema, 'ghi789', '', $customAttributes);
 
-        expect($compiled)->toContain('array_merge(');
+        expect($compiled)->toContain('craftile()->filterContext(');
         expect($compiled)->toContain($customAttributes);
         expect($compiled)->toContain('<x-craftile-hero');
     });
@@ -114,9 +114,8 @@ describe('BladeComponentBlockCompiler', function () {
         );
         $compiled = $this->compiler->compile($schema, 'jkl012');
 
-        expect($compiled)->toContain('array_filter(get_defined_vars()');
-        expect($compiled)->toContain("!str_starts_with(\$key, '__')");
-        expect($compiled)->toContain("\$key === '__staticBlocksChildren'");
+        expect($compiled)->toContain('craftile()->filterContext(get_defined_vars()');
+        expect($compiled)->toContain('$__contextjkl012');
     });
 
     it('includes variable cleanup', function () {
@@ -175,8 +174,20 @@ describe('BladeComponentBlockCompiler', function () {
         );
         $compiled = $this->compiler->compile($schema, 'stu901');
 
-        expect($compiled)->toContain('array_merge(');
+        expect($compiled)->toContain('craftile()->filterContext(');
         expect($compiled)->toContain('[]'); // Default empty array
+    });
+
+    it('passes context to component', function () {
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBladeComponent::class,
+            name: 'Hero Block'
+        );
+        $compiled = $this->compiler->compile($schema, 'ctx123');
+
+        expect($compiled)->toContain(':context="$__contextctx123"');
     });
 
     it('produces valid PHP syntax', function () {

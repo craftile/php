@@ -66,9 +66,9 @@ test('compiles block with custom attributes', function () {
     $customAttrs = "['variant' => 'primary', 'size' => 'large']";
     $compiled = $compiler->compile($schema, 'ghi789', '', $customAttrs);
 
-    expect($compiled)->toContain('array_merge(');
+    expect($compiled)->toContain('craftile()->filterContext(');
     expect($compiled)->toContain($customAttrs);
-    expect($compiled)->toContain('$__contextghi789 = array_merge(');
+    expect($compiled)->toContain('$__contextghi789');
 });
 
 test('includes context filtering logic', function () {
@@ -82,10 +82,8 @@ test('includes context filtering logic', function () {
     );
     $compiled = $compiler->compile($schema, 'filter123');
 
-    expect($compiled)->toContain('array_filter(get_defined_vars()');
-    expect($compiled)->toContain("fn(\$_, \$key) => !str_starts_with(\$key, '__')");
-    expect($compiled)->toContain("|| \$key === '__staticBlocksChildren'");
-    expect($compiled)->toContain('ARRAY_FILTER_USE_BOTH');
+    expect($compiled)->toContain('craftile()->filterContext(get_defined_vars()');
+    expect($compiled)->toContain('$__contextfilter123');
 });
 
 test('handles view rendering and output', function () {
@@ -101,10 +99,28 @@ test('handles view rendering and output', function () {
 
     expect($compiled)->toContain('if($__blockViewrender123 instanceof \\Illuminate\\View\\View)');
     expect($compiled)->toContain('$__blockViewDatarender123 = array_merge(');
-    expect($compiled)->toContain("['block' => \$__blockDatarender123, 'children' => \$__childrenrender123]");
+    expect($compiled)->toContain("['block' => \$__blockDatarender123, 'children' => \$__childrenrender123, '__craftileContext' => \$__mergedContext]");
     expect($compiled)->toContain('echo $__blockViewrender123->with($__blockViewDatarender123)->render();');
     expect($compiled)->toContain('} else {');
     expect($compiled)->toContain('echo $__blockViewrender123;');
+});
+
+test('includes share() method support', function () {
+    $compiler = new DefaultBlockCompiler;
+
+    $schema = new BlockSchema(
+        type: 'test-block',
+        slug: 'test-block',
+        class: TestBlock::class,
+        name: 'Test Block'
+    );
+    $compiled = $compiler->compile($schema, 'share456');
+
+    expect($compiled)->toContain("method_exists(\$__blockInstanceshare456, 'share')");
+    expect($compiled)->toContain('$__blockInstanceshare456->share()');
+    expect($compiled)->toContain('$__sharedData');
+    expect($compiled)->toContain('$__mergedContext');
+    expect($compiled)->toContain('array_merge($__contextshare456, $__sharedData)');
 });
 
 test('includes variable cleanup', function () {
