@@ -131,7 +131,7 @@ class BlockPreset implements JsonSerializable
 
         if (! empty($this->children)) {
             $data['children'] = array_map(function ($child) {
-                if ($child instanceof PresetBlock) {
+                if ($child instanceof PresetChild) {
                     return $child->toArray();
                 }
 

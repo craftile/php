@@ -200,7 +200,6 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
 
         foreach ($template['blocks'] as $blockId => $blockData) {
             if (($blockData['static'] ?? false) && ! empty($blockData['children'])) {
-                // Generate children closure for this static block
                 $childrenClosureCode = $this->generateChildrenClosureForStaticBlock($blockData, $template, $path);
                 if ($childrenClosureCode) {
                     $staticBlocksChildren[$blockId] = $childrenClosureCode;

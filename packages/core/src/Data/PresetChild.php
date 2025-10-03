@@ -5,10 +5,10 @@ namespace Craftile\Core\Data;
 use JsonSerializable;
 
 /**
- * Represents a block within a preset configuration.
+ * Represents a child block within a preset configuration.
  * Supports fluent API for building nested block structures.
  */
-class PresetBlock implements JsonSerializable
+class PresetChild implements JsonSerializable
 {
     protected string $type;
 
@@ -21,7 +21,7 @@ class PresetBlock implements JsonSerializable
     protected array $children = [];
 
     /**
-     * Create a new preset block instance.
+     * Create a new preset child instance.
      */
     public function __construct(string $type)
     {
@@ -29,7 +29,7 @@ class PresetBlock implements JsonSerializable
     }
 
     /**
-     * Create a new preset block.
+     * Create a new preset child.
      */
     public static function make(string $type): self
     {

@@ -7,7 +7,7 @@ namespace Tests\Laravel\Stubs\Discovery;
 use Craftile\Core\Concerns\IsBlock;
 use Craftile\Core\Contracts\BlockInterface;
 use Craftile\Core\Data\BlockPreset;
-use Craftile\Core\Data\PresetBlock;
+use Craftile\Core\Data\PresetChild;
 
 class ContainerBlock implements BlockInterface
 {
@@ -38,8 +38,8 @@ class ContainerBlock implements BlockInterface
         //     ->description('Container with a heading and description')
         //     ->properties(['gap' => 12])
         //     ->blocks([
-        //         PresetBlock::make('text')->id('heading')->properties(['content' => '<h2>Title</h2>']),
-        //         PresetBlock::make('text')->id('description')->properties(['content' => '<p>Description</p>']),
+        //         PresetChild::make('text')->id('heading')->properties(['content' => '<h2>Title</h2>']),
+        //         PresetChild::make('text')->id('description')->properties(['content' => '<p>Description</p>']),
         //     ]),
 
         // Array syntax example

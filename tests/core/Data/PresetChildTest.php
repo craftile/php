@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-use Craftile\Core\Data\PresetBlock;
+use Craftile\Core\Data\PresetChild;
 
-describe('PresetBlock', function () {
+describe('PresetChild', function () {
     it('can be created with type', function () {
-        $block = PresetBlock::make('text');
+        $block = PresetChild::make('text');
 
         expect($block->toArray())->toHaveKey('type', 'text');
     });
 
     it('can set id', function () {
-        $block = PresetBlock::make('text')->id('heading');
+        $block = PresetChild::make('text')->id('heading');
 
         $array = $block->toArray();
         expect($array)->toHaveKey('type', 'text');
@@ -20,7 +20,7 @@ describe('PresetBlock', function () {
     });
 
     it('can set properties', function () {
-        $block = PresetBlock::make('text')
+        $block = PresetChild::make('text')
             ->properties(['content' => '<h1>Title</h1>']);
 
         $array = $block->toArray();
@@ -29,24 +29,24 @@ describe('PresetBlock', function () {
     });
 
     it('can mark as static', function () {
-        $block = PresetBlock::make('text')->static();
+        $block = PresetChild::make('text')->static();
 
         $array = $block->toArray();
         expect($array)->toHaveKey('static', true);
     });
 
     it('does not include static in array when false', function () {
-        $block = PresetBlock::make('text')->static(false);
+        $block = PresetChild::make('text')->static(false);
 
         $array = $block->toArray();
         expect($array)->not()->toHaveKey('static');
     });
 
     it('can set children using blocks method', function () {
-        $block = PresetBlock::make('container')
+        $block = PresetChild::make('container')
             ->blocks([
-                PresetBlock::make('text')->id('child1'),
-                PresetBlock::make('text')->id('child2'),
+                PresetChild::make('text')->id('child1'),
+                PresetChild::make('text')->id('child2'),
             ]);
 
         $array = $block->toArray();
@@ -57,9 +57,9 @@ describe('PresetBlock', function () {
     });
 
     it('can set children using children method alias', function () {
-        $block = PresetBlock::make('container')
+        $block = PresetChild::make('container')
             ->children([
-                PresetBlock::make('text')->id('child1'),
+                PresetChild::make('text')->id('child1'),
             ]);
 
         $array = $block->toArray();
@@ -68,16 +68,16 @@ describe('PresetBlock', function () {
     });
 
     it('supports nested children', function () {
-        $block = PresetBlock::make('section')
+        $block = PresetChild::make('section')
             ->id('hero')
             ->children([
-                PresetBlock::make('container')
+                PresetChild::make('container')
                     ->id('wrapper')
                     ->children([
-                        PresetBlock::make('text')
+                        PresetChild::make('text')
                             ->id('title')
                             ->properties(['content' => '<h1>Hero Title</h1>']),
-                        PresetBlock::make('button')
+                        PresetChild::make('button')
                             ->id('cta')
                             ->properties(['label' => 'Get Started']),
                     ]),
@@ -90,9 +90,9 @@ describe('PresetBlock', function () {
     });
 
     it('supports mixed child types (objects and arrays)', function () {
-        $block = PresetBlock::make('container')
+        $block = PresetChild::make('container')
             ->children([
-                PresetBlock::make('text')->id('obj'),
+                PresetChild::make('text')->id('obj'),
                 ['type' => 'text', 'id' => 'arr'],
             ]);
 
@@ -103,7 +103,7 @@ describe('PresetBlock', function () {
     });
 
     it('can chain all methods fluently', function () {
-        $block = PresetBlock::make('text')
+        $block = PresetChild::make('text')
             ->id('heading')
             ->properties(['content' => '<h1>Title</h1>'])
             ->static();
@@ -116,7 +116,7 @@ describe('PresetBlock', function () {
     });
 
     it('is json serializable', function () {
-        $block = PresetBlock::make('text')
+        $block = PresetChild::make('text')
             ->id('test')
             ->properties(['content' => 'Test']);
 
@@ -129,7 +129,7 @@ describe('PresetBlock', function () {
     });
 
     it('omits null and empty values from array', function () {
-        $block = PresetBlock::make('text');
+        $block = PresetChild::make('text');
 
         $array = $block->toArray();
         expect($array)->toHaveKey('type');

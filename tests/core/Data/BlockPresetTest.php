@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Craftile\Core\Data\BlockPreset;
-use Craftile\Core\Data\PresetBlock;
+use Craftile\Core\Data\PresetChild;
 
 describe('BlockPreset', function () {
     it('can be created with name', function () {
@@ -56,8 +56,8 @@ describe('BlockPreset', function () {
     it('can set blocks', function () {
         $preset = BlockPreset::make('Test Preset')
             ->blocks([
-                PresetBlock::make('text')->id('heading'),
-                PresetBlock::make('text')->id('description'),
+                PresetChild::make('text')->id('heading'),
+                PresetChild::make('text')->id('description'),
             ]);
 
         $array = $preset->toArray();
@@ -70,7 +70,7 @@ describe('BlockPreset', function () {
     it('serializes blocks as children in array output', function () {
         $preset = BlockPreset::make('Test')
             ->blocks([
-                PresetBlock::make('text'),
+                PresetChild::make('text'),
             ]);
 
         $array = $preset->toArray();
@@ -83,15 +83,15 @@ describe('BlockPreset', function () {
             ->description('A hero section with heading and CTA')
             ->properties(['backgroundColor' => '#fff'])
             ->blocks([
-                PresetBlock::make('container')
+                PresetChild::make('container')
                     ->id('hero')
                     ->properties(['padding' => 40])
                     ->children([
-                        PresetBlock::make('text')
+                        PresetChild::make('text')
                             ->id('title')
                             ->static()
                             ->properties(['content' => '<h1>Welcome</h1>']),
-                        PresetBlock::make('button')
+                        PresetChild::make('button')
                             ->id('cta')
                             ->properties(['label' => 'Get Started']),
                     ]),
@@ -109,7 +109,7 @@ describe('BlockPreset', function () {
     it('supports mixed block types (objects and arrays)', function () {
         $preset = BlockPreset::make('Test')
             ->blocks([
-                PresetBlock::make('text')->id('obj'),
+                PresetChild::make('text')->id('obj'),
                 ['type' => 'text', 'id' => 'arr'],
             ]);
 
@@ -127,7 +127,7 @@ describe('BlockPreset', function () {
             ->previewImageUrl('https://example.com/preview.jpg')
             ->properties(['gap' => 16])
             ->blocks([
-                PresetBlock::make('text')->id('test'),
+                PresetChild::make('text')->id('test'),
             ]);
 
         $array = $preset->toArray();
@@ -144,7 +144,7 @@ describe('BlockPreset', function () {
         $preset = BlockPreset::make('Test Preset')
             ->description('Test description')
             ->blocks([
-                PresetBlock::make('text')->id('test'),
+                PresetChild::make('text')->id('test'),
             ]);
 
         $json = json_encode($preset);
@@ -173,10 +173,10 @@ describe('BlockPreset', function () {
             ->description('Container with a heading and description')
             ->properties(['gap' => 12])
             ->blocks([
-                PresetBlock::make('text')
+                PresetChild::make('text')
                     ->id('heading')
                     ->properties(['content' => '<h2>Title</h2>']),
-                PresetBlock::make('text')
+                PresetChild::make('text')
                     ->id('description')
                     ->properties(['content' => '<p>Description</p>']),
             ]);

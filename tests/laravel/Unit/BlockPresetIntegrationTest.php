@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
-use Craftile\Core\Data\PresetBlock;
+use Craftile\Core\Data\PresetChild;
 use Tests\Laravel\Stubs\Discovery\ContainerBlock;
 
 describe('Block Preset Integration', function () {
@@ -60,8 +60,8 @@ describe('Block Preset Integration', function () {
                 ->description('A card with image and text')
                 ->properties(['padding' => 16])
                 ->blocks([
-                    PresetBlock::make('image')->id('cover'),
-                    PresetBlock::make('text')->id('title')->static(),
+                    PresetChild::make('image')->id('cover'),
+                    PresetChild::make('text')->id('title')->static(),
                 ]),
         ]);
 

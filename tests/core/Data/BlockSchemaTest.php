@@ -243,8 +243,8 @@ describe('BlockSchema', function () {
                 ->description('Container with heading')
                 ->properties(['gap' => 12])
                 ->blocks([
-                    \Craftile\Core\Data\PresetBlock::make('text')->id('heading'),
-                    \Craftile\Core\Data\PresetBlock::make('text')->id('description'),
+                    \Craftile\Core\Data\PresetChild::make('text')->id('heading'),
+                    \Craftile\Core\Data\PresetChild::make('text')->id('description'),
                 ]),
         ];
 
@@ -270,7 +270,7 @@ describe('BlockSchema', function () {
                     ->description('Container with heading')
                     ->properties(['gap' => 12])
                     ->blocks([
-                        \Craftile\Core\Data\PresetBlock::make('text')->id('heading'),
+                        \Craftile\Core\Data\PresetChild::make('text')->id('heading'),
                     ]),
             ]
         );
