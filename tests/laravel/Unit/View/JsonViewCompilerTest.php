@@ -537,3 +537,43 @@ test('multiple blocks with different wrappers compile correctly', function () {
     expect($compiled)->toContain('<article data-block="block-b" id="article-b" class="wrapper-b">');
     expect($compiled)->toContain('</article>');
 });
+
+test('assigns indices to blocks in regions', function () {
+    // Create a temp file with blocks
+    $filePath = sys_get_temp_dir().'/test_indices.json';
+    $template = json_encode([
+        'blocks' => [
+            'block-1' => ['id' => 'block-1', 'type' => 'test', 'properties' => []],
+            'block-2' => ['id' => 'block-2', 'type' => 'test', 'properties' => []],
+            'block-3' => ['id' => 'block-3', 'type' => 'test', 'properties' => []],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['block-1', 'block-2', 'block-3']],
+        ],
+    ]);
+
+    $this->files->put($filePath, $template);
+
+    // Load the file through BlockDatastore
+    app(\Craftile\Laravel\BlockDatastore::class)->loadFile($filePath);
+
+    // Get blocks and check their indices
+    $datastore = app(\Craftile\Laravel\BlockDatastore::class);
+
+    $block1 = $datastore->getBlock('block-1');
+    $block2 = $datastore->getBlock('block-2');
+    $block3 = $datastore->getBlock('block-3');
+
+    expect($block1->index)->toBe(0);
+    expect($block1->iteration)->toBe(1);
+
+    expect($block2->index)->toBe(1);
+    expect($block2->iteration)->toBe(2);
+
+    expect($block3->index)->toBe(2);
+    expect($block3->iteration)->toBe(3);
+
+    // Clean up
+    $this->files->delete($filePath);
+    $datastore->clear();
+});

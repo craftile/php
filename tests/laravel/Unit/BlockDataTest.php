@@ -71,4 +71,27 @@ describe('BlockData', function () {
         expect($blockData->properties->get('content'))->toBe('Custom content');
         expect($blockData->properties->has('content'))->toBeTrue();
     });
+
+    it('handles index in make method', function () {
+        $blockData = BlockData::make([
+            'id' => 'test',
+            'type' => 'text',
+            'index' => 2,
+        ]);
+
+        expect($blockData->index)->toBe(2);
+        expect($blockData->iteration)->toBe(3);
+    });
+
+    it('preserves index when merged with defaults', function () {
+        $blockData = BlockData::make([
+            'id' => 'test',
+            'type' => 'text',
+            'index' => 1,
+            'properties' => ['content' => 'Test'],
+        ]);
+
+        expect($blockData->index)->toBe(1);
+        expect($blockData->iteration)->toBe(2);
+    });
 });

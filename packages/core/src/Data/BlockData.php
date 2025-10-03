@@ -11,6 +11,8 @@ class BlockData implements JsonSerializable
 {
     protected mixed $resolveChildData;
 
+    public readonly ?int $iteration;
+
     final public function __construct(
         public readonly string $id,
         public readonly string $type,
@@ -21,9 +23,11 @@ class BlockData implements JsonSerializable
         public readonly bool $static = false,
         public readonly bool $repeated = false,
         public readonly ?string $semanticId = null,
+        public readonly ?int $index = null,
         mixed $resolveChildData = null,
     ) {
         $this->resolveChildData = $resolveChildData;
+        $this->iteration = $index !== null ? $index + 1 : null;
     }
 
     /**
@@ -43,6 +47,7 @@ class BlockData implements JsonSerializable
             static: $data['static'] ?? false,
             repeated: $data['repeated'] ?? false,
             semanticId: $data['semanticId'] ?? null,
+            index: $data['index'] ?? null,
             resolveChildData: $resolveChildData,
         );
     }
@@ -127,6 +132,8 @@ class BlockData implements JsonSerializable
             'static' => $this->static,
             'repeated' => $this->repeated,
             'semanticId' => $this->semanticId,
+            'index' => $this->index,
+            'iteration' => $this->iteration,
         ];
     }
 

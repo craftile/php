@@ -180,4 +180,79 @@ describe('BlockData', function () {
         expect($decoded)->toHaveKey('type', 'text');
         expect($decoded['properties'])->toHaveKey('content', 'JSON Test');
     });
+
+    it('has index and auto-computed iteration', function () {
+        $block = new BlockData(
+            id: 'test-block',
+            type: 'text',
+            properties: new PropertyBag([]),
+            index: 0
+        );
+
+        expect($block->index)->toBe(0);
+        expect($block->iteration)->toBe(1);
+    });
+
+    it('iteration is null when index is null', function () {
+        $block = new BlockData(
+            id: 'test-block',
+            type: 'text',
+            properties: new PropertyBag([])
+        );
+
+        expect($block->index)->toBeNull();
+        expect($block->iteration)->toBeNull();
+    });
+
+    it('computes iteration correctly for different indices', function () {
+        $block0 = new BlockData(id: 'b0', type: 'text', properties: new PropertyBag([]), index: 0);
+        $block1 = new BlockData(id: 'b1', type: 'text', properties: new PropertyBag([]), index: 1);
+        $block5 = new BlockData(id: 'b5', type: 'text', properties: new PropertyBag([]), index: 5);
+
+        expect($block0->index)->toBe(0);
+        expect($block0->iteration)->toBe(1);
+
+        expect($block1->index)->toBe(1);
+        expect($block1->iteration)->toBe(2);
+
+        expect($block5->index)->toBe(5);
+        expect($block5->iteration)->toBe(6);
+    });
+
+    it('includes index and iteration in toArray', function () {
+        $block = BlockData::make([
+            'id' => 'test',
+            'type' => 'text',
+            'index' => 2,
+        ]);
+
+        $array = $block->toArray();
+
+        expect($array)->toHaveKey('index', 2);
+        expect($array)->toHaveKey('iteration', 3);
+    });
+
+    it('includes index and iteration in json serialization', function () {
+        $block = BlockData::make([
+            'id' => 'test',
+            'type' => 'text',
+            'index' => 1,
+        ]);
+
+        $decoded = json_decode(json_encode($block), true);
+
+        expect($decoded)->toHaveKey('index', 1);
+        expect($decoded)->toHaveKey('iteration', 2);
+    });
+
+    it('handles index in make method', function () {
+        $block = BlockData::make([
+            'id' => 'test',
+            'type' => 'text',
+            'index' => 3,
+        ]);
+
+        expect($block->index)->toBe(3);
+        expect($block->iteration)->toBe(4);
+    });
 });
