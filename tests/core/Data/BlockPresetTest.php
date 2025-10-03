@@ -36,6 +36,14 @@ describe('BlockPreset', function () {
         expect($array)->toHaveKey('category', 'content');
     });
 
+    it('can set preview image url', function () {
+        $preset = BlockPreset::make('Test Preset')
+            ->previewImageUrl('https://example.com/preview.jpg');
+
+        $array = $preset->toArray();
+        expect($array)->toHaveKey('previewImageUrl', 'https://example.com/preview.jpg');
+    });
+
     it('can set properties', function () {
         $preset = BlockPreset::make('Test Preset')
             ->properties(['gap' => 12, 'padding' => 20]);
@@ -116,6 +124,7 @@ describe('BlockPreset', function () {
             ->description('A complete example')
             ->icon('test-icon')
             ->category('layouts')
+            ->previewImageUrl('https://example.com/preview.jpg')
             ->properties(['gap' => 16])
             ->blocks([
                 PresetBlock::make('text')->id('test'),
@@ -126,6 +135,7 @@ describe('BlockPreset', function () {
         expect($array)->toHaveKey('description', 'A complete example');
         expect($array)->toHaveKey('icon', 'test-icon');
         expect($array)->toHaveKey('category', 'layouts');
+        expect($array)->toHaveKey('previewImageUrl', 'https://example.com/preview.jpg');
         expect($array)->toHaveKey('properties');
         expect($array)->toHaveKey('children');
     });
@@ -153,6 +163,7 @@ describe('BlockPreset', function () {
         expect($array)->not()->toHaveKey('description');
         expect($array)->not()->toHaveKey('icon');
         expect($array)->not()->toHaveKey('category');
+        expect($array)->not()->toHaveKey('previewImageUrl');
         expect($array)->not()->toHaveKey('properties');
         expect($array)->not()->toHaveKey('children');
     });

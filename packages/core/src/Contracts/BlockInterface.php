@@ -57,6 +57,12 @@ interface BlockInterface
     public static function wrapper(): ?string;
 
     /**
+     * Get the preview image URL for this block.
+     * Return null if no preview image is available.
+     */
+    public static function previewImageUrl(): ?string;
+
+    /**
      * Define preset configurations for this block.
      * Presets provide predefined block configurations with custom properties and children.
      * Return an array of BlockPreset instances or array configurations.

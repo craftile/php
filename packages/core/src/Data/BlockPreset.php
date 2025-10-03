@@ -18,6 +18,8 @@ class BlockPreset implements JsonSerializable
 
     protected ?string $category = null;
 
+    protected ?string $previewImageUrl = null;
+
     protected array $properties = [];
 
     protected array $children = [];
@@ -69,6 +71,16 @@ class BlockPreset implements JsonSerializable
     }
 
     /**
+     * Set the preset preview image URL.
+     */
+    public function previewImageUrl(string $previewImageUrl): self
+    {
+        $this->previewImageUrl = $previewImageUrl;
+
+        return $this;
+    }
+
+    /**
      * Set the preset properties (overrides for the block's default properties).
      */
     public function properties(array $properties): self
@@ -107,6 +119,10 @@ class BlockPreset implements JsonSerializable
 
         if ($this->category !== null) {
             $data['category'] = $this->category;
+        }
+
+        if ($this->previewImageUrl !== null) {
+            $data['previewImageUrl'] = $this->previewImageUrl;
         }
 
         if (! empty($this->properties)) {
