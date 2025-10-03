@@ -77,9 +77,13 @@ trait HandlesCraftileBlocks
             craftile()->startBlock({$idVar}, $blockDataVar);
         } ?>
 
+        <?php if (craftile()->shouldRenderBlock($blockDataVar)): ?>
+
         {$wrapperOpening}
         {$compiler->compile($schema, $hash, '$childrenClosure', $propertiesExpr)}
         {$wrapperClosing}
+
+        <?php endif; ?>
 
         <?php if (craftile()->inPreview()) {
             craftile()->endBlock({$idVar});
