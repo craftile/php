@@ -1,0 +1,23 @@
+{
+  "blocks": {
+    "parent-block": {
+      "id": "parent-block",
+      "type": "container",
+      "children": ["dynamic-child"]
+    },
+    "static-child": {
+      "id": "static-child",
+      "type": "text",
+      "static": true,
+      "semanticId": "static-child",
+      "parentId": "parent-block"
+    },
+    "dynamic-child": {
+      "id": "dynamic-child",
+      "type": "button",
+      "static": false,
+      "semanticId": "dynamic-child",
+      "parentId": "parent-block"
+    }
+  }
+}

@@ -59,9 +59,11 @@ test('can track content layers', function () {
 
     $data = $collector->getCollectedData();
 
-    expect($data['regionsBeforeContent'])->toContain('header');
-    expect($data['regionsInContent'])->toContain('main');
-    expect($data['regionsAfterContent'])->toContain('footer');
+    // Verify regions are in correct order
+    expect($data['regions'])->toHaveCount(3);
+    expect($data['regions'][0]['name'])->toBe('header');
+    expect($data['regions'][1]['name'])->toBe('main');
+    expect($data['regions'][2]['name'])->toBe('footer');
 });
 
 test('detects if currently collecting', function () {
@@ -91,4 +93,136 @@ test('can check if in content region', function () {
 
     $collector->endContent();
     expect($collector->inContentRegion())->toBeFalse();
+});
+
+test('tracks render order of child blocks', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    // Create parent block
+    $parentBlock = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['dynamic-1', 'dynamic-2'],
+    ]);
+
+    $collector->startBlock('parent', $parentBlock);
+
+    // Render static blocks first (as they appear in template)
+    $staticBlock1 = BlockData::make([
+        'id' => 'static-1',
+        'type' => 'text',
+        'properties' => ['content' => 'Static 1'],
+        'parentId' => 'parent',
+        'static' => true,
+    ]);
+    $collector->startBlock('static-1', $staticBlock1);
+
+    $staticBlock2 = BlockData::make([
+        'id' => 'static-2',
+        'type' => 'text',
+        'properties' => ['content' => 'Static 2'],
+        'parentId' => 'parent',
+        'static' => true,
+    ]);
+    $collector->startBlock('static-2', $staticBlock2);
+
+    // Render dynamic blocks (from JSON children array)
+    $dynamicBlock1 = BlockData::make([
+        'id' => 'dynamic-1',
+        'type' => 'button',
+        'properties' => ['text' => 'Click me'],
+        'parentId' => 'parent',
+    ]);
+    $collector->startBlock('dynamic-1', $dynamicBlock1);
+
+    $dynamicBlock2 = BlockData::make([
+        'id' => 'dynamic-2',
+        'type' => 'button',
+        'properties' => ['text' => 'Submit'],
+        'parentId' => 'parent',
+    ]);
+    $collector->startBlock('dynamic-2', $dynamicBlock2);
+
+    $data = $collector->getCollectedData();
+
+    // Parent should have children in render order: static blocks first, then dynamic
+    expect($data['blocks']['parent']['children'])->toBe([
+        'static-1',
+        'static-2',
+        'dynamic-1',
+        'dynamic-2',
+    ]);
+});
+
+test('does not duplicate static blocks on repeated rendering', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $staticBlock = BlockData::make([
+        'id' => 'static-block',
+        'type' => 'text',
+        'properties' => ['content' => 'Static content'],
+        'static' => true,
+    ]);
+
+    // Render the same static block multiple times (simulating a loop)
+    $collector->startBlock('static-block', $staticBlock);
+    $collector->startBlock('static-block', $staticBlock);
+    $collector->startBlock('static-block', $staticBlock);
+
+    $data = $collector->getCollectedData();
+
+    // Block should only be collected once
+    expect($data['blocks'])->toHaveKey('static-block');
+    expect($data['blocks']['static-block']['type'])->toBe('text');
+});
+
+test('tracks children in visual order for nested parents', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    // Create grandparent
+    $grandparent = BlockData::make([
+        'id' => 'grandparent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['parent'],
+    ]);
+    $collector->startBlock('grandparent', $grandparent);
+
+    // Create parent with dynamic children in JSON
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'feature',
+        'properties' => [],
+        'parentId' => 'grandparent',
+        'children' => ['child-2'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    // Render static child first
+    $child1 = BlockData::make([
+        'id' => 'child-1',
+        'type' => 'text',
+        'properties' => [],
+        'parentId' => 'parent',
+        'static' => true,
+    ]);
+    $collector->startBlock('child-1', $child1);
+
+    // Render dynamic child second
+    $child2 = BlockData::make([
+        'id' => 'child-2',
+        'type' => 'button',
+        'properties' => [],
+        'parentId' => 'parent',
+    ]);
+    $collector->startBlock('child-2', $child2);
+
+    $data = $collector->getCollectedData();
+
+    // Parent should have children in visual order
+    expect($data['blocks']['parent']['children'])->toBe(['child-1', 'child-2']);
+
+    // Grandparent should still reference parent
+    expect($data['blocks']['grandparent']['children'])->toBe(['parent']);
 });

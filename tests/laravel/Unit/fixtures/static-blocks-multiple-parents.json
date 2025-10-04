@@ -1,0 +1,28 @@
+{
+  "blocks": {
+    "parent-1": {
+      "id": "parent-1",
+      "type": "container",
+      "children": []
+    },
+    "parent-2": {
+      "id": "parent-2",
+      "type": "container",
+      "children": []
+    },
+    "parent-1-shared": {
+      "id": "parent-1-shared",
+      "type": "text",
+      "static": true,
+      "semanticId": "shared-name",
+      "parentId": "parent-1"
+    },
+    "parent-2-shared": {
+      "id": "parent-2-shared",
+      "type": "text",
+      "static": true,
+      "semanticId": "shared-name",
+      "parentId": "parent-2"
+    }
+  }
+}
