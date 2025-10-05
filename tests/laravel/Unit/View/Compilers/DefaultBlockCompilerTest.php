@@ -32,26 +32,9 @@ test('compiles block with basic parameters', function () {
     $compiled = $compiler->compile($schema, 'abc123');
 
     expect($compiled)->toContain('$__blockInstanceabc123 = new \TestBlock;');
-    expect($compiled)->toContain('$__childrenabc123 = null;');
     expect($compiled)->toContain('if (method_exists($__blockInstanceabc123, \'setBlockData\'))');
     expect($compiled)->toContain('if (method_exists($__blockInstanceabc123, \'setContext\'))');
     expect($compiled)->toContain('$__blockViewabc123 = $__blockInstanceabc123->render();');
-});
-
-test('compiles block with children closure', function () {
-    $compiler = new DefaultBlockCompiler;
-
-    $schema = new BlockSchema(
-        type: 'container-block',
-        slug: 'container-block',
-        class: TestBlock::class,
-        name: 'Container Block'
-    );
-    $childrenCode = 'fn() => collect($children)->map(fn($c) => render($c))';
-    $compiled = $compiler->compile($schema, 'def456', $childrenCode);
-
-    expect($compiled)->toContain("\$__childrendef456 = {$childrenCode};");
-    expect($compiled)->not->toContain('$__childrendef456 = null;');
 });
 
 test('compiles block with custom attributes', function () {
@@ -99,7 +82,7 @@ test('handles view rendering and output', function () {
 
     expect($compiled)->toContain('if($__blockViewrender123 instanceof \\Illuminate\\View\\View)');
     expect($compiled)->toContain('$__blockViewDatarender123 = array_merge(');
-    expect($compiled)->toContain("['block' => \$__blockDatarender123, 'children' => \$__childrenrender123, '__craftileContext' => \$__mergedContext]");
+    expect($compiled)->toContain("['block' => \$__blockDatarender123, '__craftileContext' => \$__mergedContext]");
     expect($compiled)->toContain('echo $__blockViewrender123->with($__blockViewDatarender123)->render();');
     expect($compiled)->toContain('} else {');
     expect($compiled)->toContain('echo $__blockViewrender123;');
@@ -184,13 +167,11 @@ test('generates unique variable names with hash', function () {
     expect($compiled1)->toContain('$__blockInstanceunique1');
     expect($compiled1)->toContain('$__contextunique1');
     expect($compiled1)->toContain('$__blockViewunique1');
-    expect($compiled1)->toContain('$__childrenunique1');
 
     // Check unique2 variables
     expect($compiled2)->toContain('$__blockInstanceunique2');
     expect($compiled2)->toContain('$__contextunique2');
     expect($compiled2)->toContain('$__blockViewunique2');
-    expect($compiled2)->toContain('$__childrenunique2');
 
     // Ensure no cross-contamination
     expect($compiled1)->not->toContain('unique2');

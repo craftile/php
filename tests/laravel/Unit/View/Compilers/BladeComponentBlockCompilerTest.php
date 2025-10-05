@@ -71,23 +71,6 @@ describe('BladeComponentBlockCompiler', function () {
         expect($compiled)->toContain('<x-craftile-hero');
         expect($compiled)->toContain(':block="$__blockDataabc123"');
         expect($compiled)->toContain(':context="$__contextabc123"');
-        expect($compiled)->toContain(':children="$__childrenabc123"');
-        expect($compiled)->toContain('$__childrenabc123 = null;');
-    });
-
-    it('compiles block with children closure', function () {
-        $schema = new BlockSchema(
-            type: 'hero',
-            slug: 'hero',
-            class: TestBladeComponent::class,
-            name: 'Hero Block'
-        );
-        $childrenClosure = 'function() { return "child content"; }';
-        $compiled = $this->compiler->compile($schema, 'def456', $childrenClosure);
-
-        expect($compiled)->toContain('$__childrendef456 = function() { return "child content"; };');
-        expect($compiled)->toContain('<x-craftile-hero');
-        expect($compiled)->toContain(':children="$__childrendef456"');
     });
 
     it('compiles block with custom attributes', function () {
@@ -127,7 +110,7 @@ describe('BladeComponentBlockCompiler', function () {
         );
         $compiled = $this->compiler->compile($schema, 'mno345');
 
-        expect($compiled)->toContain('unset($__childrenmno345, $__contextmno345);');
+        expect($compiled)->toContain('unset($__contextmno345);');
     });
 
     it('generates unique variable names with hash', function () {
@@ -141,28 +124,13 @@ describe('BladeComponentBlockCompiler', function () {
         $compiled2 = $this->compiler->compile($schema, 'hash2');
 
         expect($compiled1)->toContain('$__blockDatahash1');
-        expect($compiled1)->toContain('$__childrenhash1');
         expect($compiled1)->toContain('$__contexthash1');
 
         expect($compiled2)->toContain('$__blockDatahash2');
-        expect($compiled2)->toContain('$__childrenhash2');
         expect($compiled2)->toContain('$__contexthash2');
 
         expect($compiled1)->not->toContain('hash2');
         expect($compiled2)->not->toContain('hash1');
-    });
-
-    it('handles empty children closure properly', function () {
-        $schema = new BlockSchema(
-            type: 'hero',
-            slug: 'hero',
-            class: TestBladeComponent::class,
-            name: 'Hero Block'
-        );
-        $compiled = $this->compiler->compile($schema, 'pqr678', '');
-
-        expect($compiled)->toContain('$__childrenpqr678 = null;');
-        expect($compiled)->not->toContain('$__childrenpqr678 = ;');
     });
 
     it('handles default custom attributes', function () {

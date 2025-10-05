@@ -3,6 +3,7 @@
 use Craftile\Laravel\View\NodeTransformers\CraftileChildrenTagTransformer;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
+use Stillat\BladeParser\Nodes\DirectiveNode;
 use Stillat\BladeParser\Nodes\LiteralNode;
 use Stillat\BladeParser\Nodes\Position;
 
@@ -71,9 +72,9 @@ test('transforms children tag to PHP code', function () {
     $result = $transformer->transform($node, null);
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
-    expect($result->content)->toContain('if(isset($children) && is_callable($children))');
-    expect($result->content)->toContain('$__contextToPass = isset($__craftileContext) ? $__craftileContext : []');
-    expect($result->content)->toContain('echo $children($__contextToPass)');
+    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePath($block->id)');
+    expect($result->content)->toContain('if(file_exists($__childrenFilePath))');
+    expect($result->content)->toContain('require $__childrenFilePath');
 });
 
 test('throws error when children tag has parameters', function () {
@@ -94,4 +95,36 @@ test('children transformer implements node transformer interface', function () {
     $transformer = new CraftileChildrenTagTransformer;
 
     expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
+});
+
+test('supports @children directive', function () {
+    $transformer = new CraftileChildrenTagTransformer;
+
+    $node = new DirectiveNode;
+    $node->content = 'children';
+
+    expect($transformer->supports($node))->toBeTrue();
+});
+
+test('does not support other directives', function () {
+    $transformer = new CraftileChildrenTagTransformer;
+
+    $node = new DirectiveNode;
+    $node->content = 'other';
+
+    expect($transformer->supports($node))->toBeFalse();
+});
+
+test('transforms @children directive to PHP code', function () {
+    $transformer = new CraftileChildrenTagTransformer;
+
+    $node = new DirectiveNode;
+    $node->content = 'children';
+
+    $result = $transformer->transform($node, null);
+
+    expect($result)->toBeInstanceOf(LiteralNode::class);
+    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePath($block->id)');
+    expect($result->content)->toContain('if(file_exists($__childrenFilePath))');
+    expect($result->content)->toContain('require $__childrenFilePath');
 });
