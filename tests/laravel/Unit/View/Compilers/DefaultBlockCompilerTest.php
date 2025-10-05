@@ -47,7 +47,7 @@ test('compiles block with custom attributes', function () {
         name: 'Button Block'
     );
     $customAttrs = "['variant' => 'primary', 'size' => 'large']";
-    $compiled = $compiler->compile($schema, 'ghi789', '', $customAttrs);
+    $compiled = $compiler->compile($schema, 'ghi789', $customAttrs);
 
     expect($compiled)->toContain('craftile()->filterContext(');
     expect($compiled)->toContain($customAttrs);

@@ -81,7 +81,7 @@ describe('BladeComponentBlockCompiler', function () {
             name: 'Hero Block'
         );
         $customAttributes = "['class' => 'custom-class', 'id' => 'custom-id']";
-        $compiled = $this->compiler->compile($schema, 'ghi789', '', $customAttributes);
+        $compiled = $this->compiler->compile($schema, 'ghi789', $customAttributes);
 
         expect($compiled)->toContain('craftile()->filterContext(');
         expect($compiled)->toContain($customAttributes);
