@@ -7,6 +7,8 @@ use JsonSerializable;
 /**
  * Represents a child block within a preset configuration.
  * Supports fluent API for building nested block structures.
+ *
+ * @phpstan-consistent-constructor
  */
 class PresetChild implements JsonSerializable
 {
@@ -31,15 +33,15 @@ class PresetChild implements JsonSerializable
     /**
      * Create a new preset child.
      */
-    public static function make(string $type): self
+    public static function make(string $type): static
     {
-        return new self($type);
+        return new static($type);
     }
 
     /**
      * Set the block's semantic ID.
      */
-    public function id(string $id): self
+    public function id(string $id): static
     {
         $this->id = $id;
 
@@ -49,7 +51,7 @@ class PresetChild implements JsonSerializable
     /**
      * Set the block's properties.
      */
-    public function properties(array $properties): self
+    public function properties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -59,7 +61,7 @@ class PresetChild implements JsonSerializable
     /**
      * Mark the block as static (non-editable).
      */
-    public function static(bool $static = true): self
+    public function static(bool $static = true): static
     {
         $this->static = $static;
 
@@ -69,7 +71,7 @@ class PresetChild implements JsonSerializable
     /**
      * Set child blocks using the blocks() method.
      */
-    public function blocks(array $children): self
+    public function blocks(array $children): static
     {
         $this->children = $children;
 
@@ -79,7 +81,7 @@ class PresetChild implements JsonSerializable
     /**
      * Set child blocks using the children() method (alias for blocks()).
      */
-    public function children(array $children): self
+    public function children(array $children): static
     {
         return $this->blocks($children);
     }

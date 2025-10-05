@@ -7,6 +7,8 @@ use JsonSerializable;
 /**
  * Represents a block preset configuration.
  * Presets define predefined block configurations with custom properties and nested children.
+ *
+ * @phpstan-consistent-constructor
  */
 class BlockPreset implements JsonSerializable
 {
@@ -35,15 +37,15 @@ class BlockPreset implements JsonSerializable
     /**
      * Create a new block preset.
      */
-    public static function make(string $name): self
+    public static function make(string $name): static
     {
-        return new self($name);
+        return new static($name);
     }
 
     /**
      * Set the preset description.
      */
-    public function description(string $description): self
+    public function description(string $description): static
     {
         $this->description = $description;
 
@@ -53,7 +55,7 @@ class BlockPreset implements JsonSerializable
     /**
      * Set the preset icon.
      */
-    public function icon(string $icon): self
+    public function icon(string $icon): static
     {
         $this->icon = $icon;
 
@@ -63,7 +65,7 @@ class BlockPreset implements JsonSerializable
     /**
      * Set the preset category.
      */
-    public function category(string $category): self
+    public function category(string $category): static
     {
         $this->category = $category;
 
@@ -73,7 +75,7 @@ class BlockPreset implements JsonSerializable
     /**
      * Set the preset preview image URL.
      */
-    public function previewImageUrl(string $previewImageUrl): self
+    public function previewImageUrl(string $previewImageUrl): static
     {
         $this->previewImageUrl = $previewImageUrl;
 
@@ -83,7 +85,7 @@ class BlockPreset implements JsonSerializable
     /**
      * Set the preset properties (overrides for the block's default properties).
      */
-    public function properties(array $properties): self
+    public function properties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -93,7 +95,7 @@ class BlockPreset implements JsonSerializable
     /**
      * Set child blocks for this preset.
      */
-    public function blocks(array $children): self
+    public function blocks(array $children): static
     {
         $this->children = $children;
 
