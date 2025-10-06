@@ -37,6 +37,13 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
     protected array $resolved = [];
 
     /**
+     * Context for resolving dynamic sources.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $context = [];
+
+    /**
      * Create a new PropertyBag instance.
      *
      * @param  iterable<TKey, TValue>  $values
@@ -80,6 +87,20 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
         $type = null;
         if (is_array($schema) && isset($schema['type'])) {
             $type = $schema['type'];
+        }
+
+        // Detect dynamic source (@ prefix) and create DynamicSource object
+        if (is_string($value) && str_starts_with($value, '@')) {
+            $path = substr($value, 1); // Remove @ prefix
+            $default = is_array($schema) && isset($schema['default']) ? $schema['default'] : null;
+
+            $value = new DynamicSource(
+                path: $path,
+                type: $type ?? 'text', // Fallback to 'text' if no type specified
+                context: $this->context,
+                default: $default
+            );
+            $type = '__dynamic_source__';
         }
 
         $transformedValue = $this->transformValue($value, $type);
@@ -208,5 +229,19 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
     public function toArray(): array
     {
         return $this->all();
+    }
+
+    /**
+     * Set the context for resolving dynamic sources.
+     *
+     * @param  array<string, mixed>  $context
+     */
+    public function setContext(array $context): self
+    {
+        $this->context = $context;
+        // Clear resolved cache when context changes
+        $this->resolved = [];
+
+        return $this;
     }
 }
