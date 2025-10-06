@@ -127,12 +127,7 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
      */
     public function all(): array
     {
-        $result = [];
-        foreach (array_keys($this->values) as $key) {
-            $result[$key] = $this->get($key);
-        }
-
-        return $result;
+        return $this->values;
     }
 
     /**
