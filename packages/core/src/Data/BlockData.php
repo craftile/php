@@ -17,6 +17,7 @@ class BlockData implements JsonSerializable
         public readonly string $id,
         public readonly string $type,
         public readonly PropertyBag $properties,
+        public readonly ?string $name = null,
         public readonly ?string $parentId = null,
         public readonly ?array $childrenIds = [],
         public readonly bool $disabled = false,
@@ -41,6 +42,7 @@ class BlockData implements JsonSerializable
             id: $data['id'],
             type: $data['type'],
             properties: $properties,
+            name: $data['name'] ?? null,
             parentId: $data['parentId'] ?? null,
             childrenIds: $data['children'] ?? [],
             disabled: $data['disabled'] ?? false,
@@ -125,6 +127,7 @@ class BlockData implements JsonSerializable
         return [
             'id' => $this->id,
             'type' => $this->type,
+            'name' => $this->name,
             'properties' => $this->properties->toArray(),
             'parentId' => $this->parentId,
             'children' => $this->childrenIds,
