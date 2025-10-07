@@ -85,8 +85,22 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
         $schema = $this->schemas[$key] ?? null;
 
         $type = null;
-        if (is_array($schema) && isset($schema['type'])) {
-            $type = $schema['type'];
+        $isResponsive = false;
+        if (is_array($schema)) {
+            $type = $schema['type'] ?? null;
+            $isResponsive = $schema['responsive'] ?? false;
+        }
+
+        if ($isResponsive && is_array($value) && isset($value['_default'])) {
+            $transformedBreakpoints = [];
+            foreach ($value as $breakpoint => $breakpointValue) {
+                $transformedBreakpoints[$breakpoint] = $this->transformValue($breakpointValue, $type);
+            }
+
+            $responsiveValue = new ResponsiveValue($transformedBreakpoints, $type);
+            $this->resolved[$key] = $responsiveValue;
+
+            return $responsiveValue;
         }
 
         // Detect dynamic source (@ prefix) and create DynamicSource object

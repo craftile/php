@@ -59,6 +59,23 @@ abstract class Property
         return $this;
     }
 
+    /**
+     * Mark this property as responsive, allowing different values per breakpoint.
+     *
+     *
+     * @example
+     * ```php
+     * Text::make('title', 'Title')->responsive();
+     * Number::make('columns', 'Columns')->responsive()->default(1);
+     * ```
+     */
+    public function responsive(): static
+    {
+        $this->meta['responsive'] = true;
+
+        return $this;
+    }
+
     abstract public function type(): string;
 
     public function getId(): string
