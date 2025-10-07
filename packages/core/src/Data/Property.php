@@ -39,6 +39,26 @@ abstract class Property
         return $this;
     }
 
+    /**
+     * Set conditional visibility rule for this property.
+     *
+     * @param  callable  $callback  Callback that receives a Rule instance
+     *
+     * @example
+     * ```php
+     * $property->visibleIf(fn($rule) => $rule->where('layout', 'grid'));
+     * ```
+     */
+    public function visibleIf(callable $callback): static
+    {
+        $rule = new Rule;
+        $callback($rule);
+
+        $this->meta['visibleIf'] = $rule->toArray();
+
+        return $this;
+    }
+
     abstract public function type(): string;
 
     public function getId(): string
