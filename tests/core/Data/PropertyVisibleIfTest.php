@@ -13,7 +13,7 @@ class TestVisibleIfProperty extends Property
 
 test('property can have visibleIf condition', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
-        ->visibleIf(fn ($rule) => $rule->where('layout', 'grid'));
+        ->visibleIf(fn ($rule) => $rule->when('layout', 'grid'));
 
     $array = $property->toArray();
 
@@ -27,8 +27,8 @@ test('property can have visibleIf condition', function () {
 
 test('property visibleIf with multiple conditions', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
-        ->visibleIf(fn ($rule) => $rule->where('layout', 'grid')
-            ->where('status', 'published')
+        ->visibleIf(fn ($rule) => $rule->when('layout', 'grid')
+            ->when('status', 'published')
         );
 
     $array = $property->toArray();
@@ -39,7 +39,7 @@ test('property visibleIf with multiple conditions', function () {
 
 test('property visibleIf with in operator', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
-        ->visibleIf(fn ($rule) => $rule->whereIn('layout', ['grid', 'flex']));
+        ->visibleIf(fn ($rule) => $rule->whenIn('layout', ['grid', 'flex']));
 
     $array = $property->toArray();
 
@@ -52,8 +52,8 @@ test('property visibleIf with in operator', function () {
 
 test('property visibleIf with nested logic', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
-        ->visibleIf(fn ($rule) => $rule->where('layout', 'grid')
-            ->or(fn ($r) => $r->where('type', 'image'))
+        ->visibleIf(fn ($rule) => $rule->when('layout', 'grid')
+            ->or(fn ($r) => $r->when('type', 'image'))
         );
 
     $array = $property->toArray();
@@ -63,7 +63,7 @@ test('property visibleIf with nested logic', function () {
 
 test('property visibleIf with truthy condition', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
-        ->visibleIf(fn ($rule) => $rule->whereTruthy('is_active'));
+        ->visibleIf(fn ($rule) => $rule->whenTruthy('is_active'));
 
     $array = $property->toArray();
 
@@ -77,7 +77,7 @@ test('property visibleIf can be chained with other methods', function () {
     $property = TestVisibleIfProperty::make('test_field', 'Test Field')
         ->default('default value')
         ->placeholder('Enter value')
-        ->visibleIf(fn ($rule) => $rule->where('layout', 'grid'))
+        ->visibleIf(fn ($rule) => $rule->when('layout', 'grid'))
         ->info('Some info');
 
     $array = $property->toArray();
@@ -100,7 +100,7 @@ test('property without visibleIf has no visibleIf key', function () {
 test('property toArray includes all metadata', function () {
     $property = TestVisibleIfProperty::make('columns', 'Number of Columns')
         ->default('3')
-        ->visibleIf(fn ($rule) => $rule->where('layout', 'grid'));
+        ->visibleIf(fn ($rule) => $rule->when('layout', 'grid'));
 
     $array = $property->toArray();
 
@@ -114,5 +114,19 @@ test('property toArray includes all metadata', function () {
             'operator' => 'equals',
             'value' => 'grid',
         ],
+    ]);
+});
+
+test('property visibleWhen is an alias for visibleIf', function () {
+    $property = TestVisibleIfProperty::make('test_field', 'Test Field')
+        ->visibleWhen(fn ($rule) => $rule->when('status', 'published'));
+
+    $array = $property->toArray();
+
+    expect($array)->toHaveKey('visibleIf');
+    expect($array['visibleIf'])->toBe([
+        'field' => 'status',
+        'operator' => 'equals',
+        'value' => 'published',
     ]);
 });

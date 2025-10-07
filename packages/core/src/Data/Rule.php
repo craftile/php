@@ -13,8 +13,8 @@ namespace Craftile\Core\Data;
  * @example
  * ```php
  * $rule = Rule::make()
- *     ->where('layout_style', 'grid')
- *     ->whereIn('status', ['published', 'draft']);
+ *     ->when('layout_style', 'grid')
+ *     ->whenIn('status', ['published', 'draft']);
  * ```
  */
 class Rule
@@ -40,7 +40,7 @@ class Rule
      * @param  mixed  $operatorOrValue  Operator or value (if operator is omitted, defaults to equals)
      * @param  mixed  $value  The value to compare against (optional if operator is omitted)
      */
-    public function where(string $field, mixed $operatorOrValue, mixed $value = null): static
+    public function when(string $field, mixed $operatorOrValue, mixed $value = null): static
     {
         if ($value === null) {
             $operator = 'equals';
@@ -62,7 +62,7 @@ class Rule
     /**
      * Add a "not equals" condition.
      */
-    public function whereNot(string $field, mixed $value): static
+    public function whenNot(string $field, mixed $value): static
     {
         return $this->addCondition($field, 'not_equals', $value);
     }
@@ -70,7 +70,7 @@ class Rule
     /**
      * Add an "in array" condition.
      */
-    public function whereIn(string $field, array $values): static
+    public function whenIn(string $field, array $values): static
     {
         $this->rules[] = [
             'field' => $field,
@@ -84,7 +84,7 @@ class Rule
     /**
      * Add a "not in array" condition.
      */
-    public function whereNotIn(string $field, array $values): static
+    public function whenNotIn(string $field, array $values): static
     {
         $this->rules[] = [
             'field' => $field,
@@ -98,7 +98,7 @@ class Rule
     /**
      * Add a "greater than" condition.
      */
-    public function whereGt(string $field, mixed $value): static
+    public function whenGt(string $field, mixed $value): static
     {
         return $this->addCondition($field, 'greater_than', $value);
     }
@@ -106,7 +106,7 @@ class Rule
     /**
      * Add a "less than" condition.
      */
-    public function whereLt(string $field, mixed $value): static
+    public function whenLt(string $field, mixed $value): static
     {
         return $this->addCondition($field, 'less_than', $value);
     }
@@ -114,7 +114,7 @@ class Rule
     /**
      * Add a "truthy" condition (!!field === true).
      */
-    public function whereTruthy(string $field): static
+    public function whenTruthy(string $field): static
     {
         $this->rules[] = [
             'field' => $field,
@@ -127,7 +127,7 @@ class Rule
     /**
      * Add a "falsy" condition (!!field === false).
      */
-    public function whereFalsy(string $field): static
+    public function whenFalsy(string $field): static
     {
         $this->rules[] = [
             'field' => $field,

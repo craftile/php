@@ -46,7 +46,7 @@ abstract class Property
      *
      * @example
      * ```php
-     * $property->visibleIf(fn($rule) => $rule->where('layout', 'grid'));
+     * $property->visibleIf(fn($rule) => $rule->when('layout', 'grid'));
      * ```
      */
     public function visibleIf(callable $callback): static
@@ -57,6 +57,21 @@ abstract class Property
         $this->meta['visibleIf'] = $rule->toArray();
 
         return $this;
+    }
+
+    /**
+     * Alias for visibleIf().
+     *
+     * @param  callable  $callback  Callback that receives a Rule instance
+     *
+     * @example
+     * ```php
+     * $property->visibleWhen(fn($rule) => $rule->when('layout', 'grid'));
+     * ```
+     */
+    public function visibleWhen(callable $callback): static
+    {
+        return $this->visibleIf($callback);
     }
 
     /**

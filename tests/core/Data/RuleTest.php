@@ -3,7 +3,7 @@
 use Craftile\Core\Data\Rule;
 
 test('it creates a simple equals condition', function () {
-    $rule = Rule::make()->where('layout', 'grid');
+    $rule = Rule::make()->when('layout', 'grid');
 
     expect($rule->toArray())->toBe([
         'field' => 'layout',
@@ -13,7 +13,7 @@ test('it creates a simple equals condition', function () {
 });
 
 test('it creates equals condition with explicit operator', function () {
-    $rule = Rule::make()->where('status', '=', 'published');
+    $rule = Rule::make()->when('status', '=', 'published');
 
     expect($rule->toArray())->toBe([
         'field' => 'status',
@@ -23,7 +23,7 @@ test('it creates equals condition with explicit operator', function () {
 });
 
 test('it creates not equals condition', function () {
-    $rule = Rule::make()->whereNot('status', 'draft');
+    $rule = Rule::make()->whenNot('status', 'draft');
 
     expect($rule->toArray())->toBe([
         'field' => 'status',
@@ -33,7 +33,7 @@ test('it creates not equals condition', function () {
 });
 
 test('it creates in condition', function () {
-    $rule = Rule::make()->whereIn('type', ['image', 'video']);
+    $rule = Rule::make()->whenIn('type', ['image', 'video']);
 
     expect($rule->toArray())->toBe([
         'field' => 'type',
@@ -43,7 +43,7 @@ test('it creates in condition', function () {
 });
 
 test('it creates not in condition', function () {
-    $rule = Rule::make()->whereNotIn('type', ['draft', 'archived']);
+    $rule = Rule::make()->whenNotIn('type', ['draft', 'archived']);
 
     expect($rule->toArray())->toBe([
         'field' => 'type',
@@ -53,7 +53,7 @@ test('it creates not in condition', function () {
 });
 
 test('it creates greater than condition', function () {
-    $rule = Rule::make()->whereGt('views', 1000);
+    $rule = Rule::make()->whenGt('views', 1000);
 
     expect($rule->toArray())->toBe([
         'field' => 'views',
@@ -63,7 +63,7 @@ test('it creates greater than condition', function () {
 });
 
 test('it creates less than condition', function () {
-    $rule = Rule::make()->whereLt('views', 10);
+    $rule = Rule::make()->whenLt('views', 10);
 
     expect($rule->toArray())->toBe([
         'field' => 'views',
@@ -73,7 +73,7 @@ test('it creates less than condition', function () {
 });
 
 test('it creates truthy condition', function () {
-    $rule = Rule::make()->whereTruthy('is_active');
+    $rule = Rule::make()->whenTruthy('is_active');
 
     expect($rule->toArray())->toBe([
         'field' => 'is_active',
@@ -82,7 +82,7 @@ test('it creates truthy condition', function () {
 });
 
 test('it creates falsy condition', function () {
-    $rule = Rule::make()->whereFalsy('is_hidden');
+    $rule = Rule::make()->whenFalsy('is_hidden');
 
     expect($rule->toArray())->toBe([
         'field' => 'is_hidden',
@@ -92,8 +92,8 @@ test('it creates falsy condition', function () {
 
 test('it creates AND group with multiple conditions', function () {
     $rule = Rule::make()
-        ->where('layout', 'grid')
-        ->where('status', 'published');
+        ->when('layout', 'grid')
+        ->when('status', 'published');
 
     expect($rule->toArray())->toBe([
         'and' => [
@@ -113,8 +113,8 @@ test('it creates AND group with multiple conditions', function () {
 
 test('it creates nested AND group', function () {
     $rule = Rule::make()
-        ->where('layout', 'grid')
-        ->and(fn ($r) => $r->where('status', 'published')->where('visible', true));
+        ->when('layout', 'grid')
+        ->and(fn ($r) => $r->when('status', 'published')->when('visible', true));
 
     expect($rule->toArray())->toBe([
         'and' => [
@@ -143,8 +143,8 @@ test('it creates nested AND group', function () {
 
 test('it creates OR group', function () {
     $rule = Rule::make()
-        ->where('layout', 'flex')
-        ->or(fn ($r) => $r->where('type', 'image')->where('status', 'published'));
+        ->when('layout', 'flex')
+        ->or(fn ($r) => $r->when('type', 'image')->when('status', 'published'));
 
     $result = $rule->toArray();
 
@@ -153,10 +153,10 @@ test('it creates OR group', function () {
 });
 
 test('it normalizes operator symbols', function () {
-    $rule1 = Rule::make()->where('field', '==', 'value');
-    $rule2 = Rule::make()->where('field', '!=', 'value');
-    $rule3 = Rule::make()->where('field', '>', 100);
-    $rule4 = Rule::make()->where('field', '<', 100);
+    $rule1 = Rule::make()->when('field', '==', 'value');
+    $rule2 = Rule::make()->when('field', '!=', 'value');
+    $rule3 = Rule::make()->when('field', '>', 100);
+    $rule4 = Rule::make()->when('field', '<', 100);
 
     expect($rule1->toArray()['operator'])->toBe('equals');
     expect($rule2->toArray()['operator'])->toBe('not_equals');
@@ -166,9 +166,9 @@ test('it normalizes operator symbols', function () {
 
 test('it handles complex nested logic', function () {
     $rule = Rule::make()
-        ->where('layout', 'grid')
-        ->or(fn ($r) => $r->where('type', 'image')
-            ->where('status', 'published')
+        ->when('layout', 'grid')
+        ->or(fn ($r) => $r->when('type', 'image')
+            ->when('status', 'published')
         );
 
     $result = $rule->toArray();
@@ -179,9 +179,9 @@ test('it handles complex nested logic', function () {
 
 test('it supports fluent chaining', function () {
     $rule = Rule::make()
-        ->where('layout', 'grid')
-        ->whereIn('status', ['published', 'draft'])
-        ->whereGt('views', 100);
+        ->when('layout', 'grid')
+        ->whenIn('status', ['published', 'draft'])
+        ->whenGt('views', 100);
 
     expect($rule->toArray())->toHaveKey('and');
     expect($rule->toArray()['and'])->toHaveCount(3);
