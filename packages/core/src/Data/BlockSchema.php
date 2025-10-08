@@ -65,7 +65,7 @@ class BlockSchema implements JsonSerializable
     /**
      * Create schema from BlockInterface class.
      */
-    public static function fromClass(string $blockClass): self
+    public static function fromClass(string $blockClass): static
     {
         if (! class_exists($blockClass)) {
             throw new \InvalidArgumentException("Block class {$blockClass} does not exist");
@@ -75,7 +75,8 @@ class BlockSchema implements JsonSerializable
             throw new \InvalidArgumentException("Block class {$blockClass} must implement BlockInterface");
         }
 
-        return new self(
+        /** @phpstan-ignore-next-line */
+        return new static(
             type: $blockClass::type(),
             slug: $blockClass::slug(),
             class: $blockClass,

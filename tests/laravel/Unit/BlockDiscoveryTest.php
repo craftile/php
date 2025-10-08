@@ -32,4 +32,39 @@ describe('BlockDiscovery', function () {
 
         expect($this->registry->getAllSchemas())->toBeEmpty();
     });
+
+    it('uses custom BlockSchema class from config', function () {
+        config(['craftile.block_schema_class' => CustomBlockSchema::class]);
+
+        $stubsDir = __DIR__.'/../Stubs/Discovery';
+        $this->discovery->scan('Tests\Laravel\Stubs\Discovery', $stubsDir);
+
+        $schema = $this->registry->getSchema('stub-test-block');
+
+        expect($schema)->toBeInstanceOf(CustomBlockSchema::class);
+        expect($schema->customProperty)->toBe('custom value');
+    });
+
+    it('throws exception when custom BlockSchema class does not extend BlockSchema', function () {
+        config(['craftile.block_schema_class' => \stdClass::class]);
+
+        $stubsDir = __DIR__.'/../Stubs/Discovery';
+
+        expect(fn () => $this->discovery->scan('Tests\Laravel\Stubs\Discovery', $stubsDir))
+            ->toThrow(\InvalidArgumentException::class, 'must extend Craftile\Core\Data\BlockSchema');
+    });
 });
+
+// Custom BlockSchema class for testing
+class CustomBlockSchema extends \Craftile\Core\Data\BlockSchema
+{
+    public string $customProperty = 'custom value';
+
+    public static function fromClass(string $blockClass): static
+    {
+        $instance = parent::fromClass($blockClass);
+        $instance->customProperty = 'custom value';
+
+        return $instance;
+    }
+}
