@@ -41,12 +41,11 @@ class ResponsiveValue implements Stringable
      * Magic getter to access breakpoint-specific values.
      *
      * @param  string  $breakpoint  The breakpoint name (e.g., 'md', 'lg', 'xl')
-     * @return mixed The value for the breakpoint, or default if not set
+     * @return mixed The value for the breakpoint, or null
      */
     public function __get(string $breakpoint): mixed
     {
-        // Return breakpoint value if it exists, otherwise fallback to _default
-        return $this->values[$breakpoint] ?? $this->defaultValue;
+        return $this->values[$breakpoint] ?? null;
     }
 
     /**

@@ -44,7 +44,7 @@ describe('ResponsiveValue', function () {
         expect($responsive->xl)->toBe('Extra Large');
     });
 
-    it('falls back to default when breakpoint not set', function () {
+    it('returns null when breakpoint not set', function () {
         $values = [
             '_default' => 'Default',
             'md' => 'Medium',
@@ -52,9 +52,9 @@ describe('ResponsiveValue', function () {
 
         $responsive = new ResponsiveValue($values);
 
-        expect($responsive->sm)->toBe('Default'); // No sm value, falls back
-        expect($responsive->lg)->toBe('Default'); // No lg value, falls back
-        expect($responsive->xl)->toBe('Default'); // No xl value, falls back
+        expect($responsive->sm)->toBeNull(); // No sm value, returns null
+        expect($responsive->lg)->toBeNull(); // No lg value, returns null
+        expect($responsive->xl)->toBeNull(); // No xl value, returns null
         expect($responsive->md)->toBe('Medium'); // Has md value
     });
 
@@ -124,7 +124,7 @@ describe('ResponsiveValue', function () {
         expect($responsive->md)->toBe(2);
         expect($responsive->lg)->toBe(4);
         expect($responsive->xl)->toBe(8);
-        expect($responsive->sm)->toBe(1); // Fallback
+        expect($responsive->sm)->toBeNull(); // Returns null when not set
     });
 
     it('works with array values', function () {
@@ -148,7 +148,7 @@ describe('ResponsiveValue', function () {
         $responsive = new ResponsiveValue($values);
 
         expect($responsive->value())->toBeNull();
-        expect($responsive->sm)->toBeNull(); // Fallback to null
+        expect($responsive->sm)->toBeNull(); // Returns null when not set
         expect($responsive->md)->toBe('Medium');
     });
 
