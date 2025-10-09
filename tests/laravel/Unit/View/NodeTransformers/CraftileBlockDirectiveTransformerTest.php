@@ -88,3 +88,25 @@ test('directive transformer implements node transformer interface', function () 
 
     expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
 });
+
+test('extracts custom attributes from third parameter', function () {
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"', "['class' => 'custom-class']"]);
+
+    expect($node->arguments->getArgValues())->toHaveCount(3);
+    expect($node->arguments->getArgValues()[2])->toBe("['class' => 'custom-class']");
+});
+
+test('uses empty array as default when no custom attributes provided', function () {
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"']);
+
+    // Only 2 arguments, third should default to []
+    expect($node->arguments->getArgValues())->toHaveCount(2);
+});
+
+test('handles complex custom attributes expressions', function () {
+    $customAttrs = "['class' => \$className, 'data-id' => \$itemId, 'style' => 'color: red']";
+    $node = createMockDirectiveNode('craftileBlock', ['"hero"', '"hero-1"', $customAttrs]);
+
+    expect($node->arguments->getArgValues())->toHaveCount(3);
+    expect($node->arguments->getArgValues()[2])->toBe($customAttrs);
+});

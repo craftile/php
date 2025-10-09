@@ -192,3 +192,114 @@ test('handles custom attributes expression with default', function () {
     // Should include the default empty array when no custom attributes provided
     expect($compiled)->toContain('[]');
 });
+
+describe('Custom Attributes Integration', function () {
+    it('passes custom attributes through filterContext', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'card',
+            slug: 'card',
+            class: TestBlock::class,
+            name: 'Card Block'
+        );
+
+        $customAttrs = "['variant' => 'primary', 'size' => 'large']";
+        $compiled = $compiler->compile($schema, 'card123', $customAttrs);
+
+        // Custom attributes should be passed to filterContext
+        expect($compiled)->toContain("craftile()->filterContext(get_defined_vars(), ['variant' => 'primary', 'size' => 'large'])");
+    });
+
+    it('makes custom attributes available to block instance via context', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'button',
+            slug: 'button',
+            class: TestBlock::class,
+            name: 'Button Block'
+        );
+
+        $customAttrs = "['class' => 'btn-primary']";
+        $compiled = $compiler->compile($schema, 'btn456', $customAttrs);
+
+        // Context should be set on block instance
+        expect($compiled)->toContain('if (method_exists($__blockInstancebtn456, \'setContext\')) {');
+        expect($compiled)->toContain('$__blockInstancebtn456->setContext($__contextbtn456);');
+
+        // Context should include custom attributes
+        expect($compiled)->toContain("craftile()->filterContext(get_defined_vars(), ['class' => 'btn-primary'])");
+    });
+
+    it('injects custom attributes into PropertyBag context', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'hero',
+            slug: 'hero',
+            class: TestBlock::class,
+            name: 'Hero Block'
+        );
+
+        $customAttrs = "['theme' => 'dark']";
+        $compiled = $compiler->compile($schema, 'hero789', $customAttrs);
+
+        // PropertyBag should receive context with custom attributes
+        expect($compiled)->toContain('$__blockDatahero789->properties->setContext($__mergedContext);');
+    });
+
+    it('merges custom attributes with view data for rendering', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'section',
+            slug: 'section',
+            class: TestBlock::class,
+            name: 'Section Block'
+        );
+
+        $customAttrs = "['spacing' => 'large', 'align' => 'center']";
+        $compiled = $compiler->compile($schema, 'sect101', $customAttrs);
+
+        // View data should include merged context
+        expect($compiled)->toContain('$__blockViewDatasect101 = array_merge(');
+        expect($compiled)->toContain('$__mergedContext');
+        expect($compiled)->toContain("['block' => \$__blockDatasect101, '__craftileContext' => \$__mergedContext]");
+    });
+
+    it('handles dynamic custom attributes expressions', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'dynamic',
+            slug: 'dynamic',
+            class: TestBlock::class,
+            name: 'Dynamic Block'
+        );
+
+        $customAttrs = '$dynamicAttrs';
+        $compiled = $compiler->compile($schema, 'dyn202', $customAttrs);
+
+        // Should accept variable expressions
+        expect($compiled)->toContain('craftile()->filterContext(get_defined_vars(), $dynamicAttrs)');
+    });
+
+    it('preserves custom attributes through share() method merge', function () {
+        $compiler = new DefaultBlockCompiler;
+
+        $schema = new BlockSchema(
+            type: 'shared',
+            slug: 'shared',
+            class: TestBlock::class,
+            name: 'Shared Block'
+        );
+
+        $customAttrs = "['customProp' => 'value']";
+        $compiled = $compiler->compile($schema, 'shr303', $customAttrs);
+
+        // Custom attributes context should be merged with shared data
+        expect($compiled)->toContain('$__mergedContext = array_merge($__contextshr303, $__sharedData);');
+        expect($compiled)->toContain("craftile()->filterContext(get_defined_vars(), ['customProp' => 'value'])");
+    });
+});

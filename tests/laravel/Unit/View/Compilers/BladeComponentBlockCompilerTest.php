@@ -165,12 +165,130 @@ describe('BladeComponentBlockCompiler', function () {
             class: TestBladeComponent::class,
             name: 'Hero Block'
         );
-        $compiled = $this->compiler->compile($schema, 'vwx234', 'function() { return "test"; }', "['attr' => 'value']");
+        $compiled = $this->compiler->compile($schema, 'vwx234', "['attr' => 'value']");
 
         // Basic syntax checks
         expect($compiled)->toContain('<?php');
         expect($compiled)->toContain('?>');
         expect($compiled)->toContain(';'); // Statements end with semicolons
         expect($compiled)->not->toContain(';;'); // No double semicolons
+    });
+});
+
+describe('Custom Attributes Integration for Blade Components', function () {
+    beforeEach(function () {
+        $this->compiler = new BladeComponentBlockCompiler;
+    });
+
+    it('passes custom attributes through filterContext', function () {
+        $schema = new BlockSchema(
+            type: 'alert',
+            slug: 'alert',
+            class: TestBladeComponent::class,
+            name: 'Alert Component'
+        );
+
+        $customAttrs = "['variant' => 'danger', 'dismissible' => true]";
+        $compiled = $this->compiler->compile($schema, 'alert123', $customAttrs);
+
+        // Custom attributes should be passed to filterContext
+        expect($compiled)->toContain("craftile()->filterContext(get_defined_vars(), ['variant' => 'danger', 'dismissible' => true])");
+    });
+
+    it('makes custom attributes available via context variable', function () {
+        $schema = new BlockSchema(
+            type: 'modal',
+            slug: 'modal',
+            class: TestBladeComponent::class,
+            name: 'Modal Component'
+        );
+
+        $customAttrs = "['size' => 'large']";
+        $compiled = $this->compiler->compile($schema, 'modal456', $customAttrs);
+
+        // Context variable should be created
+        expect($compiled)->toContain('$__contextmodal456 = craftile()->filterContext(');
+
+        // Context should be passed to component
+        expect($compiled)->toContain(':context="$__contextmodal456"');
+    });
+
+    it('injects custom attributes into PropertyBag context', function () {
+        $schema = new BlockSchema(
+            type: 'card',
+            slug: 'card',
+            class: TestBladeComponent::class,
+            name: 'Card Component'
+        );
+
+        $customAttrs = "['elevation' => 2]";
+        $compiled = $this->compiler->compile($schema, 'card789', $customAttrs);
+
+        // PropertyBag should receive context with custom attributes
+        expect($compiled)->toContain('$__blockDatacard789->properties->setContext($__contextcard789);');
+    });
+
+    it('passes custom attributes to Blade component via context prop', function () {
+        $schema = new BlockSchema(
+            type: 'button',
+            slug: 'button',
+            class: TestBladeComponent::class,
+            name: 'Button Component'
+        );
+
+        $customAttrs = "['icon' => 'check', 'loading' => false]";
+        $compiled = $this->compiler->compile($schema, 'btn101', $customAttrs);
+
+        // Component tag should include context binding
+        expect($compiled)->toContain('<x-craftile-button');
+        expect($compiled)->toContain(':context="$__contextbtn101"');
+    });
+
+    it('handles dynamic custom attributes expressions', function () {
+        $schema = new BlockSchema(
+            type: 'dynamic',
+            slug: 'dynamic',
+            class: TestBladeComponent::class,
+            name: 'Dynamic Component'
+        );
+
+        $customAttrs = '$componentAttrs';
+        $compiled = $this->compiler->compile($schema, 'dyn202', $customAttrs);
+
+        // Should accept variable expressions
+        expect($compiled)->toContain('craftile()->filterContext(get_defined_vars(), $componentAttrs)');
+    });
+
+    it('cleans up context variable after rendering', function () {
+        $schema = new BlockSchema(
+            type: 'cleanup',
+            slug: 'cleanup',
+            class: TestBladeComponent::class,
+            name: 'Cleanup Component'
+        );
+
+        $customAttrs = "['test' => 'value']";
+        $compiled = $this->compiler->compile($schema, 'clean303', $customAttrs);
+
+        // Context variable should be unset
+        expect($compiled)->toContain('unset($__contextclean303);');
+    });
+
+    it('preserves block data with custom attributes context', function () {
+        $schema = new BlockSchema(
+            type: 'preserve',
+            slug: 'preserve',
+            class: TestBladeComponent::class,
+            name: 'Preserve Component'
+        );
+
+        $customAttrs = "['preserve' => true]";
+        $compiled = $this->compiler->compile($schema, 'pres404', $customAttrs);
+
+        // Block should be passed to component
+        expect($compiled)->toContain(':block="$__blockDatapres404"');
+
+        // Context should be set before component rendering
+        expect($compiled)->toContain('$__blockDatapres404->properties->setContext($__contextpres404);');
     });
 });
