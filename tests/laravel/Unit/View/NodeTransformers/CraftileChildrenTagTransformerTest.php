@@ -136,8 +136,8 @@ test('includes BEGIN and END comment markers for children', function () {
     $result = $transformer->transform($node, null);
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
-    expect($result->content)->toContain('<!--BEGIN children');
-    expect($result->content)->toContain('<!--END children');
+    expect($result->content)->toContain('<!--BEGIN children: ');
+    expect($result->content)->toContain('<!--END children: ');
     expect($result->content)->toContain('$block->id');
 });
 
@@ -151,6 +151,6 @@ test('comment markers are wrapped in preview mode check', function () {
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
     expect($result->content)->toContain('craftile()->inPreview()');
-    expect($result->content)->toContain('echo \'<!--BEGIN children');
-    expect($result->content)->toContain('echo \'<!--END children');
+    expect($result->content)->toContain('echo \'<!--BEGIN children: ');
+    expect($result->content)->toContain('echo \'<!--END children: ');
 });
