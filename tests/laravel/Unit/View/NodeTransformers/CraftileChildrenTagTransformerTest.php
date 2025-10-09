@@ -128,3 +128,29 @@ test('transforms @children directive to PHP code', function () {
     expect($result->content)->toContain('if(file_exists($__childrenFilePath))');
     expect($result->content)->toContain('require $__childrenFilePath');
 });
+
+test('includes BEGIN and END comment markers for children', function () {
+    $transformer = new CraftileChildrenTagTransformer;
+
+    $node = createMockChildrenComponentNode('craftile');
+    $result = $transformer->transform($node, null);
+
+    expect($result)->toBeInstanceOf(LiteralNode::class);
+    expect($result->content)->toContain('<!--BEGIN children');
+    expect($result->content)->toContain('<!--END children');
+    expect($result->content)->toContain('$block->id');
+});
+
+test('comment markers are wrapped in preview mode check', function () {
+    $transformer = new CraftileChildrenTagTransformer;
+
+    $node = new DirectiveNode;
+    $node->content = 'children';
+
+    $result = $transformer->transform($node, null);
+
+    expect($result)->toBeInstanceOf(LiteralNode::class);
+    expect($result->content)->toContain('craftile()->inPreview()');
+    expect($result->content)->toContain('echo \'<!--BEGIN children');
+    expect($result->content)->toContain('echo \'<!--END children');
+});
