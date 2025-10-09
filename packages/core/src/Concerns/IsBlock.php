@@ -120,4 +120,12 @@ trait IsBlock
     {
         return static::$presets ?? [];
     }
+
+    /**
+     * Check if block is private from static property.
+     */
+    public static function private(): bool
+    {
+        return static::$private ?? false;
+    }
 }

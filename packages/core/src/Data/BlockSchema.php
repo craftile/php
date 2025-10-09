@@ -34,6 +34,8 @@ class BlockSchema implements JsonSerializable
 
     public array $presets = [];
 
+    public bool $private = false;
+
     public function __construct(
         string $type,
         string $slug,
@@ -46,7 +48,8 @@ class BlockSchema implements JsonSerializable
         array $accepts = [],
         ?string $wrapper = null,
         ?string $previewImageUrl = null,
-        array $presets = []
+        array $presets = [],
+        bool $private = false
     ) {
         $this->type = $type;
         $this->slug = $slug;
@@ -60,6 +63,7 @@ class BlockSchema implements JsonSerializable
         $this->wrapper = $wrapper;
         $this->previewImageUrl = $previewImageUrl;
         $this->presets = $presets;
+        $this->private = $private;
     }
 
     /**
@@ -88,7 +92,8 @@ class BlockSchema implements JsonSerializable
             accepts: $blockClass::accepts(),
             wrapper: $blockClass::wrapper(),
             previewImageUrl: $blockClass::previewImageUrl(),
-            presets: $blockClass::presets()
+            presets: $blockClass::presets(),
+            private: $blockClass::private()
         );
     }
 
@@ -114,6 +119,7 @@ class BlockSchema implements JsonSerializable
             'presets' => array_map(function ($preset) {
                 return $preset instanceof BlockPreset ? $preset->toArray() : $preset;
             }, $this->presets),
+            'private' => $this->private,
         ];
     }
 

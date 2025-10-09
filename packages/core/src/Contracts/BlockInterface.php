@@ -70,6 +70,12 @@ interface BlockInterface
     public static function presets(): array;
 
     /**
+     * Check if this block is private.
+     * Return true to mark as private, false (default) for public.
+     */
+    public static function private(): bool;
+
+    /**
      * Render the block with its current data (and context).
      * Implementation can return HTML string or framework-specific response.
      */

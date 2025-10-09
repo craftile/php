@@ -304,4 +304,66 @@ describe('BlockSchema', function () {
         expect($array['presets'][0])->toHaveKey('name', 'Array Preset');
         expect($array['presets'][1])->toHaveKey('name', 'Object Preset');
     });
+
+    it('has private flag that defaults to false', function () {
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block');
+
+        expect($schema->private)->toBe(false);
+    });
+
+    it('can be created with private flag set to true', function () {
+        $schema = new BlockSchema(
+            'text',
+            'text',
+            TestBlock::class,
+            'Text Block',
+            private: true
+        );
+
+        expect($schema->private)->toBe(true);
+    });
+
+    it('can be created with private flag set to false explicitly', function () {
+        $schema = new BlockSchema(
+            'text',
+            'text',
+            TestBlock::class,
+            'Text Block',
+            private: false
+        );
+
+        expect($schema->private)->toBe(false);
+    });
+
+    it('includes private flag in toArray output', function () {
+        $publicSchema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block', private: false);
+        $privateSchema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block', private: true);
+
+        $publicArray = $publicSchema->toArray();
+        $privateArray = $privateSchema->toArray();
+
+        expect($publicArray)->toHaveKey('private', false);
+        expect($privateArray)->toHaveKey('private', true);
+    });
+
+    it('includes private flag in JSON serialization', function () {
+        $schema = new BlockSchema('text', 'text', TestBlock::class, 'Text Block', private: true);
+
+        $json = json_encode($schema);
+        $decoded = json_decode($json, true);
+
+        expect($decoded)->toHaveKey('private', true);
+    });
+
+    it('reads private flag from block class using fromClass', function () {
+        $schema = BlockSchema::fromClass(PrivateTestBlock::class);
+
+        expect($schema->private)->toBe(true);
+    });
 });
+
+// Test block with private flag set
+class PrivateTestBlock extends TestBlock
+{
+    protected static bool $private = true;
+}
