@@ -16,6 +16,8 @@ class PresetChild implements JsonSerializable
 
     protected ?string $id = null;
 
+    protected ?string $name = null;
+
     protected array $properties = [];
 
     protected bool $static = false;
@@ -44,6 +46,16 @@ class PresetChild implements JsonSerializable
     public function id(string $id): static
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Set the block's custom display name.
+     */
+    public function name(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }
@@ -97,6 +109,10 @@ class PresetChild implements JsonSerializable
 
         if ($this->id !== null) {
             $data['id'] = $this->id;
+        }
+
+        if ($this->name !== null) {
+            $data['name'] = $this->name;
         }
 
         if (! empty($this->properties)) {

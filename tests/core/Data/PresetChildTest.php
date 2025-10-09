@@ -134,8 +134,82 @@ describe('PresetChild', function () {
         $array = $block->toArray();
         expect($array)->toHaveKey('type');
         expect($array)->not()->toHaveKey('id');
+        expect($array)->not()->toHaveKey('name');
         expect($array)->not()->toHaveKey('properties');
         expect($array)->not()->toHaveKey('static');
         expect($array)->not()->toHaveKey('children');
+    });
+
+    it('can set custom block name', function () {
+        $block = PresetChild::make('text')
+            ->id('hero-title')
+            ->name('Hero Title');
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('type', 'text');
+        expect($array)->toHaveKey('id', 'hero-title');
+        expect($array)->toHaveKey('name', 'Hero Title');
+    });
+
+    it('includes name in toArray output', function () {
+        $block = PresetChild::make('text')->name('Custom Name');
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('name', 'Custom Name');
+    });
+
+    it('omits name when not set', function () {
+        $block = PresetChild::make('text')->id('test');
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('id', 'test');
+        expect($array)->not()->toHaveKey('name');
+    });
+
+    it('includes name in JSON serialization', function () {
+        $block = PresetChild::make('text')
+            ->name('Hero Section')
+            ->properties(['content' => 'Test']);
+
+        $json = json_encode($block);
+        $decoded = json_decode($json, true);
+
+        expect($decoded)->toHaveKey('name', 'Hero Section');
+        expect($decoded)->toHaveKey('properties');
+    });
+
+    it('supports name with nested children', function () {
+        $block = PresetChild::make('section')
+            ->id('hero')
+            ->name('Hero Section')
+            ->children([
+                PresetChild::make('text')
+                    ->id('title')
+                    ->name('Title Text')
+                    ->properties(['content' => '<h1>Hero</h1>']),
+                PresetChild::make('button')
+                    ->id('cta')
+                    ->name('Call to Action'),
+            ]);
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('name', 'Hero Section');
+        expect($array['children'][0])->toHaveKey('name', 'Title Text');
+        expect($array['children'][1])->toHaveKey('name', 'Call to Action');
+    });
+
+    it('can chain name with other methods fluently', function () {
+        $block = PresetChild::make('text')
+            ->id('heading')
+            ->name('Page Heading')
+            ->properties(['content' => '<h1>Title</h1>'])
+            ->static();
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('type', 'text');
+        expect($array)->toHaveKey('id', 'heading');
+        expect($array)->toHaveKey('name', 'Page Heading');
+        expect($array)->toHaveKey('properties');
+        expect($array)->toHaveKey('static', true);
     });
 });
