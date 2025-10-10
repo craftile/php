@@ -97,7 +97,7 @@ test('can check if block exists', function () {
     expect($this->datastore->hasBlock('test-block'))->toBeTrue();
 });
 
-test('can get block with defaults', function () {
+test('can get block with overrides', function () {
     $blocksData = [
         'blocks' => [
             'test-block' => [
@@ -114,12 +114,12 @@ test('can get block with defaults', function () {
 
     $this->datastore->loadFile($filePath);
 
-    // Get block with defaults - existing data should take precedence
-    $defaults = ['properties' => ['content' => 'Default', 'color' => 'blue']];
-    $block = $this->datastore->getBlock('test-block', $defaults);
+    // Get block with overrides - overrides should take precedence
+    $overrides = ['properties' => ['content' => 'Overridden', 'color' => 'blue']];
+    $block = $this->datastore->getBlock('test-block', $overrides);
 
-    expect($block->property('content'))->toBe('Original'); // Original value preserved
-    expect($block->property('color'))->toBe('blue'); // Default added
+    expect($block->property('content'))->toBe('Overridden'); // Override wins
+    expect($block->property('color'))->toBe('blue'); // New property added
 });
 
 test('handles non-existent files gracefully', function () {
