@@ -62,7 +62,7 @@ class BlockSchema implements JsonSerializable
         $this->accepts = static::normalizeAccepts($accepts);
         $this->wrapper = $wrapper;
         $this->previewImageUrl = $previewImageUrl;
-        $this->presets = $presets;
+        $this->presets = static::normalizePresets($presets);
         $this->private = $private;
     }
 
@@ -86,6 +86,28 @@ class BlockSchema implements JsonSerializable
             // Otherwise return as-is (type string or '*')
             return $item;
         }, $accepts);
+    }
+
+    /**
+     * Normalize presets array by converting class names to instances.
+     *
+     * @param  array  $presets  Raw presets array (may contain class names, instances, or arrays)
+     * @return array Normalized presets array (instances and arrays)
+     */
+    protected static function normalizePresets(array $presets): array
+    {
+        return array_map(function ($item) {
+            // If it's a class string that exists and extends BlockPreset
+            if (is_string($item) && class_exists($item)) {
+                if (is_subclass_of($item, BlockPreset::class)) {
+                    // Call ::make() to instantiate (name will be auto-derived)
+                    return $item::make();
+                }
+            }
+
+            // Otherwise return as-is (BlockPreset instance or array)
+            return $item;
+        }, $presets);
     }
 
     /**

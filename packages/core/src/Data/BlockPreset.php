@@ -29,17 +29,56 @@ class BlockPreset implements JsonSerializable
     /**
      * Create a new block preset instance.
      */
-    public function __construct(string $name)
+    public function __construct(?string $name = null)
     {
-        $this->name = $name;
+        $this->build();
+
+        // Set name with priority: constructor param > build() set value > getName()
+        $this->name = $name ?? $this->name ?? $this->getName();
     }
 
     /**
      * Create a new block preset.
      */
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return new static($name);
+    }
+
+    /**
+     * Get default preset name.
+     * Can be overridden in subclasses to provide a custom name.
+     */
+    protected function getName(): string
+    {
+        $class = (new \ReflectionClass(static::class))->getShortName();
+
+        // Remove "Preset" suffix if present
+        $class = preg_replace('/Preset$/', '', $class);
+
+        // Convert PascalCase to spaces (e.g., "RichText" -> "Rich Text")
+        $words = preg_replace('/(?<!^)[A-Z]/', ' $0', $class);
+
+        return trim($words);
+    }
+
+    /**
+     * Build the preset configuration.
+     * Override this method in subclasses to define preset structure.
+     */
+    protected function build(): void
+    {
+        // Base implementation does nothing
+    }
+
+    /**
+     * Set the preset name.
+     */
+    public function name(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -97,7 +136,63 @@ class BlockPreset implements JsonSerializable
      */
     public function blocks(array $children): static
     {
-        $this->children = $children;
+        $this->children = static::normalizeChildren($children);
+
+        return $this;
+    }
+
+    /**
+     * Normalize children array by converting class names to instances.
+     *
+     * @param  array  $children  Raw children array (may contain class names, instances, or arrays)
+     * @return array Normalized children array (instances and arrays)
+     */
+    protected static function normalizeChildren(array $children): array
+    {
+        return array_map(function ($item) {
+            // If it's a class string that exists and extends PresetChild
+            if (is_string($item) && class_exists($item)) {
+                if (is_subclass_of($item, PresetChild::class)) {
+                    // Call ::make() to instantiate (type will be auto-derived)
+                    return $item::make();
+                }
+            }
+
+            // Otherwise return as-is (PresetChild instance or array)
+            return $item;
+        }, $children);
+    }
+
+    /**
+     * Append a single child block to this preset.
+     */
+    public function addBlock(PresetChild|array|string $block): static
+    {
+        $normalized = static::normalizeChildren([$block]);
+        $this->children[] = $normalized[0];
+
+        return $this;
+    }
+
+    /**
+     * Append multiple child blocks to this preset.
+     */
+    public function addBlocks(array $blocks): static
+    {
+        $normalized = static::normalizeChildren($blocks);
+        foreach ($normalized as $block) {
+            $this->children[] = $block;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Merge additional properties into existing properties.
+     */
+    public function mergeProperties(array $properties): static
+    {
+        $this->properties = array_merge($this->properties, $properties);
 
         return $this;
     }

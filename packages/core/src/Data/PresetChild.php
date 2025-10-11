@@ -27,17 +27,57 @@ class PresetChild implements JsonSerializable
     /**
      * Create a new preset child instance.
      */
-    public function __construct(string $type)
+    public function __construct(?string $type = null)
     {
-        $this->type = $type;
+        // Call build() first to allow subclass configuration
+        $this->build();
+
+        // Set type with priority: constructor param > build() set value > getType()
+        $this->type = $type ?? $this->type ?? $this->getType();
     }
 
     /**
      * Create a new preset child.
      */
-    public static function make(string $type): static
+    public static function make(?string $type = null): static
     {
         return new static($type);
+    }
+
+    /**
+     * Get default preset child type.
+     * Can be overridden in subclasses to provide a custom type.
+     */
+    protected function getType(): string
+    {
+        $class = (new \ReflectionClass(static::class))->getShortName();
+
+        // Remove "PresetChild" or "Child" suffix if present
+        $class = preg_replace('/(PresetChild|Child)$/', '', $class);
+
+        // Convert PascalCase to kebab-case (e.g., "Paragraph" -> "paragraph")
+        $kebab = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $class));
+
+        return $kebab;
+    }
+
+    /**
+     * Build the preset child configuration.
+     * Override this method in subclasses to define structure.
+     */
+    protected function build(): void
+    {
+        // Base implementation does nothing
+    }
+
+    /**
+     * Set the block type.
+     */
+    public function type(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -85,7 +125,7 @@ class PresetChild implements JsonSerializable
      */
     public function blocks(array $children): static
     {
-        $this->children = $children;
+        $this->children = static::normalizeChildren($children);
 
         return $this;
     }
@@ -96,6 +136,78 @@ class PresetChild implements JsonSerializable
     public function children(array $children): static
     {
         return $this->blocks($children);
+    }
+
+    /**
+     * Normalize children array by converting class names to instances.
+     *
+     * @param  array  $children  Raw children array (may contain class names, instances, or arrays)
+     * @return array Normalized children array (instances and arrays)
+     */
+    protected static function normalizeChildren(array $children): array
+    {
+        return array_map(function ($item) {
+            // If it's a class string that exists and extends PresetChild
+            if (is_string($item) && class_exists($item)) {
+                if (is_subclass_of($item, self::class)) {
+                    // Call ::make() to instantiate (type will be auto-derived)
+                    return $item::make();
+                }
+            }
+
+            // Otherwise return as-is (PresetChild instance or array)
+            return $item;
+        }, $children);
+    }
+
+    /**
+     * Append a single child block to this preset child.
+     */
+    public function addChild(self|array|string $child): static
+    {
+        $normalized = static::normalizeChildren([$child]);
+        $this->children[] = $normalized[0];
+
+        return $this;
+    }
+
+    /**
+     * Append multiple child blocks to this preset child.
+     */
+    public function addChildren(array $children): static
+    {
+        $normalized = static::normalizeChildren($children);
+        foreach ($normalized as $child) {
+            $this->children[] = $child;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Append a single child block (alias for addChild()).
+     */
+    public function addBlock(self|array|string $child): static
+    {
+        return $this->addChild($child);
+    }
+
+    /**
+     * Append multiple child blocks (alias for addChildren()).
+     */
+    public function addBlocks(array $children): static
+    {
+        return $this->addChildren($children);
+    }
+
+    /**
+     * Merge additional properties into existing properties.
+     */
+    public function mergeProperties(array $properties): static
+    {
+        $this->properties = array_merge($this->properties, $properties);
+
+        return $this;
     }
 
     /**
