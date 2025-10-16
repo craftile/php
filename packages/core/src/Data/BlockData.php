@@ -23,6 +23,7 @@ class BlockData implements JsonSerializable
         public readonly bool $disabled = false,
         public readonly bool $static = false,
         public readonly bool $repeated = false,
+        public readonly bool $ghost = false,
         public readonly ?string $semanticId = null,
         public readonly ?int $index = null,
         mixed $resolveChildData = null,
@@ -48,6 +49,7 @@ class BlockData implements JsonSerializable
             disabled: $data['disabled'] ?? false,
             static: $data['static'] ?? false,
             repeated: $data['repeated'] ?? false,
+            ghost: $data['ghost'] ?? false,
             semanticId: $data['semanticId'] ?? null,
             index: $data['index'] ?? null,
             resolveChildData: $resolveChildData,
@@ -108,6 +110,14 @@ class BlockData implements JsonSerializable
     }
 
     /**
+     * Check if block is a ghost block (data-only, not rendered).
+     */
+    public function isGhost(): bool
+    {
+        return $this->ghost;
+    }
+
+    /**
      * Get child data if resolver is available.
      */
     public function getChildData(): mixed
@@ -134,6 +144,7 @@ class BlockData implements JsonSerializable
             'disabled' => $this->disabled,
             'static' => $this->static,
             'repeated' => $this->repeated,
+            'ghost' => $this->ghost,
             'semanticId' => $this->semanticId,
             'index' => $this->index,
             'iteration' => $this->iteration,

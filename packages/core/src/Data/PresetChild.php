@@ -22,6 +22,8 @@ class PresetChild implements JsonSerializable
 
     protected bool $static = false;
 
+    protected bool $ghost = false;
+
     protected array $children = [];
 
     /**
@@ -116,6 +118,16 @@ class PresetChild implements JsonSerializable
     public function static(bool $static = true): static
     {
         $this->static = $static;
+
+        return $this;
+    }
+
+    /**
+     * Mark the block as a ghost block (data-only, not rendered).
+     */
+    public function ghost(bool $ghost = true): static
+    {
+        $this->ghost = $ghost;
 
         return $this;
     }
@@ -233,6 +245,10 @@ class PresetChild implements JsonSerializable
 
         if ($this->static) {
             $data['static'] = $this->static;
+        }
+
+        if ($this->ghost) {
+            $data['ghost'] = $this->ghost;
         }
 
         if (! empty($this->children)) {

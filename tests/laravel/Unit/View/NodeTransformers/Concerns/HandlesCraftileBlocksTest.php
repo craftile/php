@@ -127,8 +127,9 @@ test('compileBlock includes shouldRenderBlock check', function () {
 
     $compiled = $this->handler->testCompileBlock('text', 'render-test', '[]', $node, null);
 
-    // Should check if block should be rendered
-    expect($compiled)->toContain('if (craftile()->shouldRenderBlock');
+    // Should check if block should be rendered (and not a ghost block)
+    expect($compiled)->toContain('isGhost()');
+    expect($compiled)->toContain('craftile()->shouldRenderBlock');
 });
 
 test('compileBlock cleans up block data variable', function () {
