@@ -24,6 +24,8 @@ class PresetChild implements JsonSerializable
 
     protected bool $ghost = false;
 
+    protected bool $repeated = false;
+
     protected array $children = [];
 
     /**
@@ -128,6 +130,16 @@ class PresetChild implements JsonSerializable
     public function ghost(bool $ghost = true): static
     {
         $this->ghost = $ghost;
+
+        return $this;
+    }
+
+    /**
+     * Mark the block as repeated (rendered in a loop).
+     */
+    public function repeated(bool $repeated = true): static
+    {
+        $this->repeated = $repeated;
 
         return $this;
     }
@@ -249,6 +261,10 @@ class PresetChild implements JsonSerializable
 
         if ($this->ghost) {
             $data['ghost'] = $this->ghost;
+        }
+
+        if ($this->repeated) {
+            $data['repeated'] = $this->repeated;
         }
 
         if (! empty($this->children)) {

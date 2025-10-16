@@ -42,6 +42,20 @@ describe('PresetChild', function () {
         expect($array)->not()->toHaveKey('static');
     });
 
+    it('can mark as repeated', function () {
+        $block = PresetChild::make('text')->repeated();
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('repeated', true);
+    });
+
+    it('does not include repeated in array when false', function () {
+        $block = PresetChild::make('text')->repeated(false);
+
+        $array = $block->toArray();
+        expect($array)->not()->toHaveKey('repeated');
+    });
+
     it('can set children using blocks method', function () {
         $block = PresetChild::make('container')
             ->blocks([
