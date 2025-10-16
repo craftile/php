@@ -95,6 +95,9 @@ describe('Ghost Blocks Integration', function () {
             expect($collected['blocks'])->toHaveKey('child-ghost');
             expect($collected['blocks']['child-ghost']['ghost'])->toBeTrue();
 
+            // Ghost child should be in parent's children array
+            expect($collected['blocks']['parent-1']['children'])->toContain('child-ghost');
+
             // Normal children are not auto-collected (they render normally)
             // They would be collected when they render
             expect($collected['blocks'])->not->toHaveKey('child-visible');
@@ -138,6 +141,10 @@ describe('Ghost Blocks Integration', function () {
             // Ghost child should only be collected once
             expect($collected['blocks'])->toHaveKey('ghost-1');
             expect($collected['blocks']['ghost-1']['ghost'])->toBeTrue();
+
+            // Ghost child should be in parent's children array (only once)
+            expect($collected['blocks']['parent-1']['children'])->toContain('ghost-1');
+            expect($collected['blocks']['parent-1']['children'])->toHaveCount(1);
 
             @unlink($testFile);
         });
@@ -189,6 +196,10 @@ describe('Ghost Blocks Integration', function () {
             expect($collected['blocks'])->toHaveKey('meta-desc');
             expect($collected['blocks']['meta-title']['ghost'])->toBeTrue();
             expect($collected['blocks']['meta-desc']['ghost'])->toBeTrue();
+
+            // Both ghost children should be in parent's children array
+            expect($collected['blocks']['page-1']['children'])->toContain('meta-title');
+            expect($collected['blocks']['page-1']['children'])->toContain('meta-desc');
 
             // Normal child not auto-collected
             expect($collected['blocks'])->not->toHaveKey('hero');
