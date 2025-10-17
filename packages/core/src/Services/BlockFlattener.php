@@ -99,7 +99,7 @@ class BlockFlattener
             $flatBlock['semanticId'] = $blockData['id'];
         }
 
-        $children = $blockData['children'] ?? $blockData['blocks'] ?? $blockData['content'] ?? null;
+        $children = $blockData['children'] ?? null;
 
         if (! empty($children) && $this->isNestedChildren($children)) {
             $childBlocks = $this->extractChildBlocks($children);
@@ -121,19 +121,15 @@ class BlockFlattener
             $flatBlock['children'] = $children;
         }
 
-        // Remove nested children data since we've flattened it
-        unset($flatBlock['blocks'], $flatBlock['content']);
-
         $flatBlocks[$uniqueId] = $flatBlock;
     }
 
     /**
      * Check if a block has nested children (not just ID references).
-     * Supports 'children', 'blocks', and 'content' property names.
      */
     protected function hasNestedChildren(array $block): bool
     {
-        $children = $block['children'] ?? $block['blocks'] ?? $block['content'] ?? null;
+        $children = $block['children'] ?? null;
 
         return $this->isNestedChildren($children);
     }

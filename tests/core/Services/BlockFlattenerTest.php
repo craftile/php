@@ -127,47 +127,6 @@ describe('BlockFlattener', function () {
         expect($blocks['parent']['children'])->toHaveCount(2);
     });
 
-    it('handles blocks property for children', function () {
-        $nested = [
-            'blocks' => [
-                'parent' => [
-                    'id' => 'parent',
-                    'type' => 'container',
-                    'blocks' => [
-                        ['id' => 'child1', 'type' => 'text'],
-                    ],
-                ],
-            ],
-        ];
-
-        $result = $this->flattener->flattenNestedStructure($nested);
-        $blocks = $result['blocks'];
-
-        expect($blocks)->toHaveCount(2);
-        expect($blocks['parent'])->toHaveKey('children');
-        expect($blocks['parent']['children'])->toHaveCount(1);
-    });
-
-    it('handles content property for children', function () {
-        $nested = [
-            'blocks' => [
-                'parent' => [
-                    'id' => 'parent',
-                    'type' => 'container',
-                    'content' => [
-                        ['id' => 'child1', 'type' => 'text'],
-                    ],
-                ],
-            ],
-        ];
-
-        $result = $this->flattener->flattenNestedStructure($nested);
-        $blocks = $result['blocks'];
-
-        expect($blocks)->toHaveCount(2);
-        expect($blocks['parent'])->toHaveKey('children');
-    });
-
     it('preserves parent-child relationships', function () {
         $nested = [
             'blocks' => [

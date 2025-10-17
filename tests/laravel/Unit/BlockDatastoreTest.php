@@ -193,6 +193,7 @@ test('uses in-memory cache only in preview mode', function () {
     Cache::flush();
 
     Craftile::shouldReceive('inPreview')->andReturn(true);
+    Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
     // First call should parse file (no Laravel cache in preview mode)
     $result1 = $this->datastore->getBlocksArray($filePath);
@@ -220,6 +221,7 @@ test('uses Laravel cache in production mode', function () {
     Cache::flush();
 
     Craftile::shouldReceive('inPreview')->andReturn(false);
+    Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
     // First call should store in Laravel cache
     $result1 = $this->datastore->getBlocksArray($filePath);
