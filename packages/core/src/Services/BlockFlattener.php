@@ -54,25 +54,17 @@ class BlockFlattener
      */
     protected function extractRegions(array $templateData): array
     {
-        if (isset($templateData['name']) && isset($templateData['order'])) {
-            return [
-                [
-                    'name' => $templateData['name'],
-                    'blocks' => $templateData['order'],
-                ],
-            ];
-        }
-
         if (isset($templateData['regions'])) {
             return $templateData['regions'];
         }
 
         // Default: single region with all blocks
+        $regionName = $templateData['name'] ?? 'main';
         $blockIds = array_keys($templateData['blocks'] ?? []);
 
         return [
             [
-                'name' => 'main',
+                'name' => $regionName,
                 'blocks' => $blockIds,
             ],
         ];
