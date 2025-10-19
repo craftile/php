@@ -63,6 +63,15 @@ class BlockPreset implements JsonSerializable
     }
 
     /**
+     * Get block type for asChild() method.
+     * Can be overridden in subclasses to provide a default type.
+     */
+    protected function getType(): ?string
+    {
+        return null;
+    }
+
+    /**
      * Build the preset configuration.
      * Override this method in subclasses to define preset structure.
      */
@@ -195,6 +204,37 @@ class BlockPreset implements JsonSerializable
         $this->properties = array_merge($this->properties, $properties);
 
         return $this;
+    }
+
+    /**
+     * Convert preset to a PresetChild for use in another preset's children.
+     *
+     * @param  string|null  $type  Block type (if null, uses getType())
+     *
+     * @throws \LogicException If no type provided and getType() returns null
+     */
+    public static function asChild(?string $type = null): PresetChild
+    {
+        $instance = new static;
+
+        // Priority: param > getType() > exception
+        $blockType = $type ?? $instance->getType();
+
+        if ($blockType === null) {
+            throw new \LogicException(
+                'Type must be provided via asChild($type) or by overriding getType() method in '.static::class
+            );
+        }
+
+        $child = PresetChild::make($blockType)
+            ->properties($instance->properties)
+            ->children($instance->children);
+
+        if (isset($instance->name)) {
+            $child->name($instance->name);
+        }
+
+        return $child;
     }
 
     /**
