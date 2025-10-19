@@ -164,4 +164,37 @@ describe('ResponsiveValue', function () {
 
         expect($greeting)->toBe('Hello World');
     });
+
+    it('can access default value using ->default', function () {
+        $values = [
+            '_default' => 'Default Value',
+            'md' => 'Medium Value',
+            'lg' => 'Large Value',
+        ];
+
+        $responsive = new ResponsiveValue($values);
+
+        // New cleaner API using ->default
+        expect($responsive->default)->toBe('Default Value');
+        // Backward compatibility - ->_default still works
+        expect($responsive->_default)->toBe('Default Value');
+    });
+
+    it('supports both ->default and ->_default syntax', function () {
+        $values = [
+            '_default' => 'Hello',
+            'sm' => 'Small',
+            'md' => 'Medium',
+        ];
+
+        $responsive = new ResponsiveValue($values);
+
+        // Both syntaxes should return the same value
+        expect($responsive->default)->toBe($responsive->_default);
+        expect($responsive->default)->toBe('Hello');
+
+        // Other breakpoints remain unchanged
+        expect($responsive->sm)->toBe('Small');
+        expect($responsive->md)->toBe('Medium');
+    });
 });
