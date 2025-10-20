@@ -1,4 +1,62 @@
-# 0.1.0 (2025-09-25)
+# [0.2.0](https://github.com/craftile/php/compare/v0.1.0...v0.2.0) (2025-10-20)
+
+
+### Bug Fixes
+
+* **core:** Update BlockPreset and PresetChild to use static return types for inheritance ([82468b3](https://github.com/craftile/php/commit/82468b3097bef8581ed92951812220a41720f383))
+* **laravel:** [@children](https://github.com/children) comment markers ([1ba6b0e](https://github.com/craftile/php/commit/1ba6b0eb40c1c20634658d02b1ad64306751d258))
+* **laravel:** collect block data for editor even if the block is disabled ([6a1390a](https://github.com/craftile/php/commit/6a1390a4db15a80fbdcf5239f47fefc2984ffe35))
+* **laravel:** fix [@craftile](https://github.com/craftile)Block and <craftile:block/> custom attributes compilation ([e3fb728](https://github.com/craftile/php/commit/e3fb7289471bb28c3f445038cbae60999c2ff173))
+* **laravel:** improve HandleUpdates data normalization ([947ae45](https://github.com/craftile/php/commit/947ae45a5a7f1fc4060c06665aeea7076893d0a5))
+* **laravel:** make sure ghost blocks are collected in preview mode for the editor ([b631da0](https://github.com/craftile/php/commit/b631da0b0be2d8a41d0cba4a8bddd513a7accbde))
+* **laravel:** prevent parent block context from overriding child block context ([a6990d7](https://github.com/craftile/php/commit/a6990d74218eecaedc995913a2a7dce9860a4abf))
+* **laravel:** remove childrenClosureCode from BlockCompilerInterface ([9ad6913](https://github.com/craftile/php/commit/9ad691310a734d3fd80bd14d041fbf74ea7c8dc2))
+* **laravel:** skip updating blocks marked for removal and reindex filtered regions ([cce42c3](https://github.com/craftile/php/commit/cce42c3bd1ba8e6969a006e1dbedbec6238a41e1))
+* **laravel:** when creating block data template context values that should override stored block data ([567b153](https://github.com/craftile/php/commit/567b15397fa0f65a7b97ee15de530e6ee426de37))
+* region extraction in BlockFlatenner ([bd69c54](https://github.com/craftile/php/commit/bd69c5490919dec335b53a81a077405aa5e4ecdd))
+
+
+### Features
+
+* add block wrapper support ([3cbb7dd](https://github.com/craftile/php/commit/3cbb7dd5ccf4cbbe2019b8c73b0de05f8469bdd1))
+* Add dynamic source properties value resolution for block properties ([c4f0055](https://github.com/craftile/php/commit/c4f0055f3c5ea8544969f5e3e8cd60204c0ac410))
+* add previewImageUrl support to blocks and presets ([d6f4a03](https://github.com/craftile/php/commit/d6f4a03507a1cfefa7eed0ffc3fc160ad773bbae))
+* add support for creating templates using PHP files (.craft.php) with a fluent API, providing a better developer experience than JSON/YAML ([42610b8](https://github.com/craftile/php/commit/42610b8a4f7ba9ffe9f7355c48ca4fff54d6e75d))
+* add support for ghost/data-only blocks ([0bf0a28](https://github.com/craftile/php/commit/0bf0a28876ca0e20e6d03edd5d64b8da1a878831))
+* add support for template normalizer ([1a0fba0](https://github.com/craftile/php/commit/1a0fba0f176bcc2600d1a763f7fdeeba03a1c165))
+* add type/slug support and update BlockCompiler to use BlockSchema ([3592da1](https://github.com/craftile/php/commit/3592da1dc97750832b77d7efd1fb587cd664a93b))
+* **core:** add asChild() API to BlockPreset so that it can be used as child in another preset ([e2a2f7c](https://github.com/craftile/php/commit/e2a2f7c88e25bcc5f085c5d63e96b28e1be0b939))
+* **core:** Add conditional property field visibility with visibleIf ([44ebbca](https://github.com/craftile/php/commit/44ebbcad3fca35f8f778b2ec23ac77997574fd18))
+* **core:** Add name property to BlockData ([d8494ec](https://github.com/craftile/php/commit/d8494ec9f664d4b9493c3b139b884b8368dc3d59))
+* **core:** add private flag support to block schemas ([3e7668b](https://github.com/craftile/php/commit/3e7668b26cf1d45ffe687180ea75a4e304c5822f))
+* **core:** add repeated() method to PresetChild ([b35ca55](https://github.com/craftile/php/commit/b35ca5504e22f1773973525d79a461ec51041005))
+* **core:** Add responsive properties support ([0d3cb88](https://github.com/craftile/php/commit/0d3cb882976e8ddacc830c97253852c00d743b28))
+* **core:** add support for custom block name to PresetChild ([77ef74c](https://github.com/craftile/php/commit/77ef74cb41779b6a1130f2afe1836b7f1c9cad13))
+* **core:** Add support for custom BlockSchema class override ([36a7dd2](https://github.com/craftile/php/commit/36a7dd265cec5e514df3a5651bdea350edfd5d11))
+* **core:** add support for reusable BlockPreset and PresetChild classes ([aeefba0](https://github.com/craftile/php/commit/aeefba057f378ec4da231e102dfe8a79e22bf395))
+* **core:** support accessing default value via ->default in ResponsiveValue ([a73502d](https://github.com/craftile/php/commit/a73502d1d6e5d921eeee06ea343bbf6077d6f8b9))
+* **core:** support block class names in accepts array ([288dc0a](https://github.com/craftile/php/commit/288dc0a3993d6a67f46b09ba1563aab4b91914e9))
+* **laravel:** add block index/iteration support ([ad55ba0](https://github.com/craftile/php/commit/ad55ba0580ba898fd1f809672861a9f053b0586d))
+* **laravel:** add block presets support ([9cc3192](https://github.com/craftile/php/commit/9cc31921ff7637fd7440c1985805c17aed85b496))
+* **laravel:** add cache invalidation for nested blocks in JSON view compilation ([715c1b1](https://github.com/craftile/php/commit/715c1b1a03ce93ed2f28ba61b9de98b6d358f55a))
+* **laravel:** add comment markers around [@children](https://github.com/children) compilation ([7973330](https://github.com/craftile/php/commit/79733307c7cfaded19ec8a6b518862c44d57cc7f))
+* **laravel:** add configuration for region view resolver ([1445f45](https://github.com/craftile/php/commit/1445f45e251d826eafc1b08b5caccc398221f2a8))
+* **laravel:** add HandleUpdates and UpdateRequest DTO for editor updates ([d51b657](https://github.com/craftile/php/commit/d51b657186c215dd3c24d0653c57a8afabe5999b))
+* **laravel:** add parent id and semantic id tracking to static blocks ([69e72f1](https://github.com/craftile/php/commit/69e72f1cc9321491975527bbcebfea3980f1fb6d))
+* **laravel:** add source file tracking to BlockData instances ([0f2ea7d](https://github.com/craftile/php/commit/0f2ea7d40e3b482b62b99761be8bc951a834095d))
+* **laravel:** add support for custom BlockData ([bfec696](https://github.com/craftile/php/commit/bfec6967d700e0048b8c471314cc932d2fadfb6f))
+* **laravel:** dispatch JsonViewLoaded when a json view is rendered ([b119dfe](https://github.com/craftile/php/commit/b119dfe0ba1e928e7198963c9e4777e19b59b7b0))
+* **laravel:** dispatch JsonViewLoaded when a json view is rendered ([ce9de81](https://github.com/craftile/php/commit/ce9de811806052cd265ab096a0ae604e62b52f2b))
+* **laravel:** improved json view compiler to compile blocks children to separate file ([eb69b08](https://github.com/craftile/php/commit/eb69b08655f8fa3d4ac56a09f3df1d1cc5f57588))
+* **laravel:** improved json view compiler to compile blocks children to separate file ([f4f17c4](https://github.com/craftile/php/commit/f4f17c45288331c11f4955544584948a3ec5ff4b))
+* **laravel:** propagate block context to children and add support for share() to share data with children ([1c56f8c](https://github.com/craftile/php/commit/1c56f8cfb25f2c71b28dc72af3485a89a1dc8f31))
+* **laravel:** re-add source file tracking to BlockData instances ([7c9a32d](https://github.com/craftile/php/commit/7c9a32dcf4672a18ea7a5046e1624959aed21619))
+* **laravel:** track visual order of static and dynamic blocks in preview ([28e4681](https://github.com/craftile/php/commit/28e468149abac8cb5c5be5daebfd024cd3655a1e))
+* **laravel:** update json view compiler to not render disabled blocks ([1350263](https://github.com/craftile/php/commit/135026342527f06242f3b8f5e57ac2855dc02d0c))
+
+
+
+# [0.1.0](https://github.com/craftile/php/compare/69e93be5b9483e8b941b3819301d316c11b741f8...v0.1.0) (2025-09-25)
 
 
 ### Bug Fixes
