@@ -26,7 +26,7 @@ class BlockFlattener
 
         return [
             'blocks' => $flatBlocks,
-            'regions' => $this->extractRegions($templateData),
+            'regions' => $templateData['regions'] ?? [],
             '_idMappings' => $this->idMappings,
         ];
     }
@@ -47,27 +47,6 @@ class BlockFlattener
         }
 
         return false;
-    }
-
-    /**
-     * Extract regions from template data.
-     */
-    protected function extractRegions(array $templateData): array
-    {
-        if (isset($templateData['regions'])) {
-            return $templateData['regions'];
-        }
-
-        // Default: single region with all blocks
-        $regionName = $templateData['name'] ?? 'main';
-        $blockIds = array_values(array_map(fn ($block) => $block['id'], $templateData['blocks'] ?? []));
-
-        return [
-            [
-                'name' => $regionName,
-                'blocks' => $blockIds,
-            ],
-        ];
     }
 
     /**

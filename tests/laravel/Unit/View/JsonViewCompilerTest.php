@@ -131,20 +131,6 @@ test('handles empty template data', function () {
     expect($compiled)->toContain('// Empty template');
 });
 
-test('handles template with no regions (now auto-creates main region)', function () {
-    $templateData = [
-        'blocks' => [
-            'test' => ['id' => 'test', 'type' => 'test'],
-        ],
-    ];
-
-    $compiled = $this->compiler->compileTemplate($templateData);
-
-    expect($compiled)->toContain('BlockDatastore::getBlock');
-    expect($compiled)->toContain('startRegion');
-    expect($compiled)->toContain('"main"'); // Auto-created region
-});
-
 test('handles template with empty regions', function () {
     $templateData = [
         'blocks' => [],
@@ -181,58 +167,6 @@ test('handles blocks with properties', function () {
 
     expect($compiled)->toContain('BlockDatastore::getBlock');
     expect($compiled)->toContain('$__blockData');
-});
-
-test('handles order-only format', function () {
-    $templateData = [
-        'blocks' => [
-            'header' => [
-                'id' => 'header',
-                'type' => 'test',
-                'properties' => ['content' => 'Header'],
-            ],
-            'footer' => [
-                'id' => 'footer',
-                'type' => 'test',
-                'properties' => ['content' => 'Footer'],
-            ],
-        ],
-        'order' => ['header', 'footer'],
-    ];
-
-    $compiled = $this->compiler->compileTemplate($templateData);
-
-    expect($compiled)->toContain('BlockDatastore::getBlock');
-    expect($compiled)->toContain('startRegion');
-    expect($compiled)->toContain('endRegion');
-    expect($compiled)->toContain('"main"'); // Default region name
-});
-
-test('handles blocks-only format with auto-computed order', function () {
-    $templateData = [
-        'blocks' => [
-            'header' => [
-                'id' => 'header',
-                'type' => 'test',
-                'properties' => ['content' => 'Header'],
-            ],
-            'description' => [
-                'id' => 'description',
-                'type' => 'test',
-                'properties' => ['content' => 'Description'],
-            ],
-        ],
-        // No order or regions - should auto-compute from block keys
-    ];
-
-    $compiled = $this->compiler->compileTemplate($templateData);
-
-    expect($compiled)->toContain('BlockDatastore::getBlock');
-    expect($compiled)->toContain('startRegion');
-    expect($compiled)->toContain('endRegion');
-    expect($compiled)->toContain('"main"'); // Default region name
-    expect($compiled)->toContain('"header"'); // Should include header block
-    expect($compiled)->toContain('"description"'); // Should include description block
 });
 
 test('invalidates parent cache when child block changes', function () {

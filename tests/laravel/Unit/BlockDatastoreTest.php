@@ -2,14 +2,13 @@
 
 use Craftile\Laravel\BlockData;
 use Craftile\Laravel\BlockDatastore;
-use Craftile\Laravel\BlockFlattener;
 use Craftile\Laravel\View\JsonViewParser;
 
 beforeEach(function () {
     $this->testDir = sys_get_temp_dir().'/craftile-test-'.uniqid();
     mkdir($this->testDir);
 
-    $this->datastore = new BlockDatastore(app(BlockFlattener::class), new JsonViewParser);
+    $this->datastore = new BlockDatastore(new JsonViewParser);
 });
 
 afterEach(function () {

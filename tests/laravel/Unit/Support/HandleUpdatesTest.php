@@ -1,13 +1,34 @@
 <?php
 
-use Craftile\Laravel\BlockFlattener;
 use Craftile\Laravel\Data\UpdateRequest;
 use Craftile\Laravel\Support\HandleUpdates;
 
 beforeEach(function () {
-    $this->flattener = app(BlockFlattener::class);
-    $this->handler = new HandleUpdates($this->flattener);
+    $this->handler = app(HandleUpdates::class);
+    $this->tempDir = sys_get_temp_dir().'/craftile_test_'.uniqid();
+    mkdir($this->tempDir, 0777, true);
 });
+
+afterEach(function () {
+    // Clean up temp files
+    if (file_exists($this->tempDir)) {
+        $files = glob($this->tempDir.'/*');
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+        rmdir($this->tempDir);
+    }
+});
+
+function createTempTemplate(array $data): string
+{
+    $tempFile = test()->tempDir.'/template_'.uniqid().'.json';
+    file_put_contents($tempFile, json_encode($data, JSON_PRETTY_PRINT));
+
+    return $tempFile;
+}
 
 test('can execute updates without region filtering', function () {
     $sourceData = [
@@ -19,6 +40,8 @@ test('can execute updates without region filtering', function () {
             ['name' => 'main', 'blocks' => ['header']],
         ],
     ];
+
+    $sourceFile = createTempTemplate($sourceData);
 
     $updateRequest = UpdateRequest::make([
         'blocks' => [
@@ -37,7 +60,7 @@ test('can execute updates without region filtering', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest);
+    $result = $this->handler->execute($sourceFile, $updateRequest);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks'])->toHaveKey('header');
@@ -59,6 +82,8 @@ test('can execute updates with region filtering', function () {
         ],
     ];
 
+    $sourceFile = createTempTemplate($sourceData);
+
     $updateRequest = UpdateRequest::make([
         'blocks' => [
             'header' => ['id' => 'header', 'type' => 'header', 'children' => ['nav'], 'properties' => ['title' => 'Updated']],
@@ -76,7 +101,7 @@ test('can execute updates with region filtering', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest, ['main']);
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['main']);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks']['header']['properties']['title'])->toBe('Updated');
@@ -95,6 +120,8 @@ test('detects nested blocks in target regions', function () {
         ],
     ];
 
+    $sourceFile = createTempTemplate($sourceData);
+
     $updateRequest = UpdateRequest::make([
         'blocks' => [
             'menu' => ['id' => 'menu', 'type' => 'menu', 'parentId' => 'nav', 'children' => [], 'properties' => ['updated' => true]],
@@ -110,14 +137,19 @@ test('detects nested blocks in target regions', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest, ['header']);
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['header']);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks']['menu']['properties']['updated'])->toBeTrue();
 });
 
 test('handles empty source data', function () {
-    $sourceData = [];
+    $sourceData = [
+        'blocks' => [],
+        'regions' => [],
+    ];
+
+    $sourceFile = createTempTemplate($sourceData);
 
     $updateRequest = UpdateRequest::make([
         'blocks' => [
@@ -134,7 +166,7 @@ test('handles empty source data', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest);
+    $result = $this->handler->execute($sourceFile, $updateRequest);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks'])->toHaveKey('header');
@@ -161,6 +193,8 @@ test('handles nested source data by flattening', function () {
         ],
     ];
 
+    $sourceFile = createTempTemplate($sourceData);
+
     $updateRequest = UpdateRequest::make([
         'blocks' => [
             'header' => ['id' => 'header', 'type' => 'header', 'children' => ['nav'], 'properties' => ['updated' => true]],
@@ -176,7 +210,7 @@ test('handles nested source data by flattening', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest);
+    $result = $this->handler->execute($sourceFile, $updateRequest);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks']['header']['properties']['updated'])->toBeTrue();
@@ -192,6 +226,8 @@ test('returns false when no changes are made', function () {
         ],
     ];
 
+    $sourceFile = createTempTemplate($sourceData);
+
     $updateRequest = UpdateRequest::make([
         'blocks' => [], // No blocks in update request
         'regions' => [
@@ -205,10 +241,10 @@ test('returns false when no changes are made', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest);
+    $result = $this->handler->execute($sourceFile, $updateRequest);
 
     expect($result['updated'])->toBeFalse();
-    expect($result['data'])->toBe($sourceData);
+    expect($result['data']['blocks'])->toHaveKey('header');
 });
 
 test('removes blocks correctly', function () {
@@ -221,6 +257,8 @@ test('removes blocks correctly', function () {
             ['name' => 'main', 'blocks' => ['header', 'footer']],
         ],
     ];
+
+    $sourceFile = createTempTemplate($sourceData);
 
     $updateRequest = UpdateRequest::make([
         'blocks' => [
@@ -237,7 +275,7 @@ test('removes blocks correctly', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest);
+    $result = $this->handler->execute($sourceFile, $updateRequest);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks'])->not->toHaveKey('footer');
@@ -256,6 +294,8 @@ test('only updates target regions when filtering', function () {
         ],
     ];
 
+    $sourceFile = createTempTemplate($sourceData);
+
     $updateRequest = UpdateRequest::make([
         'blocks' => [
             'header' => ['id' => 'header', 'type' => 'header', 'children' => [], 'properties' => ['updated' => true]],
@@ -273,7 +313,7 @@ test('only updates target regions when filtering', function () {
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest, ['header']);
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['header']);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks']['header']['properties']['updated'])->toBeTrue();
@@ -282,7 +322,12 @@ test('only updates target regions when filtering', function () {
 });
 
 test('handles blocks from update request regions when source is empty', function () {
-    $sourceData = [];
+    $sourceData = [
+        'blocks' => [],
+        'regions' => [],
+    ];
+
+    $sourceFile = createTempTemplate($sourceData);
 
     $updateRequest = UpdateRequest::make([
         'blocks' => [
@@ -300,7 +345,7 @@ test('handles blocks from update request regions when source is empty', function
         ],
     ]);
 
-    $result = $this->handler->execute($sourceData, $updateRequest, ['header']);
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['header']);
 
     expect($result['updated'])->toBeTrue();
     expect($result['data']['blocks'])->toHaveKey('header');

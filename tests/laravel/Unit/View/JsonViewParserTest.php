@@ -38,8 +38,11 @@ describe('Basic Parsing', function () {
 
         $result = $this->parser->parse($filePath);
 
-        expect($result)->toBe($templateData);
         expect($result['blocks']['hero']['properties']['title'])->toBe('Welcome');
+        expect($result)->toHaveKey('regions');
+        expect($result['regions'])->toHaveCount(1);
+        expect($result['regions'][0]['name'])->toBe('main');
+        expect($result['regions'][0]['blocks'])->toBe(['hero']);
     });
 
     test('parses YAML files correctly', function () {
@@ -197,17 +200,16 @@ describe('Caching', function () {
         file_put_contents($filePath, json_encode($templateData));
 
         Craftile::shouldReceive('inPreview')->andReturn(true);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         // Cache facade should never be called in preview mode
         Cache::shouldReceive('remember')->never();
 
         // First call - parses file
         $result1 = $this->parser->parse($filePath);
-        expect($result1)->toBe($templateData);
 
         // Second call - uses in-memory cache
         $result2 = $this->parser->parse($filePath);
-        expect($result2)->toBe($templateData);
 
         // Both results should be identical
         expect($result1)->toBe($result2);
@@ -219,22 +221,24 @@ describe('Caching', function () {
         file_put_contents($filePath, json_encode($templateData));
 
         Craftile::shouldReceive('inPreview')->andReturn(false);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         // Mock Cache::remember to verify it's called
         Cache::shouldReceive('remember')
             ->once()
-            ->withArgs(function ($key, $ttl, $callback) use ($filePath) {
+            ->withArgs(function ($key, $_ttl, $_callback) use ($filePath) {
                 // Verify cache key format
                 expect($key)->toStartWith('craftile_template_');
                 expect($key)->toContain(md5($filePath.'_'.filemtime($filePath)));
 
                 return true;
             })
-            ->andReturn($templateData);
+            ->andReturnUsing(fn ($key, $ttl, $callback) => $callback());
 
         $result = $this->parser->parse($filePath);
 
-        expect($result)->toBe($templateData);
+        expect($result)->toBeArray();
+        expect($result['blocks'])->toHaveKey('test');
     });
 
     test('uses configurable cache TTL', function () {
@@ -245,15 +249,16 @@ describe('Caching', function () {
         config(['craftile.cache.ttl' => 7200]);
 
         Craftile::shouldReceive('inPreview')->andReturn(false);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         Cache::shouldReceive('remember')
             ->once()
-            ->withArgs(function ($key, $ttl, $callback) {
+            ->withArgs(function ($_key, $ttl, $_callback) {
                 expect($ttl)->toBe(7200);
 
                 return true;
             })
-            ->andReturn($templateData);
+            ->andReturnUsing(fn ($key, $ttl, $callback) => $callback());
 
         $parser = new JsonViewParser;
         $parser->parse($filePath);
@@ -267,15 +272,16 @@ describe('Caching', function () {
         config(['craftile.cache' => []]);
 
         Craftile::shouldReceive('inPreview')->andReturn(false);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         Cache::shouldReceive('remember')
             ->once()
-            ->withArgs(function ($key, $ttl, $callback) {
+            ->withArgs(function ($_key, $ttl, $_callback) {
                 expect($ttl)->toBe(3600);
 
                 return true;
             })
-            ->andReturn($templateData);
+            ->andReturnUsing(fn ($key, $ttl, $callback) => $callback());
 
         $parser = new JsonViewParser;
         $parser->parse($filePath);
@@ -287,13 +293,14 @@ describe('Caching', function () {
         file_put_contents($filePath, json_encode($templateData));
 
         Craftile::shouldReceive('inPreview')->andReturn(false);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         $mtime = filemtime($filePath);
         $expectedKey = 'craftile_template_'.md5($filePath.'_'.$mtime);
 
         Cache::shouldReceive('remember')
             ->once()
-            ->withArgs(function ($key, $ttl, $callback) use ($expectedKey, $filePath, $mtime) {
+            ->withArgs(function ($key, $_ttl, $_callback) use ($expectedKey, $filePath, $mtime) {
                 // Verify cache key format includes path and mtime
                 expect($key)->toBe($expectedKey);
                 expect($key)->toStartWith('craftile_template_');
@@ -301,7 +308,7 @@ describe('Caching', function () {
 
                 return true;
             })
-            ->andReturn($templateData);
+            ->andReturnUsing(fn ($key, $ttl, $callback) => $callback());
 
         $parser = new JsonViewParser;
         $parser->parse($filePath);
@@ -313,10 +320,10 @@ describe('Caching', function () {
         file_put_contents($filePath, json_encode($templateData));
 
         Craftile::shouldReceive('inPreview')->andReturn(true);
+        Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
 
         // First parse - should read file
         $result1 = $this->parser->parse($filePath);
-        expect($result1)->toBe($templateData);
 
         // Modify file
         $newData = ['blocks' => ['new' => ['id' => 'new']]];
@@ -324,13 +331,14 @@ describe('Caching', function () {
 
         // Second parse - should use cached data
         $result2 = $this->parser->parse($filePath);
-        expect($result2)->toBe($templateData); // Still old data
+        expect($result2)->toBe($result1); // Still old data
 
         // Clear cache
         $this->parser->clearCache();
 
         // Third parse - should read file again
         $result3 = $this->parser->parse($filePath);
-        expect($result3)->toBe($newData); // New data
+        expect($result3)->not->toBe($result1); // New data
+        expect($result3['blocks'])->toHaveKey('new');
     });
 });

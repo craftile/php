@@ -14,7 +14,6 @@ class BlockDatastore
     private static array $loadedBlocks = [];
 
     public function __construct(
-        protected BlockFlattener $flattener,
         protected JsonViewParser $parser
     ) {}
 
@@ -104,25 +103,13 @@ class BlockDatastore
     public function getBlocksArray(string $sourceFilePath): array
     {
         try {
-            // Parse template with automatic caching
-            $data = $this->parser->parse($sourceFilePath);
+            $template = $this->parser->parse($sourceFilePath);
         } catch (\Exception $e) {
-            // Gracefully handle parsing errors - return empty
             return [];
         }
 
-        if (! is_array($data)) {
+        if (! is_array($template)) {
             return [];
-        }
-
-        // Apply custom pre-normalizer if registered
-        $data = Craftile::normalizeTemplate($data);
-
-        if ($this->flattener->hasNestedStructure($data)) {
-            $template = $this->flattener->flattenNestedStructure($data);
-            unset($template['_idMappings']);
-        } else {
-            $template = $data;
         }
 
         $blocks = $template['blocks'] ?? [];

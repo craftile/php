@@ -3,11 +3,9 @@
 namespace Craftile\Laravel\View;
 
 use Craftile\Core\Data\BlockSchema;
-use Craftile\Laravel\BlockFlattener;
 use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\Contracts\BlockCompilerInterface;
 use Craftile\Laravel\Exceptions\JsonViewException;
-use Craftile\Laravel\Facades\Craftile;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\Compiler;
@@ -93,27 +91,26 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
      */
     public function compileTemplate(array $templateData, string $path = ''): string
     {
-        $template = $this->normalizeTemplate($templateData);
-        if (empty($template['regions'])) {
+        if (empty($templateData['regions'])) {
             return "<?php // Empty template ?>\n";
         }
 
-        $this->invalidateStaleBlockCaches($template);
+        $this->invalidateStaleBlockCaches($templateData);
 
         // Compile static block children to files
-        $this->compileStaticBlockChildren($template, $path);
+        $this->compileStaticBlockChildren($templateData, $path);
 
         $regionsCodes = [];
-        foreach ($template['regions'] as $region) {
+        foreach ($templateData['regions'] as $region) {
             $regionName = $region['name'] ?? 'unnamed';
 
             $blocks = '';
             foreach ($region['blocks'] as $blockId) {
-                if (! isset($template['blocks'][$blockId])) {
+                if (! isset($templateData['blocks'][$blockId])) {
                     throw new JsonViewException("Block '{$blockId}' referenced in template but not defined in blocks section", $path);
                 }
 
-                $blockData = $template['blocks'][$blockId];
+                $blockData = $templateData['blocks'][$blockId];
 
                 // Skip static blocks - they are rendered in Blade templates via @craftileBlock
                 if ($blockData['static'] ?? false) {
@@ -125,7 +122,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
                     continue;
                 }
 
-                $blocks .= $this->compileBlockSelectively($blockData, $template, $path);
+                $blocks .= $this->compileBlockSelectively($blockData, $templateData, $path);
             }
 
             $regionCode = <<<PHP
@@ -297,65 +294,6 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
         $registry = app(BlockCompilerRegistry::class);
 
         return $registry->findCompiler($schema);
-    }
-
-    /**
-     * Normalize template to default format.
-     */
-    protected function normalizeTemplate(array $templateData): array
-    {
-        // Apply custom pre-normalizer
-        $templateData = Craftile::normalizeTemplate($templateData);
-
-        $normalized = $this->normalizeTemplateFormat($templateData);
-
-        $flattener = app(BlockFlattener::class);
-        if ($flattener->hasNestedStructure($normalized)) {
-            $flattened = $flattener->flattenNestedStructure($normalized);
-            unset($flattened['_idMappings']);
-
-            return $flattened;
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * Normalize template format to standard structure.
-     */
-    protected function normalizeTemplateFormat(array $templateData): array
-    {
-        if (isset($templateData['regions'])) {
-            return $templateData;
-        }
-
-        $blocks = $templateData['blocks'] ?? [];
-
-        // Determine region name and block order based on template format
-        $regionName = match (true) {
-            isset($templateData['name']) => $templateData['name'],
-            default => 'main'
-        };
-
-        $blockOrder = match (true) {
-            isset($templateData['order']) => $templateData['order'],
-            ! empty($blocks) => array_values(array_map(fn ($block) => $block['id'], $blocks)),
-            default => []
-        };
-
-        if (empty($blocks) && empty($blockOrder) && ! isset($templateData['name']) && ! isset($templateData['order'])) {
-            return ['blocks' => [], 'regions' => []];
-        }
-
-        return [
-            'blocks' => $blocks,
-            'regions' => [
-                [
-                    'name' => $regionName,
-                    'blocks' => $blockOrder,
-                ],
-            ],
-        ];
     }
 
     /**

@@ -138,30 +138,6 @@ describe('Template Normalizer', function () {
         expect($normalized['blocks']['parent-1']['children'][0])->not()->toHaveKey('settings');
     });
 
-    it('normalizer is called in JsonViewCompiler', function () {
-        $called = false;
-
-        Craftile::normalizeTemplateUsing(function (array $data) use (&$called) {
-            $called = true;
-
-            return $data;
-        });
-
-        $compiler = app(\Craftile\Laravel\View\JsonViewCompiler::class);
-
-        $template = [
-            'blocks' => [],
-            'regions' => [
-                ['name' => 'main', 'blocks' => []],
-            ],
-        ];
-
-        // This should trigger the normalizer
-        $compiler->compileTemplate($template);
-
-        expect($called)->toBeTrue();
-    });
-
     it('normalizer is called in BlockDatastore', function () {
         $called = false;
 
@@ -197,11 +173,12 @@ describe('Template Normalizer', function () {
 
         $handler = app(\Craftile\Laravel\Support\HandleUpdates::class);
 
-        $sourceData = [
+        $testFile = sys_get_temp_dir().'/craftile_test_'.uniqid().'.json';
+        file_put_contents($testFile, json_encode([
             'blocks' => [
                 'block-1' => ['id' => 'block-1', 'type' => 'text'],
             ],
-        ];
+        ]));
 
         $updateRequest = \Craftile\Laravel\Data\UpdateRequest::make([
             'blocks' => [],
@@ -209,8 +186,10 @@ describe('Template Normalizer', function () {
             'changes' => ['added' => [], 'changed' => [], 'removed' => []],
         ]);
 
-        $handler->execute($sourceData, $updateRequest);
+        $handler->execute($testFile, $updateRequest);
 
         expect($called)->toBeTrue();
+
+        @unlink($testFile);
     });
 });

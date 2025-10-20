@@ -168,21 +168,6 @@ describe('BlockFlattener', function () {
         expect($blocks['static-block'])->toHaveKey('static', true);
     });
 
-    it('creates default regions when none specified', function () {
-        $nested = [
-            'blocks' => [
-                'block1' => ['id' => 'block1', 'type' => 'text'],
-                'block2' => ['id' => 'block2', 'type' => 'image'],
-            ],
-        ];
-
-        $result = $this->flattener->flattenNestedStructure($nested);
-
-        expect($result['regions'])->toHaveCount(1);
-        expect($result['regions'][0])->toHaveKey('name', 'main');
-        expect($result['regions'][0])->toHaveKey('blocks', ['block1', 'block2']);
-    });
-
     it('handles custom regions', function () {
         $template = [
             'blocks' => [
@@ -197,23 +182,6 @@ describe('BlockFlattener', function () {
         $result = $this->flattener->flattenNestedStructure($template);
 
         expect($result['regions'])->toBe($template['regions']);
-    });
-
-    it('handles name and order format', function () {
-        $template = [
-            'name' => 'custom-region',
-            'order' => ['block1', 'block2'],
-            'blocks' => [
-                'block1' => ['id' => 'block1', 'type' => 'text'],
-                'block2' => ['id' => 'block2', 'type' => 'image'],
-            ],
-        ];
-
-        $result = $this->flattener->flattenNestedStructure($template);
-
-        expect($result['regions'])->toHaveCount(1);
-        expect($result['regions'][0])->toHaveKey('name', 'custom-region');
-        expect($result['regions'][0])->toHaveKey('blocks', ['block1', 'block2']);
     });
 
     it('validates block structure', function () {
