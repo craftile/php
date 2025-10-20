@@ -12,21 +12,23 @@ use JsonSerializable;
  */
 class PresetChild implements JsonSerializable
 {
-    protected string $type;
+    public string $type;
 
-    protected ?string $id = null;
+    public ?string $id = null;
 
-    protected ?string $name = null;
+    public ?string $name = null;
 
-    protected array $properties = [];
+    public array $properties = [];
 
-    protected bool $static = false;
+    public bool $static = false;
 
-    protected bool $ghost = false;
+    public bool $ghost = false;
 
-    protected bool $repeated = false;
+    public bool $repeated = false;
 
-    protected array $children = [];
+    public array $children = [];
+
+    public ?array $childrenOrder = null;
 
     /**
      * Create a new preset child instance.
@@ -140,6 +142,16 @@ class PresetChild implements JsonSerializable
     public function repeated(bool $repeated = true): static
     {
         $this->repeated = $repeated;
+
+        return $this;
+    }
+
+    /**
+     * Set rendering order for children blocks.
+     */
+    public function order(array $order): static
+    {
+        $this->childrenOrder = $order;
 
         return $this;
     }
@@ -275,6 +287,10 @@ class PresetChild implements JsonSerializable
 
                 return $child;
             }, $this->children);
+
+            if ($this->childrenOrder !== null) {
+                $data['order'] = $this->childrenOrder;
+            }
         }
 
         return $data;

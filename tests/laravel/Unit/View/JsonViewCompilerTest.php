@@ -6,6 +6,7 @@ use Craftile\Core\Data\BlockSchema;
 use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\View\BlockCacheManager;
 use Craftile\Laravel\View\JsonViewCompiler;
+use Craftile\Laravel\View\JsonViewParser;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -14,12 +15,14 @@ beforeEach(function () {
     $this->cachePath = sys_get_temp_dir().'/craftile_test_cache';
     $this->bladeCompiler = app(BladeCompiler::class);
     $this->cacheManager = new BlockCacheManager($this->files);
+    $this->parser = new JsonViewParser;
 
     $this->compiler = new JsonViewCompiler(
         $this->files,
         $this->cachePath,
         $this->bladeCompiler,
-        $this->cacheManager
+        $this->cacheManager,
+        $this->parser
     );
 
     // Register test block schema
@@ -288,7 +291,8 @@ test('finds changed blocks correctly', function () {
         $this->app['files'],
         $this->app['config']['view.compiled'],
         $this->app['blade.compiler'],
-        $this->app[BlockCacheManager::class]
+        $this->app[BlockCacheManager::class],
+        new JsonViewParser
     );
 
     $template = [
@@ -316,7 +320,8 @@ test('finds ancestors correctly using parent chain', function () {
         $this->app['files'],
         $this->app['config']['view.compiled'],
         $this->app['blade.compiler'],
-        $this->app[BlockCacheManager::class]
+        $this->app[BlockCacheManager::class],
+        new JsonViewParser
     );
 
     $template = [

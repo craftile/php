@@ -12,9 +12,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\Compiler;
 use Illuminate\View\Compilers\CompilerInterface;
-use JsonException;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 use Throwable;
 
 class JsonViewCompiler extends Compiler implements CompilerInterface
@@ -25,6 +22,8 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
 
     private BlockCacheManager $cacheManager;
 
+    private JsonViewParser $parser;
+
     /**
      * Create a new compiler instance.
      *
@@ -33,12 +32,13 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files, $cachePath, BladeCompiler $blade, BlockCacheManager $cacheManager)
+    public function __construct(Filesystem $files, $cachePath, BladeCompiler $blade, BlockCacheManager $cacheManager, JsonViewParser $parser)
     {
         parent::__construct($files, $cachePath);
 
         $this->blade = $blade;
         $this->cacheManager = $cacheManager;
+        $this->parser = $parser;
     }
 
     /**
@@ -66,14 +66,11 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
     public function compileJsonFile(string $path): string
     {
         try {
-            $templateContent = $this->files->get($path);
-            $template = $this->parseTemplate($templateContent, $path);
-        } catch (JsonException $e) {
-            throw new JsonViewException("JSON parsing failed in template: {$path}. {$e->getMessage()}", $path, 0, $e);
-        } catch (ParseException $e) {
-            throw new JsonViewException("YAML parsing failed in template: {$path}. {$e->getMessage()}", $path, 0, $e);
+            $template = $this->parser->parse($path);
+        } catch (JsonViewException $e) {
+            throw $e;
         } catch (Throwable $e) {
-            throw new JsonViewException("Failed to read template file: {$path}. {$e->getMessage()}", $path, 0, $e);
+            throw new JsonViewException("Failed to parse template file: {$path}. {$e->getMessage()}", $path, 0, $e);
         }
 
         try {
@@ -97,7 +94,6 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
     public function compileTemplate(array $templateData, string $path = ''): string
     {
         $template = $this->normalizeTemplate($templateData);
-
         if (empty($template['regions'])) {
             return "<?php // Empty template ?>\n";
         }
@@ -343,7 +339,7 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
 
         $blockOrder = match (true) {
             isset($templateData['order']) => $templateData['order'],
-            ! empty($blocks) => array_keys($blocks),
+            ! empty($blocks) => array_values(array_map(fn ($block) => $block['id'], $blocks)),
             default => []
         };
 
@@ -377,24 +373,6 @@ class JsonViewCompiler extends Compiler implements CompilerInterface
         }
 
         return $contents."<?php /**PATH {$path} ENDPATH**/ ?>";
-    }
-
-    /**
-     * Parse template content based on file extension (JSON or YAML).
-     */
-    private function parseTemplate(string $content, string $path): array
-    {
-        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-
-        switch ($extension) {
-            case 'json':
-                return json_decode($content, true, flags: JSON_THROW_ON_ERROR);
-            case 'yml':
-            case 'yaml':
-                return Yaml::parse($content);
-            default:
-                throw new JsonViewException("Unsupported template format: {$extension}", $path);
-        }
     }
 
     /**

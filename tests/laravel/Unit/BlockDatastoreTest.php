@@ -3,14 +3,13 @@
 use Craftile\Laravel\BlockData;
 use Craftile\Laravel\BlockDatastore;
 use Craftile\Laravel\BlockFlattener;
-use Craftile\Laravel\Facades\Craftile;
-use Illuminate\Support\Facades\Cache;
+use Craftile\Laravel\View\JsonViewParser;
 
 beforeEach(function () {
     $this->testDir = sys_get_temp_dir().'/craftile-test-'.uniqid();
     mkdir($this->testDir);
 
-    $this->datastore = new BlockDatastore(app(BlockFlattener::class));
+    $this->datastore = new BlockDatastore(app(BlockFlattener::class), new JsonViewParser);
 });
 
 afterEach(function () {
@@ -177,119 +176,6 @@ test('can get blocks array from file', function () {
     expect($result)->toHaveKey('block-2');
     expect($result['block-1']['type'])->toBe('text');
     expect($result['block-2']['type'])->toBe('image');
-});
-
-test('uses in-memory cache only in preview mode', function () {
-    $blocksData = [
-        'blocks' => [
-            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => [], 'children' => []],
-        ],
-    ];
-    $filePath = $this->testDir.'/blocks.json';
-    file_put_contents($filePath, json_encode($blocksData));
-
-    // Clear all caches
-    $this->datastore->clear();
-    Cache::flush();
-
-    Craftile::shouldReceive('inPreview')->andReturn(true);
-    Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
-
-    // First call should parse file (no Laravel cache in preview mode)
-    $result1 = $this->datastore->getBlocksArray($filePath);
-    expect($result1)->toHaveCount(1);
-
-    // Second call should use in-memory cache
-    $result2 = $this->datastore->getBlocksArray($filePath);
-    expect($result2)->toEqual($result1);
-
-    // Verify Laravel cache was not used by checking it's empty
-    $cacheKey = 'craftile_blocks_'.md5($filePath.'_'.filemtime($filePath));
-    expect(Cache::get($cacheKey))->toBeNull();
-});
-
-test('uses Laravel cache in production mode', function () {
-    $blocksData = [
-        'blocks' => [
-            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => [], 'children' => []],
-        ],
-    ];
-    $filePath = $this->testDir.'/blocks.json';
-    file_put_contents($filePath, json_encode($blocksData));
-
-    $this->datastore->clear();
-    Cache::flush();
-
-    Craftile::shouldReceive('inPreview')->andReturn(false);
-    Craftile::shouldReceive('normalizeTemplate')->andReturnUsing(fn ($data) => $data);
-
-    // First call should store in Laravel cache
-    $result1 = $this->datastore->getBlocksArray($filePath);
-    expect($result1)->toHaveCount(1);
-
-    // Verify Laravel cache was used
-    $cacheKey = 'craftile_blocks_'.md5($filePath.'_'.filemtime($filePath));
-    expect(Cache::get($cacheKey))->toEqual($result1);
-
-    $this->datastore->clear();
-
-    // Second call should retrieve from Laravel cache
-    $result2 = $this->datastore->getBlocksArray($filePath);
-    expect($result2)->toEqual($result1);
-});
-
-test('uses configurable cache TTL', function () {
-    $blocksData = [
-        'blocks' => [
-            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => [], 'children' => []],
-        ],
-    ];
-    $filePath = $this->testDir.'/blocks.json';
-    file_put_contents($filePath, json_encode($blocksData));
-
-    config(['craftile.cache.ttl' => 7200]);
-
-    $this->datastore->clear();
-    Cache::flush();
-
-    Craftile::shouldReceive('inPreview')->andReturn(false);
-
-    Cache::shouldReceive('remember')
-        ->once()
-        ->withArgs(function ($key, $ttl, $callback) {
-            return is_string($key) && $ttl === 7200 && is_callable($callback);
-        })
-        ->andReturn($blocksData['blocks']);
-
-    $result = $this->datastore->getBlocksArray($filePath);
-    expect($result)->toHaveCount(1);
-});
-
-test('defaults to 1 hour cache TTL when not configured', function () {
-    $blocksData = [
-        'blocks' => [
-            'test-block' => ['id' => 'test-block', 'type' => 'text', 'properties' => [], 'children' => []],
-        ],
-    ];
-    $filePath = $this->testDir.'/blocks.json';
-    file_put_contents($filePath, json_encode($blocksData));
-
-    config(['craftile.cache' => []]);
-
-    $this->datastore->clear();
-    Cache::flush();
-
-    Craftile::shouldReceive('inPreview')->andReturn(false);
-
-    Cache::shouldReceive('remember')
-        ->once()
-        ->withArgs(function ($key, $ttl, $callback) {
-            return is_string($key) && $ttl === 3600 && is_callable($callback);
-        })
-        ->andReturn($blocksData['blocks']);
-
-    $result = $this->datastore->getBlocksArray($filePath);
-    expect($result)->toHaveCount(1);
 });
 
 test('binds source file to BlockData instances', function () {

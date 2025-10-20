@@ -60,7 +60,7 @@ class BlockFlattener
 
         // Default: single region with all blocks
         $regionName = $templateData['name'] ?? 'main';
-        $blockIds = array_keys($templateData['blocks'] ?? []);
+        $blockIds = array_values(array_map(fn ($block) => $block['id'], $templateData['blocks'] ?? []));
 
         return [
             [
