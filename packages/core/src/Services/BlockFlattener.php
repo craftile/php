@@ -127,9 +127,20 @@ class BlockFlattener
         if (isset($children[0])) {
             // Array format: [{ id: "child1", ... }, { id: "child2", ... }]
             $blocks = [];
-            foreach ($children as $child) {
+            $typeCounters = [];
+
+            foreach ($children as $index => $child) {
                 if (! isset($child['id'])) {
-                    throw new \InvalidArgumentException('Child block in array format must have "id" property');
+                    $type = $child['type'] ?? 'block';
+                    $sanitizedType = $this->sanitizeTypeForId($type);
+
+                    if (! isset($typeCounters[$type])) {
+                        $typeCounters[$type] = 0;
+                    }
+
+                    $counter = $typeCounters[$type]++;
+                    $hash = substr(hash('xxh128', $type.'_'.$counter.'_'.$index), 0, 8);
+                    $child['id'] = "{$sanitizedType}_{$counter}_{$hash}";
                 }
                 $blocks[$child['id']] = $child;
             }
@@ -151,6 +162,24 @@ class BlockFlattener
         }
 
         return $children;
+    }
+
+    /**
+     * Sanitize block type for use in ID.
+     * Converts types like "@visual/some-block" to "visual_some_block"
+     */
+    protected function sanitizeTypeForId(string $type): string
+    {
+        // Remove @ prefix
+        $sanitized = ltrim($type, '@');
+
+        // Replace / and - with _
+        $sanitized = str_replace(['/', '-'], '_', $sanitized);
+
+        // Convert to snake_case
+        $sanitized = strtolower($sanitized);
+
+        return $sanitized ?: 'block';
     }
 
     /**
