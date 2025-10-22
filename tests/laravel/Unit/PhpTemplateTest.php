@@ -379,3 +379,53 @@ describe('PHP template integration', function () {
         expect($template['blocks']['grid']['children'][0]['properties']['featured'])->toBeTrue();
     });
 });
+
+describe('Template region API', function () {
+    it('supports region id and name', function () {
+        $template = Template::make()
+            ->id('header')
+            ->name('Header')
+            ->block('logo', 'logo')
+            ->block('nav', 'navigation')
+            ->toArray();
+
+        expect($template['blocks'])->toHaveCount(2);
+        expect($template['regions'])->toHaveCount(1);
+        expect($template['regions'][0]['id'])->toBe('header');
+        expect($template['regions'][0]['name'])->toBe('Header');
+        expect($template['regions'][0]['blocks'])->toBe(['logo', 'nav']);
+    });
+
+    it('uses region id as name when name not provided', function () {
+        $template = Template::make()
+            ->id('footer')
+            ->block('copyright', 'text')
+            ->toArray();
+
+        expect($template['regions'][0]['id'])->toBe('footer');
+        expect($template['regions'][0]['name'])->toBe('footer');
+        expect($template['regions'][0]['blocks'])->toBe(['copyright']);
+    });
+
+    it('respects block order in region', function () {
+        $template = Template::make()
+            ->id('header')
+            ->name('Header')
+            ->block('logo', 'logo')
+            ->block('nav', 'navigation')
+            ->block('search', 'search')
+            ->order(['nav', 'search', 'logo'])
+            ->toArray();
+
+        expect($template['regions'][0]['blocks'])->toBe(['nav', 'search', 'logo']);
+        expect($template['order'])->toBe(['nav', 'search', 'logo']);
+    });
+
+    it('does not include regions when region id not set', function () {
+        $template = Template::make()
+            ->block('hero', 'hero')
+            ->toArray();
+
+        expect($template)->not()->toHaveKey('regions');
+    });
+});

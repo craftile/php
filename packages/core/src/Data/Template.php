@@ -11,6 +11,10 @@ class Template
 
     protected ?array $order = null;
 
+    protected ?string $regionId = null;
+
+    protected ?string $regionName = null;
+
     /**
      * Create a new template.
      */
@@ -53,6 +57,26 @@ class Template
     }
 
     /**
+     * Set region ID (for single-region templates).
+     */
+    public function id(string $id): static
+    {
+        $this->regionId = $id;
+
+        return $this;
+    }
+
+    /**
+     * Set region name (for single-region templates).
+     */
+    public function name(string $name): static
+    {
+        $this->regionName = $name;
+
+        return $this;
+    }
+
+    /**
      * Convert to array.
      */
     public function toArray(): array
@@ -67,6 +91,18 @@ class Template
 
             if ($this->order !== null) {
                 $data['order'] = $this->order;
+            }
+
+            if ($this->regionId !== null) {
+                $blockIds = $this->order ?? array_keys($data['blocks']);
+
+                $data['regions'] = [
+                    [
+                        'id' => $this->regionId,
+                        'name' => $this->regionName ?? $this->regionId,
+                        'blocks' => $blockIds,
+                    ],
+                ];
             }
         }
 
