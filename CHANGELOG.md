@@ -1,3 +1,20 @@
+# [0.3.0](https://github.com/craftile/php/compare/v0.2.0...v0.3.0) (2025-10-24)
+
+
+### Bug Fixes
+
+* collect unrendered static/repeated blocks in preview data ([fa978aa](https://github.com/craftile/php/commit/fa978aa95dd12a8126294b916d82205bac906741))
+* move view extension registration to booted callback for proper config timing ([ceec3a4](https://github.com/craftile/php/commit/ceec3a4dcab4515016ace268a8b6d35c3a72dc33))
+* recursively collect entire tree of unrendered static/repeated blocks ([b9e9b39](https://github.com/craftile/php/commit/b9e9b391025c951474da25b1b85d230f489725cd))
+
+
+### Features
+
+* add region metadata support to Template fluent API ([f218b96](https://github.com/craftile/php/commit/f218b9698c8c6055e2518fd08f228df40bdb14bc))
+* auto-generate IDs for blocks without explicit IDs in normalization pipeline ([0208da5](https://github.com/craftile/php/commit/0208da53d56eebd0fa4863ba258b1535004880ed))
+
+
+
 # [0.2.0](https://github.com/craftile/php/compare/v0.1.0...v0.2.0) (2025-10-20)
 
 
