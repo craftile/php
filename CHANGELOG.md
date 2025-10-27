@@ -1,3 +1,12 @@
+## [0.3.1](https://github.com/craftile/php/compare/v0.3.0...v0.3.1) (2025-10-27)
+
+
+### Bug Fixes
+
+* **laravel:** install missing symfony/yaml package ([c0cc057](https://github.com/craftile/php/commit/c0cc0571416d0623ba8add1a25d85ad45166ba88))
+
+
+
 # [0.3.0](https://github.com/craftile/php/compare/v0.2.0...v0.3.0) (2025-10-24)
 
 
