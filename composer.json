@@ -13,7 +13,8 @@
     "require": {
         "php": "^8.2",
         "illuminate/support": "^10.0|^11.0|^12.0",
-        "stillat/blade-parser": "^2.0"
+        "stillat/blade-parser": "^2.0",
+        "symfony/yaml": "^6.4"
     },
     "require-dev": {
         "captainhook/captainhook": "^5.25",
