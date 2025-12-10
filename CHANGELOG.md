@@ -1,3 +1,13 @@
+# [0.4.0](https://github.com/craftile/php/compare/v0.3.1...v0.4.0) (2025-12-10)
+
+
+### Features
+
+* **core:** add context() method to ContextAware trait ([61ab509](https://github.com/craftile/php/commit/61ab509e0637f8451d8370dd4fd068ffb9652cd8))
+* **laravel:** add registerBlock and registerBlocks methods ([4304b27](https://github.com/craftile/php/commit/4304b27fc4a742a6e9eae3960dd8f6c9d796867a))
+
+
+
 ## [0.3.1](https://github.com/craftile/php/compare/v0.3.0...v0.3.1) (2025-10-27)
 
 
