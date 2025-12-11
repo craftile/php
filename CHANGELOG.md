@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/craftile/php/compare/v0.4.0...v0.4.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* update to Laravel 11, and symfony/yaml 7 ([4581f7e](https://github.com/craftile/php/commit/4581f7e5eec02376622e39a3800bfe64f99a3e89))
+
+
+
 # [0.4.0](https://github.com/craftile/php/compare/v0.3.1...v0.4.0) (2025-12-10)
 
 
