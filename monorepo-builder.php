@@ -11,8 +11,8 @@ return static function (MBConfig $mbConfig): void {
 
     $mbConfig->dataToAppend([
         'require-dev' => [
-            'laravel/pint' => '^1.0',
-            'pestphp/pest' => '^2.0',
+            'laravel/pint' => '^1.14',
+            'pestphp/pest' => '^3.0',
             'phpstan/phpstan' => '^1.0',
         ],
     ]);
