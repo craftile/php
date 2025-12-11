@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/craftile/php/compare/v0.4.1...v0.4.2) (2025-12-11)
+
+
+### Bug Fixes
+
+* **laravel:** remove entire block subtree when deleting a block ([6bb1d9d](https://github.com/craftile/php/commit/6bb1d9d88c39f7186f4db80e9c62846ef6b70935))
+
+
+
 ## [0.4.1](https://github.com/craftile/php/compare/v0.4.0...v0.4.1) (2025-12-11)
 
 
