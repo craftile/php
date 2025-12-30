@@ -1,3 +1,12 @@
+## [0.4.3](https://github.com/craftile/php/compare/v0.4.2...v0.4.3) (2025-12-30)
+
+
+### Bug Fixes
+
+* **laravel:** properly escape file paths in compiled views for Windows ([5151abb](https://github.com/craftile/php/commit/5151abbf59f47c28f994590a064588e7f6304d66))
+
+
+
 ## [0.4.2](https://github.com/craftile/php/compare/v0.4.1...v0.4.2) (2025-12-11)
 
 
