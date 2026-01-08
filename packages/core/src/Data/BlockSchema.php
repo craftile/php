@@ -111,6 +111,20 @@ class BlockSchema implements JsonSerializable
     }
 
     /**
+     * Register a custom preset for this block.
+     *
+     * @param  BlockPreset|array|string  $preset  Preset instance, array config, or preset class string
+     * @return $this
+     */
+    public function registerPreset(BlockPreset|array|string $preset): static
+    {
+        $normalized = static::normalizePresets([$preset]);
+        $this->presets = array_merge($this->presets, $normalized);
+
+        return $this;
+    }
+
+    /**
      * Create schema from BlockInterface class.
      */
     public static function fromClass(string $blockClass): static

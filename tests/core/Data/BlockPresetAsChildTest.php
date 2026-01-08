@@ -6,7 +6,7 @@ use Craftile\Core\Data\PresetChild;
 // Test preset with getType() override
 class ProductCardPreset extends BlockPreset
 {
-    protected function getType(): string
+    public static function getType(): ?string
     {
         return '@visual-debut/product-card';
     }

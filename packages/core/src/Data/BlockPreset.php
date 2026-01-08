@@ -63,10 +63,10 @@ class BlockPreset implements JsonSerializable
     }
 
     /**
-     * Get block type for asChild() method.
-     * Can be overridden in subclasses to provide a default type.
+     * Get the block type this preset belongs to.
+     * Override in subclasses to specify the target block type for discovery.
      */
-    protected function getType(): ?string
+    public static function getType(): ?string
     {
         return null;
     }
@@ -217,8 +217,7 @@ class BlockPreset implements JsonSerializable
     {
         $instance = new static;
 
-        // Priority: param > getType() > exception
-        $blockType = $type ?? $instance->getType();
+        $blockType = $type ?? static::getType();
 
         if ($blockType === null) {
             throw new \LogicException(

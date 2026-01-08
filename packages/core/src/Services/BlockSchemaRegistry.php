@@ -13,11 +13,57 @@ class BlockSchemaRegistry
     protected array $schemas = [];
 
     /**
+     * Store custom presets per block type.
+     *
+     * @var array<string, array>
+     */
+    protected array $customPresets = [];
+
+    /**
      * Register a block schema.
      */
     public function register(BlockSchema $schema): void
     {
-        $this->schemas[$schema->type] = $schema;
+        $type = $schema->type;
+        $this->schemas[$type] = $schema;
+
+        if (isset($this->customPresets[$type])) {
+            foreach ($this->customPresets[$type] as $preset) {
+                $schema->registerPreset($preset);
+            }
+            unset($this->customPresets[$type]);
+        }
+    }
+
+    /**
+     * Register a custom preset to a block type.
+     *
+     * @param  string  $blockType  Block type identifier (e.g., 'container', 'text')
+     * @param  \Craftile\Core\Data\BlockPreset|array|string  $preset  Preset instance, array, or class name
+     */
+    public function registerPreset(string $blockType, mixed $preset): void
+    {
+        if (isset($this->schemas[$blockType])) {
+            $this->schemas[$blockType]->registerPreset($preset);
+        } else {
+            if (! isset($this->customPresets[$blockType])) {
+                $this->customPresets[$blockType] = [];
+            }
+            $this->customPresets[$blockType][] = $preset;
+        }
+    }
+
+    /**
+     * Register multiple custom presets to a block type.
+     *
+     * @param  string  $blockType  Block type identifier
+     * @param  array  $presets  Array of presets (instances, arrays, or class names)
+     */
+    public function registerPresets(string $blockType, array $presets): void
+    {
+        foreach ($presets as $preset) {
+            $this->registerPreset($blockType, $preset);
+        }
     }
 
     /**

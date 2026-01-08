@@ -8,7 +8,7 @@ use Craftile\Core\Data\Template;
 // Test preset class for use in PHP templates
 class TestProductCardPreset extends BlockPreset
 {
-    protected function getType(): string
+    public static function getType(): ?string
     {
         return 'product-card';
     }
