@@ -1,3 +1,13 @@
+# [0.5.0](https://github.com/craftile/php/compare/v0.4.3...v0.5.0) (2026-01-15)
+
+
+### Features
+
+* add standalone preset classes discovery ([3f61c7c](https://github.com/craftile/php/commit/3f61c7cb85aaba36317720f4c5d104527193ec69))
+* allow Template::block() to accept BlockInterface classes ([27ecb82](https://github.com/craftile/php/commit/27ecb82fc944e762efac1f162429a4f617b03cb7))
+
+
+
 ## [0.4.3](https://github.com/craftile/php/compare/v0.4.2...v0.4.3) (2025-12-30)
 
 
