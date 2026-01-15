@@ -2,6 +2,8 @@
 
 namespace Craftile\Core\Data;
 
+use Craftile\Core\Contracts\BlockInterface;
+
 /**
  * Fluent builder for creating templates in .craft.php files.
  */
@@ -27,7 +29,7 @@ class Template
      * Add a block to the template.
      *
      * @param  string  $id  Block ID (required)
-     * @param  string|class-string<BlockPreset>  $type  Block type or preset class
+     * @param  string|class-string<BlockPreset>|class-string<BlockInterface>  $type  Block type, preset class, or block class
      * @param  callable|null  $config  Optional callback to configure the block
      */
     public function block(string $id, string $type, ?callable $config = null): static

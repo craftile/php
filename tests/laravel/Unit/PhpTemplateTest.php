@@ -4,6 +4,7 @@ use Craftile\Core\Data\BlockBuilder;
 use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\PresetChild;
 use Craftile\Core\Data\Template;
+use Tests\Laravel\Stubs\Discovery\StubTestBlock;
 
 // Test preset class for use in PHP templates
 class TestProductCardPreset extends BlockPreset
@@ -214,6 +215,14 @@ describe('BlockBuilder', function () {
         expect($block->children)->toHaveCount(2);
     });
 
+    it('creates block from BlockInterface class', function () {
+        $block = BlockBuilder::forTemplate('test', StubTestBlock::class);
+
+        expect($block)->toBeInstanceOf(BlockBuilder::class);
+        expect($block->id)->toBe('test');
+        expect($block->type)->toBe('stub-test-block');
+    });
+
     it('supports fluent methods from PresetChild', function () {
         $block = BlockBuilder::forTemplate('hero', 'hero')
             ->properties(['title' => 'Hello'])
@@ -334,6 +343,27 @@ describe('PHP template integration', function () {
         expect($template['blocks']['card']['id'])->toBe('card');
         expect($template['blocks']['card']['name'])->toBe('Product Card');
         expect($template['blocks']['card']['children'])->toHaveCount(2);
+    });
+
+    it('can use BlockInterface class in Template', function () {
+        $template = Template::make()
+            ->block('test', StubTestBlock::class)
+            ->toArray();
+
+        expect($template['blocks']['test']['type'])->toBe('stub-test-block');
+        expect($template['blocks']['test']['id'])->toBe('test');
+    });
+
+    it('can customize BlockInterface class in Template', function () {
+        $template = Template::make()
+            ->block('test', StubTestBlock::class, fn ($b) => $b
+                ->properties(['title' => 'Custom Title'])
+                ->static())
+            ->toArray();
+
+        expect($template['blocks']['test']['type'])->toBe('stub-test-block');
+        expect($template['blocks']['test']['properties'])->toBe(['title' => 'Custom Title']);
+        expect($template['blocks']['test']['static'])->toBeTrue();
     });
 
     it('can customize BlockPreset in Template', function () {

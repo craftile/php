@@ -2,6 +2,8 @@
 
 namespace Craftile\Core\Data;
 
+use Craftile\Core\Contracts\BlockInterface;
+
 /**
  * Builder for creating blocks in .craft.php templates.
  * Extends PresetChild to reuse all fluent methods.
@@ -12,10 +14,15 @@ class BlockBuilder extends PresetChild
      * Create a new block builder for template use.
      *
      * @param  string  $id  Block ID (required)
-     * @param  string|class-string<BlockPreset>  $type  Block type or preset class
+     * @param  string|class-string<BlockPreset>|class-string<BlockInterface>  $type  Block type, preset class, or block class
      */
     public static function forTemplate(string $id, string $type): static
     {
+        // If type is a BlockInterface class, resolve to type string
+        if (class_exists($type) && is_subclass_of($type, BlockInterface::class)) {
+            $type = $type::type();
+        }
+
         // If type is a BlockPreset class, convert to PresetChild
         if (class_exists($type) && is_subclass_of($type, BlockPreset::class)) {
             /** @var BlockPreset $type */
