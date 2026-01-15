@@ -34,15 +34,12 @@ class Template
      */
     public function block(string $id, string $type, ?callable $config = null): static
     {
-        // Create new block using factory
         $block = BlockBuilder::forTemplate($id, $type);
 
-        // Apply configuration callback if provided
         if ($config !== null) {
             $config($block);
         }
 
-        // Add block to template
         $this->blocks[] = $block;
 
         return $this;

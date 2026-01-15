@@ -58,10 +58,8 @@ class PresetChild implements JsonSerializable
     {
         $class = (new \ReflectionClass(static::class))->getShortName();
 
-        // Remove "PresetChild" or "Child" suffix if present
         $class = preg_replace('/(PresetChild|Child)$/', '', $class);
 
-        // Convert PascalCase to kebab-case (e.g., "Paragraph" -> "paragraph")
         $kebab = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $class));
 
         return $kebab;
@@ -71,10 +69,7 @@ class PresetChild implements JsonSerializable
      * Build the preset child configuration.
      * Override this method in subclasses to define structure.
      */
-    protected function build(): void
-    {
-        // Base implementation does nothing
-    }
+    protected function build(): void {}
 
     /**
      * Set the block type.

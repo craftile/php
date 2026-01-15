@@ -88,7 +88,6 @@ class BlockFlattener
 
             $flatBlock['children'] = $uniqueChildIds;
         } elseif (! empty($children) && is_array($children)) {
-            // These are just ID references, keep as-is
             $flatBlock['children'] = $children;
         }
 
@@ -170,13 +169,8 @@ class BlockFlattener
      */
     protected function sanitizeTypeForId(string $type): string
     {
-        // Remove @ prefix
         $sanitized = ltrim($type, '@');
-
-        // Replace / and - with _
         $sanitized = str_replace(['/', '-'], '_', $sanitized);
-
-        // Convert to snake_case
         $sanitized = strtolower($sanitized);
 
         return $sanitized ?: 'block';

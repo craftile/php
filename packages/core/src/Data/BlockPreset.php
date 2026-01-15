@@ -53,10 +53,8 @@ class BlockPreset implements JsonSerializable
     {
         $class = (new \ReflectionClass(static::class))->getShortName();
 
-        // Remove "Preset" suffix if present
         $class = preg_replace('/Preset$/', '', $class);
 
-        // Convert PascalCase to spaces (e.g., "RichText" -> "Rich Text")
         $words = preg_replace('/(?<!^)[A-Z]/', ' $0', $class);
 
         return trim($words);

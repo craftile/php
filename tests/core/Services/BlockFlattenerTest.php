@@ -64,13 +64,11 @@ describe('BlockFlattener', function () {
         $blocks = $result['blocks'];
         expect($blocks)->toHaveCount(3); // parent + 2 children
 
-        // Check parent block
         expect($blocks['parent'])->toHaveKey('id', 'parent');
         expect($blocks['parent'])->toHaveKey('type', 'container');
         expect($blocks['parent'])->toHaveKey('children');
         expect($blocks['parent']['children'])->toHaveCount(2);
 
-        // Check children exist
         $childIds = $blocks['parent']['children'];
         expect($blocks)->toHaveKey($childIds[0]);
         expect($blocks)->toHaveKey($childIds[1]);
