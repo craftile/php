@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/craftile/php/compare/v0.5.0...v0.5.1) (2026-01-15)
+
+
+### Bug Fixes
+
+* allow PresetChild to accept BlockInterface classes as $type ([b4a622e](https://github.com/craftile/php/commit/b4a622e09778347a15ec33c08ec2f68861dadb22))
+
+
+
 # [0.5.0](https://github.com/craftile/php/compare/v0.4.3...v0.5.0) (2026-01-15)
 
 
