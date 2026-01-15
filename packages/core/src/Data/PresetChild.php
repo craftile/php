@@ -2,6 +2,7 @@
 
 namespace Craftile\Core\Data;
 
+use Craftile\Core\Contracts\BlockInterface;
 use JsonSerializable;
 
 /**
@@ -32,11 +33,17 @@ class PresetChild implements JsonSerializable
 
     /**
      * Create a new preset child instance.
+     *
+     * @param  string|class-string<BlockInterface>|null  $type  Block type string or BlockInterface class
      */
     public function __construct(?string $type = null)
     {
         // Call build() first to allow subclass configuration
         $this->build();
+
+        if ($type !== null && class_exists($type) && is_subclass_of($type, BlockInterface::class)) {
+            $type = $type::type();
+        }
 
         // Set type with priority: constructor param > build() set value > getType()
         $this->type = $type ?? $this->type ?? $this->getType();
@@ -44,6 +51,8 @@ class PresetChild implements JsonSerializable
 
     /**
      * Create a new preset child.
+     *
+     * @param  string|class-string<BlockInterface>|null  $type  Block type string or BlockInterface class
      */
     public static function make(?string $type = null): static
     {
@@ -73,9 +82,15 @@ class PresetChild implements JsonSerializable
 
     /**
      * Set the block type.
+     *
+     * @param  string|class-string<BlockInterface>  $type  Block type string or BlockInterface class
      */
     public function type(string $type): static
     {
+        if (class_exists($type) && is_subclass_of($type, BlockInterface::class)) {
+            $type = $type::type();
+        }
+
         $this->type = $type;
 
         return $this;

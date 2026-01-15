@@ -3,12 +3,31 @@
 declare(strict_types=1);
 
 use Craftile\Core\Data\PresetChild;
+use Tests\Laravel\Stubs\Discovery\StubTestBlock;
 
 describe('PresetChild', function () {
     it('can be created with type', function () {
         $block = PresetChild::make('text');
 
         expect($block->toArray())->toHaveKey('type', 'text');
+    });
+
+    it('can be created with BlockInterface class', function () {
+        $block = PresetChild::make(StubTestBlock::class);
+
+        expect($block->toArray())->toHaveKey('type', 'stub-test-block');
+    });
+
+    it('can set type using BlockInterface class via type() method', function () {
+        $block = PresetChild::make('text')->type(StubTestBlock::class);
+
+        expect($block->toArray())->toHaveKey('type', 'stub-test-block');
+    });
+
+    it('can use BlockInterface class in constructor', function () {
+        $block = new PresetChild(StubTestBlock::class);
+
+        expect($block->toArray())->toHaveKey('type', 'stub-test-block');
     });
 
     it('can set id', function () {
