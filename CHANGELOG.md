@@ -1,3 +1,12 @@
+# [0.6.0](https://github.com/craftile/php/compare/v0.5.1...v0.6.0) (2026-02-16)
+
+
+### Features
+
+* support data() method on default block compiler for additional view data ([c3a1bcf](https://github.com/craftile/php/commit/c3a1bcf90f652d82c3226e63a3ae3e0c6754b214))
+
+
+
 ## [0.5.1](https://github.com/craftile/php/compare/v0.5.0...v0.5.1) (2026-01-15)
 
 
