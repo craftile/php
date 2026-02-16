@@ -88,6 +88,26 @@ test('handles view rendering and output', function () {
     expect($compiled)->toContain('echo $__blockViewrender123;');
 });
 
+test('includes data() method support for view-only data', function () {
+    $compiler = new DefaultBlockCompiler;
+
+    $schema = new BlockSchema(
+        type: 'test-block',
+        slug: 'test-block',
+        class: TestBlock::class,
+        name: 'Test Block'
+    );
+    $compiled = $compiler->compile($schema, 'data456');
+
+    expect($compiled)->toContain("method_exists(\$__blockInstancedata456, 'data')");
+    expect($compiled)->toContain('$__blockInstancedata456->data()');
+    expect($compiled)->toContain('$__extraData');
+    // data() result is merged into view data but __craftileContext still uses $__mergedContext
+    expect($compiled)->toContain('array_merge(');
+    expect($compiled)->toContain("\$__extraData,\n");
+    expect($compiled)->toContain("'__craftileContext' => \$__mergedContext");
+});
+
 test('includes share() method support', function () {
     $compiler = new DefaultBlockCompiler;
 
