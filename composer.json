@@ -78,7 +78,7 @@
         ],
         "test:core": "pest tests/core",
         "test:laravel": "pest tests/laravel",
-        "analyse": "phpstan analyse",
+        "analyse": "phpstan analyse --memory-limit=512M",
         "validate-monorepo": "vendor/bin/monorepo-builder validate"
     }
 }

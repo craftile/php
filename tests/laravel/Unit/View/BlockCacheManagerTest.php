@@ -108,3 +108,17 @@ test('handles cache directory creation', function () {
     expect(fn () => $cacheManager->put('test-hash', 'content'))
         ->not->toThrow(Exception::class);
 });
+
+test('flushBlock deletes children file even when no block cache files exist', function () {
+    $blockId = 'static-block';
+
+    // Write a children file without any block cache files (simulates a static block)
+    $this->cacheManager->writeChildrenFile($blockId, '<?php echo "children"; ?>');
+    $childrenPath = $this->cacheManager->getChildrenFilePath($blockId);
+    expect($this->filesystem->exists($childrenPath))->toBeTrue();
+
+    // flushBlock should still delete the children file
+    $this->cacheManager->flushBlock($blockId);
+
+    expect($this->filesystem->exists($childrenPath))->toBeFalse();
+});

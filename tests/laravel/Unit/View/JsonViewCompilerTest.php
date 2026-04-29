@@ -516,3 +516,37 @@ test('assigns indices to blocks in regions', function () {
     $this->files->delete($filePath);
     $datastore->clear();
 });
+
+test('static block children file is cleaned up when children become empty', function () {
+    $cacheManager = $this->app[BlockCacheManager::class];
+
+    // Simulate a static block that previously had children
+    $blockId = 'static-hero';
+    $cacheManager->writeChildrenFile($blockId, '<?php echo "old children"; ?>');
+    $childrenPath = $cacheManager->getChildrenFilePath($blockId);
+    expect($this->files->exists($childrenPath))->toBeTrue();
+
+    // Template now has the static block with empty children
+    $template = [
+        'blocks' => [
+            $blockId => [
+                'id' => $blockId,
+                'type' => 'test',
+                'properties' => [],
+                'static' => true,
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => [$blockId]],
+        ],
+    ];
+
+    // Use reflection to call compileStaticBlockChildren
+    $reflection = new ReflectionClass($this->compiler);
+    $method = $reflection->getMethod('compileStaticBlockChildren');
+    $method->setAccessible(true);
+    $method->invoke($this->compiler, $template, '');
+
+    // Children file should be cleaned up
+    expect($this->files->exists($childrenPath))->toBeFalse();
+});
