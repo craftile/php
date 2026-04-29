@@ -1,3 +1,12 @@
+## [0.6.1](https://github.com/craftile/php/compare/v0.6.0...v0.6.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* **laravel:** cleanup stale children files for static blocks ([5d6e887](https://github.com/craftile/php/commit/5d6e887875982a9dcd76ce9d3bc8a7f2c7c07fa4))
+
+
+
 # [0.6.0](https://github.com/craftile/php/compare/v0.5.1...v0.6.0) (2026-02-16)
 
 
