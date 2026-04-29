@@ -1,6 +1,9 @@
 <?php
 
+use Craftile\Laravel\BlockDatastore;
+use Craftile\Laravel\Data\UpdateRequest;
 use Craftile\Laravel\Facades\Craftile;
+use Craftile\Laravel\Support\HandleUpdates;
 
 beforeEach(function () {
     Craftile::normalizeTemplateUsing(fn ($data) => $data);
@@ -154,7 +157,7 @@ describe('Template Normalizer', function () {
             ],
         ]));
 
-        $datastore = app(\Craftile\Laravel\BlockDatastore::class);
+        $datastore = app(BlockDatastore::class);
         $datastore->loadFile($testFile);
 
         expect($called)->toBeTrue();
@@ -171,7 +174,7 @@ describe('Template Normalizer', function () {
             return $data;
         });
 
-        $handler = app(\Craftile\Laravel\Support\HandleUpdates::class);
+        $handler = app(HandleUpdates::class);
 
         $testFile = sys_get_temp_dir().'/craftile_test_'.uniqid().'.json';
         file_put_contents($testFile, json_encode([
@@ -180,7 +183,7 @@ describe('Template Normalizer', function () {
             ],
         ]));
 
-        $updateRequest = \Craftile\Laravel\Data\UpdateRequest::make([
+        $updateRequest = UpdateRequest::make([
             'blocks' => [],
             'regions' => [],
             'changes' => ['added' => [], 'changed' => [], 'removed' => []],

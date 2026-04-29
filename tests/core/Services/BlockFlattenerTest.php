@@ -193,7 +193,7 @@ describe('BlockFlattener', function () {
         ];
 
         expect(fn () => $this->flattener->flattenNestedStructure($invalidNested))
-            ->toThrow(\InvalidArgumentException::class, 'Block must have both "id" and "type" properties');
+            ->toThrow(InvalidArgumentException::class, 'Block must have both "id" and "type" properties');
     });
 
     it('stores ID mappings', function () {

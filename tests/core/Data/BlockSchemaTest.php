@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
+use Craftile\Core\Data\PresetChild;
 
 describe('BlockSchema', function () {
     it('can be created with all parameters', function () {
@@ -239,12 +241,12 @@ describe('BlockSchema', function () {
 
     it('can be created with presets using fluent API', function () {
         $presets = [
-            \Craftile\Core\Data\BlockPreset::make('Heading and Text')
+            BlockPreset::make('Heading and Text')
                 ->description('Container with heading')
                 ->properties(['gap' => 12])
                 ->blocks([
-                    \Craftile\Core\Data\PresetChild::make('text')->id('heading'),
-                    \Craftile\Core\Data\PresetChild::make('text')->id('description'),
+                    PresetChild::make('text')->id('heading'),
+                    PresetChild::make('text')->id('description'),
                 ]),
         ];
 
@@ -266,11 +268,11 @@ describe('BlockSchema', function () {
             TestBlock::class,
             'Container Block',
             presets: [
-                \Craftile\Core\Data\BlockPreset::make('Heading and Text')
+                BlockPreset::make('Heading and Text')
                     ->description('Container with heading')
                     ->properties(['gap' => 12])
                     ->blocks([
-                        \Craftile\Core\Data\PresetChild::make('text')->id('heading'),
+                        PresetChild::make('text')->id('heading'),
                     ]),
             ]
         );
@@ -294,7 +296,7 @@ describe('BlockSchema', function () {
             'Container Block',
             presets: [
                 ['name' => 'Array Preset', 'properties' => ['gap' => 8]],
-                \Craftile\Core\Data\BlockPreset::make('Object Preset')->properties(['gap' => 16]),
+                BlockPreset::make('Object Preset')->properties(['gap' => 16]),
             ]
         );
 

@@ -1,5 +1,6 @@
 <?php
 
+use Craftile\Laravel\BlockData;
 use Craftile\Laravel\Craftile;
 
 it('resolves region view with default prefix', function () {
@@ -60,7 +61,7 @@ it('can return complex view paths with custom resolver', function () {
 
 test('shouldRenderBlock returns true for enabled blocks by default', function () {
     $craftile = app(Craftile::class);
-    $blockData = \Craftile\Laravel\BlockData::make([
+    $blockData = BlockData::make([
         'id' => 'test-block',
         'type' => 'test',
         'disabled' => false,
@@ -71,7 +72,7 @@ test('shouldRenderBlock returns true for enabled blocks by default', function ()
 
 test('shouldRenderBlock returns false for disabled blocks by default', function () {
     $craftile = app(Craftile::class);
-    $blockData = \Craftile\Laravel\BlockData::make([
+    $blockData = BlockData::make([
         'id' => 'test-block',
         'type' => 'test',
         'disabled' => true,
@@ -88,12 +89,12 @@ test('shouldRenderBlock can use custom checker', function () {
         return str_contains($blockData->id, 'public');
     });
 
-    $publicBlock = \Craftile\Laravel\BlockData::make([
+    $publicBlock = BlockData::make([
         'id' => 'public-block',
         'type' => 'test',
     ]);
 
-    $privateBlock = \Craftile\Laravel\BlockData::make([
+    $privateBlock = BlockData::make([
         'id' => 'private-block',
         'type' => 'test',
     ]);
@@ -110,13 +111,13 @@ test('custom render checker overrides default disabled logic', function () {
         return $blockData->type === 'always-render';
     });
 
-    $disabledButAllowedType = \Craftile\Laravel\BlockData::make([
+    $disabledButAllowedType = BlockData::make([
         'id' => 'test-block',
         'type' => 'always-render',
         'disabled' => true, // This should be ignored
     ]);
 
-    $enabledButWrongType = \Craftile\Laravel\BlockData::make([
+    $enabledButWrongType = BlockData::make([
         'id' => 'test-block',
         'type' => 'never-render',
         'disabled' => false,
@@ -134,7 +135,7 @@ test('createBlockData uses default BlockData class', function () {
         'type' => 'test',
     ]);
 
-    expect($blockData)->toBeInstanceOf(\Craftile\Laravel\BlockData::class);
+    expect($blockData)->toBeInstanceOf(BlockData::class);
     expect($blockData->id)->toBe('test-block');
     expect($blockData->type)->toBe('test');
 });
@@ -146,7 +147,7 @@ test('createBlockData uses factory when provided', function () {
     $craftile->createBlockDataUsing(function ($blockData, $resolveChildData) {
         $blockData['id'] = 'custom-'.$blockData['id'];
 
-        return \Craftile\Laravel\BlockData::make($blockData, $resolveChildData);
+        return BlockData::make($blockData, $resolveChildData);
     });
 
     $blockData = $craftile->createBlockData([
@@ -161,10 +162,10 @@ test('createBlockData validates custom class extends BlockData', function () {
     $craftile = app(Craftile::class);
 
     // Mock config to return invalid class
-    config(['craftile.block_data_class' => \stdClass::class]);
+    config(['craftile.block_data_class' => stdClass::class]);
 
     expect(fn () => $craftile->createBlockData(['id' => 'test', 'type' => 'test']))
-        ->toThrow(\InvalidArgumentException::class, 'BlockData class \'stdClass\' must extend Craftile\Laravel\BlockData');
+        ->toThrow(InvalidArgumentException::class, 'BlockData class \'stdClass\' must extend Craftile\Laravel\BlockData');
 });
 
 describe('filterContext', function () {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Craftile\Core\Data\BlockSchema;
+use Craftile\Laravel\BlockDatastore;
 use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\View\BlockCacheManager;
 use Craftile\Laravel\View\JsonViewCompiler;
@@ -494,10 +495,10 @@ test('assigns indices to blocks in regions', function () {
     $this->files->put($filePath, $template);
 
     // Load the file through BlockDatastore
-    app(\Craftile\Laravel\BlockDatastore::class)->loadFile($filePath);
+    app(BlockDatastore::class)->loadFile($filePath);
 
     // Get blocks and check their indices
-    $datastore = app(\Craftile\Laravel\BlockDatastore::class);
+    $datastore = app(BlockDatastore::class);
 
     $block1 = $datastore->getBlock('block-1');
     $block2 = $datastore->getBlock('block-2');

@@ -1,5 +1,6 @@
 <?php
 
+use Craftile\Laravel\Contracts\NodeTransformerInterface;
 use Craftile\Laravel\View\NodeTransformers\CraftileChildrenTagTransformer;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
@@ -94,7 +95,7 @@ test('throws error when children tag has parameters', function () {
 test('children transformer implements node transformer interface', function () {
     $transformer = new CraftileChildrenTagTransformer;
 
-    expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
+    expect($transformer)->toBeInstanceOf(NodeTransformerInterface::class);
 });
 
 test('supports @children directive', function () {

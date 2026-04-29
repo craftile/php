@@ -1,6 +1,7 @@
 <?php
 
 use Craftile\Laravel\View\NodeTransformers\CraftileContentTransformer;
+use Stillat\BladeParser\Nodes\AbstractNode;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\DirectiveNode;
 
@@ -90,7 +91,7 @@ test('transforms layout content directive correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
     // We can't easily test the exact content without more complex setup
     // but we can verify the transform method was called without error
 });
@@ -101,7 +102,7 @@ test('transforms layout content tag correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
 });
 
 test('transforms content directive correctly', function () {
@@ -110,7 +111,7 @@ test('transforms content directive correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
 });
 
 test('transforms content tag correctly', function () {
@@ -119,7 +120,7 @@ test('transforms content tag correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
 });
 
 test('transforms end content directive correctly', function () {
@@ -128,7 +129,7 @@ test('transforms end content directive correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
 });
 
 test('transforms end content tag correctly', function () {
@@ -137,7 +138,7 @@ test('transforms end content tag correctly', function () {
 
     $result = $transformer->transform($node, null);
 
-    expect($result)->toBeInstanceOf(\Stillat\BladeParser\Nodes\AbstractNode::class);
+    expect($result)->toBeInstanceOf(AbstractNode::class);
 });
 
 test('uses custom configured component namespace', function () {

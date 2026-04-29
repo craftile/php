@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Craftile\Core\Data\BlockSchema;
 use Craftile\Laravel\BlockDiscovery;
 use Craftile\Laravel\BlockSchemaRegistry;
 
@@ -46,17 +47,17 @@ describe('BlockDiscovery', function () {
     });
 
     it('throws exception when custom BlockSchema class does not extend BlockSchema', function () {
-        config(['craftile.block_schema_class' => \stdClass::class]);
+        config(['craftile.block_schema_class' => stdClass::class]);
 
         $stubsDir = __DIR__.'/../Stubs/Discovery';
 
         expect(fn () => $this->discovery->scan('Tests\Laravel\Stubs\Discovery', $stubsDir))
-            ->toThrow(\InvalidArgumentException::class, 'must extend Craftile\Core\Data\BlockSchema');
+            ->toThrow(InvalidArgumentException::class, 'must extend Craftile\Core\Data\BlockSchema');
     });
 });
 
 // Custom BlockSchema class for testing
-class CustomBlockSchema extends \Craftile\Core\Data\BlockSchema
+class CustomBlockSchema extends BlockSchema
 {
     public string $customProperty = 'custom value';
 

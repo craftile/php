@@ -2,6 +2,7 @@
 
 namespace Craftile\Core\Services;
 
+use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
 
 /**
@@ -39,7 +40,7 @@ class BlockSchemaRegistry
      * Register a custom preset to a block type.
      *
      * @param  string  $blockType  Block type identifier (e.g., 'container', 'text')
-     * @param  \Craftile\Core\Data\BlockPreset|array|string  $preset  Preset instance, array, or class name
+     * @param  BlockPreset|array|string  $preset  Preset instance, array, or class name
      */
     public function registerPreset(string $blockType, mixed $preset): void
     {

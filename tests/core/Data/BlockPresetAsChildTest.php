@@ -78,7 +78,7 @@ describe('BlockPreset asChild API', function () {
     it('throws exception when no type provided and getType() returns null', function () {
         GenericPreset::asChild();
     })->throws(
-        \LogicException::class,
+        LogicException::class,
         'Type must be provided via asChild($type) or by overriding getType() method'
     );
 

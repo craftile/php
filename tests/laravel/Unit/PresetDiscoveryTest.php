@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Craftile\Core\Concerns\IsBlock;
 use Craftile\Core\Contracts\BlockInterface;
 use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
@@ -38,7 +39,7 @@ class NoBlockTypePreset extends BlockPreset {}
 
 class DiscoveryTestBlock implements BlockInterface
 {
-    use \Craftile\Core\Concerns\IsBlock;
+    use IsBlock;
 
     public static function type(): string
     {

@@ -1,6 +1,7 @@
 <?php
 
 use Craftile\Core\Data\BlockData;
+use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\PresetChild;
 
 describe('Ghost Blocks', function () {
@@ -134,7 +135,7 @@ describe('Ghost Blocks', function () {
 
     describe('Ghost blocks in build() method', function () {
         it('can define ghost children in build()', function () {
-            $preset = new class extends \Craftile\Core\Data\BlockPreset
+            $preset = new class extends BlockPreset
             {
                 protected function getName(): string
                 {
@@ -166,7 +167,7 @@ describe('Ghost Blocks', function () {
         });
 
         it('can mix ghost and normal children', function () {
-            $preset = new class extends \Craftile\Core\Data\BlockPreset
+            $preset = new class extends BlockPreset
             {
                 protected function getName(): string
                 {

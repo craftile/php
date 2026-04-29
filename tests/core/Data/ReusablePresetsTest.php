@@ -1,5 +1,6 @@
 <?php
 
+use Craftile\Core\Concerns\IsBlock;
 use Craftile\Core\Contracts\BlockInterface;
 use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
@@ -82,7 +83,7 @@ class NameOverrideInBuildPreset extends BlockPreset
 // Test block class
 class TestBlockWithPresetClasses implements BlockInterface
 {
-    use \Craftile\Core\Concerns\IsBlock;
+    use IsBlock;
 
     protected static string $type = 'test/preset-block';
 

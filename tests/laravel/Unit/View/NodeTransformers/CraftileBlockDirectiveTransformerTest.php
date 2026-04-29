@@ -1,5 +1,6 @@
 <?php
 
+use Craftile\Laravel\Contracts\NodeTransformerInterface;
 use Craftile\Laravel\View\NodeTransformers\CraftileBlockDirectiveTransformer;
 use Stillat\BladeParser\Nodes\ArgumentGroupNode;
 use Stillat\BladeParser\Nodes\DirectiveNode;
@@ -86,7 +87,7 @@ test('can extract directive content', function () {
 test('directive transformer implements node transformer interface', function () {
     $transformer = new CraftileBlockDirectiveTransformer;
 
-    expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
+    expect($transformer)->toBeInstanceOf(NodeTransformerInterface::class);
 });
 
 test('extracts custom attributes from third parameter', function () {

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Craftile\Core\Concerns\IsBlock;
+use Craftile\Core\Contracts\BlockInterface;
 use Craftile\Core\Data\BlockPreset;
 use Craftile\Core\Data\BlockSchema;
 use Craftile\Core\Data\PresetChild;
@@ -34,9 +36,9 @@ describe('Block Preset Integration', function () {
 
     it('supports fluent API presets', function () {
         // Create a test block class with fluent presets
-        $testBlockClass = new class implements \Craftile\Core\Contracts\BlockInterface
+        $testBlockClass = new class implements BlockInterface
         {
-            use \Craftile\Core\Concerns\IsBlock;
+            use IsBlock;
 
             protected static string $type = 'test-fluent';
 
@@ -88,9 +90,9 @@ describe('Block Preset Integration', function () {
 
     it('handles blocks with no presets', function () {
         // Create a test block without presets
-        $testBlockClass = new class implements \Craftile\Core\Contracts\BlockInterface
+        $testBlockClass = new class implements BlockInterface
         {
-            use \Craftile\Core\Concerns\IsBlock;
+            use IsBlock;
 
             protected static string $type = 'no-presets';
 

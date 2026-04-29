@@ -6,6 +6,7 @@ use Craftile\Core\Data\BlockSchema;
 use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\Events\BlockSchemaRegistered;
 // TestBlock is available from Pest.php
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 
 describe('BlockSchemaRegistry', function () {
@@ -14,7 +15,7 @@ describe('BlockSchemaRegistry', function () {
     });
 
     it('extends core block schema registry', function () {
-        expect($this->registry)->toBeInstanceOf(\Craftile\Core\Services\BlockSchemaRegistry::class);
+        expect($this->registry)->toBeInstanceOf(Craftile\Core\Services\BlockSchemaRegistry::class);
     });
 
     it('dispatches event when registering schema', function () {
@@ -78,10 +79,10 @@ describe('BlockSchemaRegistry', function () {
 
         $grouped = $this->registry->getByCategory();
 
-        expect($grouped)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+        expect($grouped)->toBeInstanceOf(Collection::class);
         expect($grouped->keys()->toArray())->toContain('content', 'layout', 'default');
 
-        expect($grouped->get('content'))->toBeInstanceOf(\Illuminate\Support\Collection::class);
+        expect($grouped->get('content'))->toBeInstanceOf(Collection::class);
         expect($grouped->get('content')->count())->toBe(1);
         expect($grouped->get('content')->first())->toBe($contentSchema);
 
@@ -122,7 +123,7 @@ describe('BlockSchemaRegistry', function () {
     it('returns empty collection for category with no schemas', function () {
         $grouped = $this->registry->getByCategory();
 
-        expect($grouped)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+        expect($grouped)->toBeInstanceOf(Collection::class);
         expect($grouped->isEmpty())->toBeTrue();
     });
 

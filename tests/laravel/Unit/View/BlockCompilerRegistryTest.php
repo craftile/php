@@ -105,7 +105,7 @@ test('finds most specific compiler', function () {
 });
 
 test('can get all registered compilers', function () {
-    $registry = new \Craftile\Laravel\View\BlockCompilerRegistry;
+    $registry = new BlockCompilerRegistry;
 
     $compiler1 = new MockBlockCompiler;
     $compiler2 = new AnotherMockCompiler;

@@ -1,11 +1,13 @@
 <?php
 
 use Craftile\Laravel\BlockSchemaRegistry;
+use Craftile\Laravel\Contracts\NodeTransformerInterface;
 use Craftile\Laravel\View\NodeTransformers\CraftileBlockTagTransformer;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\Components\ParameterAttribute;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
 use Stillat\BladeParser\Nodes\Components\ParameterType;
+use Stillat\BladeParser\Nodes\DirectiveNode;
 use Stillat\BladeParser\Nodes\LiteralNode as BladeLiteralNode;
 
 beforeEach(function () {
@@ -74,12 +76,12 @@ test('uses custom configured component namespace', function () {
 test('implements node transformer interface', function () {
     $transformer = new CraftileBlockTagTransformer;
 
-    expect($transformer)->toBeInstanceOf(\Craftile\Laravel\Contracts\NodeTransformerInterface::class);
+    expect($transformer)->toBeInstanceOf(NodeTransformerInterface::class);
 });
 
 test('returns original node for non-component nodes', function () {
     $transformer = new CraftileBlockTagTransformer;
-    $nonComponentNode = new \Stillat\BladeParser\Nodes\DirectiveNode;
+    $nonComponentNode = new DirectiveNode;
 
     $result = $transformer->transform($nonComponentNode, null);
 
