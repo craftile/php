@@ -80,29 +80,26 @@ class Template
      */
     public function toArray(): array
     {
-        $data = [];
+        $data = ['blocks' => []];
 
-        if (! empty($this->blocks)) {
-            $data['blocks'] = [];
-            foreach ($this->blocks as $block) {
-                $data['blocks'][$block->id] = $block->toArray();
-            }
+        foreach ($this->blocks as $block) {
+            $data['blocks'][$block->id] = $block->toArray();
+        }
 
-            if ($this->order !== null) {
-                $data['order'] = $this->order;
-            }
+        if ($this->order !== null) {
+            $data['order'] = $this->order;
+        }
 
-            if ($this->regionId !== null) {
-                $blockIds = $this->order ?? array_keys($data['blocks']);
+        if ($this->regionId !== null) {
+            $blockIds = $this->order ?? array_keys($data['blocks']);
 
-                $data['regions'] = [
-                    [
-                        'id' => $this->regionId,
-                        'name' => $this->regionName ?? $this->regionId,
-                        'blocks' => $blockIds,
-                    ],
-                ];
-            }
+            $data['regions'] = [
+                [
+                    'id' => $this->regionId,
+                    'name' => $this->regionName ?? $this->regionId,
+                    'blocks' => array_values($blockIds),
+                ],
+            ];
         }
 
         return $data;

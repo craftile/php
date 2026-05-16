@@ -33,7 +33,7 @@ describe('Template fluent API', function () {
     it('creates empty template', function () {
         $template = Template::make()->toArray();
 
-        expect($template)->toBe([]);
+        expect($template)->toBe(['blocks' => []]);
     });
 
     it('creates template with single block', function () {
@@ -457,5 +457,19 @@ describe('Template region API', function () {
             ->toArray();
 
         expect($template)->not()->toHaveKey('regions');
+    });
+
+    it('preserves region info when no blocks are added', function () {
+        $template = Template::make()
+            ->id('footer')
+            ->name('Footer')
+            ->toArray();
+
+        expect($template)->toBe([
+            'blocks' => [],
+            'regions' => [
+                ['id' => 'footer', 'name' => 'Footer', 'blocks' => []],
+            ],
+        ]);
     });
 });
