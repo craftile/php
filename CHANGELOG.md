@@ -1,3 +1,12 @@
+## [0.6.2](https://github.com/craftile/php/compare/v0.6.1...v0.6.2) (2026-05-16)
+
+
+### Bug Fixes
+
+* **core:** always emit blocks key and preserve region info in Template::toArray() ([ffc7633](https://github.com/craftile/php/commit/ffc76335ce33856aabb835403276f59654640c16))
+
+
+
 ## [0.6.1](https://github.com/craftile/php/compare/v0.6.0...v0.6.1) (2026-04-29)
 
 
