@@ -65,6 +65,52 @@ test('can compile simple template data', function () {
     expect($compiled)->toContain('endRegion');
 });
 
+test('uses region id for preview tracking when id and name are both present', function () {
+    $templateData = [
+        'blocks' => [
+            'hero-block' => [
+                'id' => 'hero-block',
+                'type' => 'test',
+                'properties' => ['title' => 'Test Title'],
+            ],
+        ],
+        'regions' => [
+            ['id' => 'hero', 'name' => 'Hero', 'blocks' => ['hero-block']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    expect($compiled)->toContain('craftile()->startRegion("hero")');
+    expect($compiled)->toContain('craftile()->endRegion("hero")');
+    expect($compiled)->toContain('<!--BEGIN region: hero-->');
+    expect($compiled)->toContain('<!--END region: hero-->');
+    expect($compiled)->not->toContain('startRegion("Hero")');
+    expect($compiled)->not->toContain('endRegion("Hero")');
+});
+
+test('falls back to region name for preview tracking when id is missing', function () {
+    $templateData = [
+        'blocks' => [
+            'hero-block' => [
+                'id' => 'hero-block',
+                'type' => 'test',
+                'properties' => ['title' => 'Test Title'],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'Hero', 'blocks' => ['hero-block']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    expect($compiled)->toContain('craftile()->startRegion("Hero")');
+    expect($compiled)->toContain('craftile()->endRegion("Hero")');
+    expect($compiled)->toContain('<!--BEGIN region: Hero-->');
+    expect($compiled)->toContain('<!--END region: Hero-->');
+});
+
 test('compiles file and caches result', function () {
     $filePath = sys_get_temp_dir().'/test_template.json';
     $template = json_encode([

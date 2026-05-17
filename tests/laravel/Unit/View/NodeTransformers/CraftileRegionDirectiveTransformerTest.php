@@ -60,13 +60,13 @@ it('transforms craftileRegion to includeIf directive', function () {
     expect($result->content)->toBe("<?php \$__regionView = craftile()->resolveRegionView('header'); ?>@includeIf(\$__regionView)<?php unset(\$__regionView); ?>");
 });
 
-it('preserves complex expressions in region name', function () {
-    $directive = createMockRegionDirectiveNode('craftileRegion', ['$regionName']);
+it('preserves complex expressions in region id', function () {
+    $directive = createMockRegionDirectiveNode('craftileRegion', ['$regionId']);
 
     $document = new Document;
     $result = $this->transformer->transform($directive, $document);
 
-    expect($result->content)->toBe('<?php $__regionView = craftile()->resolveRegionView($regionName); ?>@includeIf($__regionView)<?php unset($__regionView); ?>');
+    expect($result->content)->toBe('<?php $__regionView = craftile()->resolveRegionView($regionId); ?>@includeIf($__regionView)<?php unset($__regionView); ?>');
 });
 
 it('handles custom directive names from config', function () {
@@ -88,7 +88,7 @@ it('throws error when no arguments provided', function () {
     $document = new Document;
 
     expect(fn () => $this->transformer->transform($directive, $document))
-        ->toThrow(ViewException::class, '@craftileRegion requires one argument: region name');
+        ->toThrow(ViewException::class, '@craftileRegion requires one argument: region ID');
 });
 
 it('throws error when empty arguments provided', function () {
@@ -102,5 +102,5 @@ it('throws error when empty arguments provided', function () {
     $document = new Document;
 
     expect(fn () => $this->transformer->transform($directive, $document))
-        ->toThrow(ViewException::class, '@craftileRegion requires one argument: region name');
+        ->toThrow(ViewException::class, '@craftileRegion requires one argument: region ID');
 });

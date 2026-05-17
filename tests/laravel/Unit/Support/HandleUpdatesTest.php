@@ -321,6 +321,88 @@ test('only updates target regions when filtering', function () {
     expect(collect($result['data']['regions'])->pluck('name'))->toContain('header');
 });
 
+test('filters target regions by id before name', function () {
+    $sourceData = [
+        'blocks' => [
+            'hero' => ['id' => 'hero', 'type' => 'hero', 'children' => []],
+            'footer' => ['id' => 'footer', 'type' => 'footer', 'children' => []],
+        ],
+        'regions' => [
+            ['id' => 'hero-region', 'name' => 'Hero Region', 'blocks' => ['hero']],
+            ['id' => 'footer-region', 'name' => 'Footer Region', 'blocks' => ['footer']],
+        ],
+    ];
+
+    $sourceFile = createTempTemplate($sourceData);
+
+    $updateRequest = UpdateRequest::make([
+        'blocks' => [
+            'hero' => ['id' => 'hero', 'type' => 'hero', 'children' => [], 'properties' => ['updated' => true]],
+            'footer' => ['id' => 'footer', 'type' => 'footer', 'children' => [], 'properties' => ['updated' => true]],
+        ],
+        'regions' => [
+            ['id' => 'hero-region', 'name' => 'Hero Region', 'blocks' => ['hero']],
+            ['id' => 'footer-region', 'name' => 'Footer Region', 'blocks' => ['footer']],
+        ],
+        'changes' => [
+            'added' => [],
+            'updated' => ['hero', 'footer'],
+            'removed' => [],
+            'moved' => [],
+        ],
+    ]);
+
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['hero-region']);
+
+    expect($result['updated'])->toBeTrue();
+    expect($result['data']['blocks']['hero']['properties']['updated'])->toBeTrue();
+    expect($result['data']['blocks']['footer'])->not->toHaveKey('properties');
+    expect($result['data']['regions'])->toBe([
+        ['id' => 'hero-region', 'name' => 'Hero Region', 'blocks' => ['hero']],
+    ]);
+});
+
+test('falls back to region name when filtering regions without id', function () {
+    $sourceData = [
+        'blocks' => [
+            'hero' => ['id' => 'hero', 'type' => 'hero', 'children' => []],
+            'footer' => ['id' => 'footer', 'type' => 'footer', 'children' => []],
+        ],
+        'regions' => [
+            ['name' => 'hero-region', 'blocks' => ['hero']],
+            ['name' => 'footer-region', 'blocks' => ['footer']],
+        ],
+    ];
+
+    $sourceFile = createTempTemplate($sourceData);
+
+    $updateRequest = UpdateRequest::make([
+        'blocks' => [
+            'hero' => ['id' => 'hero', 'type' => 'hero', 'children' => [], 'properties' => ['updated' => true]],
+            'footer' => ['id' => 'footer', 'type' => 'footer', 'children' => [], 'properties' => ['updated' => true]],
+        ],
+        'regions' => [
+            ['name' => 'hero-region', 'blocks' => ['hero']],
+            ['name' => 'footer-region', 'blocks' => ['footer']],
+        ],
+        'changes' => [
+            'added' => [],
+            'updated' => ['hero', 'footer'],
+            'removed' => [],
+            'moved' => [],
+        ],
+    ]);
+
+    $result = $this->handler->execute($sourceFile, $updateRequest, ['hero-region']);
+
+    expect($result['updated'])->toBeTrue();
+    expect($result['data']['blocks']['hero']['properties']['updated'])->toBeTrue();
+    expect($result['data']['blocks']['footer'])->not->toHaveKey('properties');
+    expect($result['data']['regions'])->toBe([
+        ['name' => 'hero-region', 'blocks' => ['hero']],
+    ]);
+});
+
 test('handles blocks from update request regions when source is empty', function () {
     $sourceData = [
         'blocks' => [],

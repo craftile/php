@@ -24,8 +24,8 @@ it('resolves region view with custom prefix from config', function () {
 it('resolves region view with custom resolver', function () {
     $craftile = app(Craftile::class);
 
-    $craftile->resolveRegionViewUsing(function ($regionName) {
-        return "custom.{$regionName}";
+    $craftile->resolveRegionViewUsing(function ($regionId) {
+        return "custom.{$regionId}";
     });
 
     $result = $craftile->resolveRegionView('header');
@@ -38,8 +38,8 @@ it('custom resolver takes precedence over config', function () {
 
     $craftile = app(Craftile::class);
 
-    $craftile->resolveRegionViewUsing(function ($regionName) {
-        return "override.{$regionName}";
+    $craftile->resolveRegionViewUsing(function ($regionId) {
+        return "override.{$regionId}";
     });
 
     $result = $craftile->resolveRegionView('header');
@@ -50,13 +50,29 @@ it('custom resolver takes precedence over config', function () {
 it('can return complex view paths with custom resolver', function () {
     $craftile = app(Craftile::class);
 
-    $craftile->resolveRegionViewUsing(function ($regionName) {
-        return "themes.default.regions.{$regionName}";
+    $craftile->resolveRegionViewUsing(function ($regionId) {
+        return "themes.default.regions.{$regionId}";
     });
 
     $result = $craftile->resolveRegionView('sidebar');
 
     expect($result)->toBe('themes.default.regions.sidebar');
+});
+
+it('passes the region id string to custom region view resolver', function () {
+    $craftile = app(Craftile::class);
+    $receivedRegionId = null;
+
+    $craftile->resolveRegionViewUsing(function ($regionId) use (&$receivedRegionId) {
+        $receivedRegionId = $regionId;
+
+        return "custom.{$regionId}";
+    });
+
+    $result = $craftile->resolveRegionView('hero');
+
+    expect($result)->toBe('custom.hero');
+    expect($receivedRegionId)->toBe('hero');
 });
 
 test('shouldRenderBlock returns true for enabled blocks by default', function () {
