@@ -13,7 +13,22 @@ test('can track regions', function () {
     $data = $collector->getCollectedData();
 
     expect($data['regions'])->toHaveCount(1);
+    expect($data['regions'][0]['id'])->toBe('header');
     expect($data['regions'][0]['name'])->toBe('header');
+    expect($data['regions'][0]['blocks'])->toBeArray();
+});
+
+test('can track region id with display name', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $collector->startRegion('hero', 'Hero');
+    $collector->endRegion('hero');
+
+    $data = $collector->getCollectedData();
+
+    expect($data['regions'])->toHaveCount(1);
+    expect($data['regions'][0]['id'])->toBe('hero');
+    expect($data['regions'][0]['name'])->toBe('Hero');
     expect($data['regions'][0]['blocks'])->toBeArray();
 });
 
@@ -34,10 +49,34 @@ test('can track blocks in regions', function () {
 
     $data = $collector->getCollectedData();
 
+    expect($data['regions'][0]['id'])->toBe('content');
     expect($data['regions'][0]['blocks'])->toHaveCount(1);
     expect($data['regions'][0]['blocks'][0])->toBe('block-1');
     expect($data['blocks']['block-1']['type'])->toBe('text');
     expect($data['blocks']['block-1']['properties']['content'])->toBe('Hello');
+});
+
+test('tracks blocks under region id when display name differs', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $collector->startRegion('hero', 'Hero');
+
+    $blockData = BlockData::make([
+        'id' => 'block-1',
+        'type' => 'text',
+        'properties' => ['content' => 'Hello'],
+    ]);
+
+    $collector->startBlock('block-1', $blockData);
+    $collector->endBlock('block-1');
+    $collector->endRegion('hero');
+
+    $data = $collector->getCollectedData();
+
+    expect($data['regions'])->toHaveCount(1);
+    expect($data['regions'][0]['id'])->toBe('hero');
+    expect($data['regions'][0]['name'])->toBe('Hero');
+    expect($data['regions'][0]['blocks'])->toBe(['block-1']);
 });
 
 test('can track content layers', function () {
@@ -62,9 +101,36 @@ test('can track content layers', function () {
 
     // Verify regions are in correct order
     expect($data['regions'])->toHaveCount(3);
+    expect($data['regions'][0]['id'])->toBe('header');
     expect($data['regions'][0]['name'])->toBe('header');
+    expect($data['regions'][1]['id'])->toBe('main');
     expect($data['regions'][1]['name'])->toBe('main');
+    expect($data['regions'][2]['id'])->toBe('footer');
     expect($data['regions'][2]['name'])->toBe('footer');
+});
+
+test('orders regions by id when display names differ', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $collector->startRegion('header', 'Header');
+    $collector->endRegion('header');
+
+    $collector->beforeContent();
+    $collector->startContent();
+
+    $collector->startRegion('main', 'Main');
+    $collector->endRegion('main');
+
+    $collector->endContent();
+    $collector->afterContent();
+
+    $collector->startRegion('footer', 'Footer');
+    $collector->endRegion('footer');
+
+    $data = $collector->getCollectedData();
+
+    expect(array_column($data['regions'], 'id'))->toBe(['header', 'main', 'footer']);
+    expect(array_column($data['regions'], 'name'))->toBe(['Header', 'Main', 'Footer']);
 });
 
 test('detects if currently collecting', function () {

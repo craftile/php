@@ -81,11 +81,11 @@ test('uses region id for preview tracking when id and name are both present', fu
 
     $compiled = $this->compiler->compileTemplate($templateData);
 
-    expect($compiled)->toContain('craftile()->startRegion("hero")');
+    expect($compiled)->toContain('craftile()->startRegion("hero", "Hero")');
     expect($compiled)->toContain('craftile()->endRegion("hero")');
     expect($compiled)->toContain('<!--BEGIN region: hero-->');
     expect($compiled)->toContain('<!--END region: hero-->');
-    expect($compiled)->not->toContain('startRegion("Hero")');
+    expect($compiled)->not->toContain('startRegion("Hero", "Hero")');
     expect($compiled)->not->toContain('endRegion("Hero")');
 });
 
@@ -105,7 +105,7 @@ test('falls back to region name for preview tracking when id is missing', functi
 
     $compiled = $this->compiler->compileTemplate($templateData);
 
-    expect($compiled)->toContain('craftile()->startRegion("Hero")');
+    expect($compiled)->toContain('craftile()->startRegion("Hero", "Hero")');
     expect($compiled)->toContain('craftile()->endRegion("Hero")');
     expect($compiled)->toContain('<!--BEGIN region: Hero-->');
     expect($compiled)->toContain('<!--END region: Hero-->');
