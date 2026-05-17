@@ -1,3 +1,12 @@
+## [0.6.3](https://github.com/craftile/php/compare/v0.6.2...v0.6.3) (2026-05-17)
+
+
+### Bug Fixes
+
+* prefer region ids for preview handling ([0de7999](https://github.com/craftile/php/commit/0de7999b7a1a653726d182cb8ab9cd3daf232618))
+
+
+
 ## [0.6.2](https://github.com/craftile/php/compare/v0.6.1...v0.6.2) (2026-05-16)
 
 
