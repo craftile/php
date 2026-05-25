@@ -9,8 +9,7 @@ class DynamicSource
 {
     public function __construct(
         public readonly string $path,
-        public readonly string $type,
         public readonly mixed $context,
-        public readonly mixed $default = null
+        public readonly array $schema = [],
     ) {}
 }

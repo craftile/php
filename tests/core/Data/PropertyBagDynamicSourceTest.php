@@ -12,7 +12,7 @@ test('it detects @ prefix and creates DynamicSource object', function () {
 
     expect($result)->toBeInstanceOf(DynamicSource::class);
     expect($result->path)->toBe('product.title');
-    expect($result->type)->toBe('text');
+    expect($result->schema)->toBe(['type' => 'text']);
 });
 
 test('it passes context to DynamicSource', function () {
@@ -29,7 +29,7 @@ test('it passes context to DynamicSource', function () {
     expect($result->context)->toBe($context);
 });
 
-test('it passes default value to DynamicSource', function () {
+test('it passes default value to DynamicSource via schema', function () {
     $values = ['title' => '@product.title'];
     $schemas = ['title' => ['type' => 'text', 'default' => 'Default Title']];
     $bag = new PropertyBag($values, $schemas);
@@ -37,10 +37,10 @@ test('it passes default value to DynamicSource', function () {
     $result = $bag->get('title');
 
     expect($result)->toBeInstanceOf(DynamicSource::class);
-    expect($result->default)->toBe('Default Title');
+    expect($result->schema['default'])->toBe('Default Title');
 });
 
-test('it handles @ prefix with fallback type', function () {
+test('it passes empty schema when none is provided', function () {
     $values = ['title' => '@product.title'];
     $schemas = ['title' => []]; // No type specified
     $bag = new PropertyBag($values, $schemas);
@@ -48,7 +48,7 @@ test('it handles @ prefix with fallback type', function () {
     $result = $bag->get('title');
 
     expect($result)->toBeInstanceOf(DynamicSource::class);
-    expect($result->type)->toBe('text'); // Fallback to 'text'
+    expect($result->schema)->toBe([]);
 });
 
 test('it does not create DynamicSource for regular values', function () {

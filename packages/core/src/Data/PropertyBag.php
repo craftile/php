@@ -82,19 +82,15 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
         }
 
         $value = $this->values[$key];
-        $schema = $this->schemas[$key] ?? null;
+        $schema = is_array($this->schemas[$key] ?? null) ? $this->schemas[$key] : [];
 
-        $type = null;
-        $isResponsive = false;
-        if (is_array($schema)) {
-            $type = $schema['type'] ?? null;
-            $isResponsive = $schema['responsive'] ?? false;
-        }
+        $type = $schema['type'] ?? null;
+        $isResponsive = $schema['responsive'] ?? false;
 
         if ($isResponsive && is_array($value) && isset($value['_default'])) {
             $transformedBreakpoints = [];
             foreach ($value as $breakpoint => $breakpointValue) {
-                $transformedBreakpoints[$breakpoint] = $this->transformValue($breakpointValue, $type);
+                $transformedBreakpoints[$breakpoint] = $this->transformValue($breakpointValue, $schema);
             }
 
             $responsiveValue = new ResponsiveValue($transformedBreakpoints, $type);
@@ -105,19 +101,15 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
 
         // Detect dynamic source (@ prefix) and create DynamicSource object
         if (is_string($value) && str_starts_with($value, '@')) {
-            $path = substr($value, 1); // Remove @ prefix
-            $default = is_array($schema) && isset($schema['default']) ? $schema['default'] : null;
-
             $value = new DynamicSource(
-                path: $path,
-                type: $type ?? 'text', // Fallback to 'text' if no type specified
+                path: substr($value, 1),
                 context: $this->context,
-                default: $default
+                schema: $schema,
             );
-            $type = '__dynamic_source__';
+            $schema = ['type' => '__dynamic_source__'];
         }
 
-        $transformedValue = $this->transformValue($value, $type);
+        $transformedValue = $this->transformValue($value, $schema);
 
         $this->resolved[$key] = $transformedValue;
 
@@ -193,9 +185,11 @@ class PropertyBag implements Countable, IteratorAggregate, JsonSerializable
     }
 
     /**
-     * Transform a value based on its type.
+     * Transform a value based on its schema.
+     *
+     * @param  array<string, mixed>  $schema
      */
-    protected function transformValue(mixed $value, ?string $type): mixed
+    protected function transformValue(mixed $value, array $schema): mixed
     {
         return $value;
     }
