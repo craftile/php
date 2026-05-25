@@ -1,3 +1,12 @@
+# [0.7.0](https://github.com/craftile/php/compare/v0.6.4...v0.7.0) (2026-05-25)
+
+
+### Features
+
+* pass property schema to value transformers ([5662b0c](https://github.com/craftile/php/commit/5662b0c6f18d3ed8dd12295b0ffaab5546509bf1))
+
+
+
 ## [0.6.4](https://github.com/craftile/php/compare/v0.6.3...v0.6.4) (2026-05-17)
 
 
