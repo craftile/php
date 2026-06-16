@@ -1,3 +1,12 @@
+## [0.9.1](https://github.com/craftile/php/compare/v0.9.0...v0.9.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* ignore missing discovery roots ([45629de](https://github.com/craftile/php/commit/45629dea2a75174aaa9d4e9e4abee9867ad7c2a5))
+
+
+
 # [0.9.0](https://github.com/craftile/php/compare/v0.8.0...v0.9.0) (2026-06-16)
 
 
