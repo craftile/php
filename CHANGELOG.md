@@ -1,3 +1,12 @@
+# [0.8.0](https://github.com/craftile/php/compare/v0.7.0...v0.8.0) (2026-06-16)
+
+
+### Features
+
+* add deferred Craftile discovery manifest ([24f4670](https://github.com/craftile/php/commit/24f4670986e8addca99758cfba1e9b0aa56a2ee5))
+
+
+
 # [0.7.0](https://github.com/craftile/php/compare/v0.6.4...v0.7.0) (2026-05-25)
 
 
