@@ -81,4 +81,67 @@ describe('Craftile discovered schemas', function () {
 
         expect(app(BlockSchemaRegistry::class)->get('container')->class)->toBe(ContainerBlock::class);
     });
+
+    it('can filter discovered entries with a persistent callback', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+
+        Craftile::filterDiscoveredSchemasUsing(fn (array $entry, string $type) => $type === 'block'
+            && $entry['class'] === StubTestBlock::class);
+
+        Craftile::registerDiscoveredSchemas();
+
+        $registry = app(BlockSchemaRegistry::class);
+
+        expect($registry->hasSchema('stub-test-block'))->toBeTrue()
+            ->and($registry->hasSchema(ContainerBlock::type()))->toBeFalse();
+    });
+
+    it('uses the per-call filter instead of the persistent callback', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+
+        Craftile::filterDiscoveredSchemasUsing(fn () => false);
+        Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block'
+            && $entry['class'] === StubTestBlock::class);
+
+        $registry = app(BlockSchemaRegistry::class);
+
+        expect($registry->hasSchema('stub-test-block'))->toBeTrue()
+            ->and($registry->hasSchema(ContainerBlock::type()))->toBeFalse();
+    });
+
+    it('can clear the persistent callback with null', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+
+        Craftile::filterDiscoveredSchemasUsing(fn () => false);
+        Craftile::filterDiscoveredSchemasUsing(null);
+        Craftile::registerDiscoveredSchemas();
+
+        expect(app(BlockSchemaRegistry::class)->hasSchema('stub-test-block'))->toBeTrue()
+            ->and(app(BlockSchemaRegistry::class)->hasSchema(ContainerBlock::type()))->toBeTrue();
+    });
+
+    it('passes preset entries through the discovered schema filter', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+        Craftile::discoverPresetsIn('Tests\\Laravel\\Stubs\\Discovery\\Presets', __DIR__.'/../Stubs/Discovery/Presets');
+
+        Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block');
+
+        $container = app(BlockSchemaRegistry::class)->get('container');
+
+        expect($container)->not->toBeNull()
+            ->and($container->presets)->toHaveCount(1);
+    });
+
+    it('keeps filtered discovered schema registration idempotent', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+
+        Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block'
+            && $entry['class'] === StubTestBlock::class);
+        Craftile::registerDiscoveredSchemas(fn () => true);
+
+        $registry = app(BlockSchemaRegistry::class);
+
+        expect($registry->hasSchema('stub-test-block'))->toBeTrue()
+            ->and($registry->hasSchema(ContainerBlock::type()))->toBeFalse();
+    });
 });
