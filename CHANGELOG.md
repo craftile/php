@@ -1,3 +1,12 @@
+# [0.9.0](https://github.com/craftile/php/compare/v0.8.0...v0.9.0) (2026-06-16)
+
+
+### Features
+
+* filter discovered schema registration ([483f400](https://github.com/craftile/php/commit/483f4002568a739dfddb18ad6e0473398bfb700b))
+
+
+
 # [0.8.0](https://github.com/craftile/php/compare/v0.7.0...v0.8.0) (2026-06-16)
 
 
