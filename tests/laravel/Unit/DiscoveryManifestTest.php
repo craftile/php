@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Craftile\Laravel\DiscoveryManifest;
 use Craftile\Laravel\DiscoveryRoots;
-use Craftile\Laravel\Exceptions\InvalidDiscoveryRootException;
 use Tests\Laravel\Stubs\Discovery\ContainerBlock;
 use Tests\Laravel\Stubs\Discovery\Content\TextBlock;
 use Tests\Laravel\Stubs\Discovery\DiscoveryBlock;
@@ -81,15 +80,37 @@ describe('DiscoveryManifest', function () {
         expect($manifest->exists())->toBeFalse();
     });
 
-    it('throws when a configured root is missing', function () {
+    it('ignores missing configured roots', function () {
         config([
             'craftile.discovery.blocks' => [
                 'App\\MissingBlocks' => __DIR__.'/../Stubs/MissingBlocks',
             ],
         ]);
 
-        expect(fn () => app(DiscoveryManifest::class)->build())
-            ->toThrow(InvalidDiscoveryRootException::class);
+        $manifest = app(DiscoveryManifest::class)->build();
+
+        expect($manifest['roots']['blocks'])->toBeEmpty()
+            ->and($manifest['blocks'])->toBeEmpty();
+    });
+
+    it('scans valid roots and omits missing roots from metadata', function () {
+        config([
+            'craftile.discovery.blocks' => [
+                'App\\MissingBlocks' => __DIR__.'/../Stubs/MissingBlocks',
+                'Tests\\Laravel\\Stubs\\Discovery' => __DIR__.'/../Stubs/Discovery',
+            ],
+        ]);
+
+        $manifest = app(DiscoveryManifest::class)->build();
+
+        expect($manifest['roots']['blocks'])->toHaveCount(1)
+            ->and($manifest['roots']['blocks'][0]['namespace'])->toBe('Tests\\Laravel\\Stubs\\Discovery')
+            ->and(array_column($manifest['blocks'], 'class'))->toBe([
+                ContainerBlock::class,
+                TextBlock::class,
+                DiscoveryBlock::class,
+                StubTestBlock::class,
+            ]);
     });
 
 });
