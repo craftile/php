@@ -16,7 +16,7 @@ class ApplyUserNormalizer
 {
     public function handle(TemplatePayload $payload, Closure $next): mixed
     {
-        $payload->data = Craftile::normalizeTemplate($payload->data);
+        $payload->data = Craftile::normalizeTemplate($payload->data, $payload->path);
 
         return $next($payload);
     }

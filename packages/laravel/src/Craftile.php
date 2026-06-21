@@ -204,10 +204,10 @@ class Craftile
     /**
      * Normalize template data using the registered normalizer.
      */
-    public function normalizeTemplate(array $templateData): array
+    public function normalizeTemplate(array $templateData, string $path): array
     {
         if ($this->templateNormalizer) {
-            return call_user_func($this->templateNormalizer, $templateData);
+            return call_user_func($this->templateNormalizer, $templateData, $path);
         }
 
         return $templateData;

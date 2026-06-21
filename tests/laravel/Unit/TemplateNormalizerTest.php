@@ -21,7 +21,7 @@ describe('Template Normalizer', function () {
             ],
         ];
 
-        $normalized = Craftile::normalizeTemplate($template);
+        $normalized = Craftile::normalizeTemplate($template, '');
 
         expect($normalized)->toBe($template);
     });
@@ -42,7 +42,7 @@ describe('Template Normalizer', function () {
             ],
         ];
 
-        $normalized = Craftile::normalizeTemplate($template);
+        $normalized = Craftile::normalizeTemplate($template, '');
 
         expect($normalized)->toHaveKey('blocks');
         expect($normalized)->not()->toHaveKey('sections');
@@ -75,7 +75,7 @@ describe('Template Normalizer', function () {
             ],
         ];
 
-        $normalized = Craftile::normalizeTemplate($template);
+        $normalized = Craftile::normalizeTemplate($template, '');
 
         expect($normalized['blocks']['block-1'])->toHaveKey('properties');
         expect($normalized['blocks']['block-1'])->not()->toHaveKey('settings');
@@ -131,7 +131,7 @@ describe('Template Normalizer', function () {
             ],
         ];
 
-        $normalized = Craftile::normalizeTemplate($template);
+        $normalized = Craftile::normalizeTemplate($template, '');
 
         expect($normalized)->toHaveKey('blocks');
         expect($normalized)->not()->toHaveKey('sections');
@@ -139,6 +139,30 @@ describe('Template Normalizer', function () {
         expect($normalized['blocks']['parent-1'])->not()->toHaveKey('settings');
         expect($normalized['blocks']['parent-1']['children'][0])->toHaveKey('properties');
         expect($normalized['blocks']['parent-1']['children'][0])->not()->toHaveKey('settings');
+    });
+
+    it('passes the file path to the normalizer callback', function () {
+        $receivedPath = null;
+
+        Craftile::normalizeTemplateUsing(function (array $data, string $path) use (&$receivedPath) {
+            $receivedPath = $path;
+
+            return $data;
+        });
+
+        $testFile = storage_path('test-normalizer-path.json');
+        file_put_contents($testFile, json_encode([
+            'blocks' => [
+                'test-1' => ['id' => 'test-1', 'type' => 'text'],
+            ],
+        ]));
+
+        $datastore = app(BlockDatastore::class);
+        $datastore->loadFile($testFile);
+
+        expect($receivedPath)->toBe($testFile);
+
+        @unlink($testFile);
     });
 
     it('normalizer is called in BlockDatastore', function () {
