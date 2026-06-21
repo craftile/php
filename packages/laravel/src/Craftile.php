@@ -31,8 +31,6 @@ class Craftile
     /** @var callable|null */
     protected $discoveredSchemaFilter = null;
 
-    protected bool $discoveredSchemasRegistered = false;
-
     public function __construct(
         protected BlockSchemaRegistry $schemaRegistry,
         protected PropertyTransformerRegistry $transformerRegistry,
@@ -63,10 +61,6 @@ class Craftile
      */
     public function registerDiscoveredSchemas(?callable $filter = null): void
     {
-        if ($this->discoveredSchemasRegistered) {
-            return;
-        }
-
         $manifest = $this->discoveryManifest->get();
         $filter ??= $this->discoveredSchemaFilter;
 
@@ -105,28 +99,11 @@ class Craftile
                 throw DiscoveredSchemaRegistrationException::forPreset($class, $preset['path'] ?? null, $e);
             }
         }
-
-        $this->discoveredSchemasRegistered = true;
-    }
-
-    /**
-     * Re-register deferred discovered block schemas and presets.
-     */
-    public function refreshDiscoveredSchemas(?callable $filter = null): void
-    {
-        $this->discoveredSchemasRegistered = false;
-
-        $this->registerDiscoveredSchemas($filter);
     }
 
     public function filterDiscoveredSchemasUsing(?callable $filter): void
     {
         $this->discoveredSchemaFilter = $filter;
-    }
-
-    public function discoveredSchemasRegistered(): bool
-    {
-        return $this->discoveredSchemasRegistered;
     }
 
     /**

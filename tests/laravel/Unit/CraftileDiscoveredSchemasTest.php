@@ -13,10 +13,6 @@ describe('Craftile discovered schemas', function () {
         app(DiscoveryManifest::class)->clear();
     });
 
-    afterEach(function () {
-        app(DiscoveryManifest::class)->clear();
-    });
-
     it('does not register discovered schemas during service provider boot', function () {
         config([
             'craftile.discovery.blocks' => [
@@ -24,11 +20,10 @@ describe('Craftile discovered schemas', function () {
             ],
         ]);
 
-        expect(app(BlockSchemaRegistry::class)->getAllSchemas())->toBeEmpty()
-            ->and(Craftile::discoveredSchemasRegistered())->toBeFalse();
+        expect(app(BlockSchemaRegistry::class)->getAllSchemas())->toBeEmpty();
     });
 
-    it('registers discovered schemas and presets explicitly and idempotently', function () {
+    it('registers discovered schemas and presets explicitly on every call', function () {
         Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
         Craftile::discoverPresetsIn('Tests\\Laravel\\Stubs\\Discovery\\Presets', __DIR__.'/../Stubs/Discovery/Presets');
 
@@ -38,8 +33,7 @@ describe('Craftile discovered schemas', function () {
         $registry = app(BlockSchemaRegistry::class);
         $container = $registry->get('container');
 
-        expect(Craftile::discoveredSchemasRegistered())->toBeTrue()
-            ->and($registry->hasSchema('stub-test-block'))->toBeTrue()
+        expect($registry->hasSchema('stub-test-block'))->toBeTrue()
             ->and($container)->not->toBeNull()
             ->and($container->presets)->toHaveCount(2)
             ->and($container->presets[1]->toArray()['name'])->toBe('Container Discovery Preset');
@@ -132,7 +126,7 @@ describe('Craftile discovered schemas', function () {
             ->and($container->presets)->toHaveCount(1);
     });
 
-    it('keeps filtered discovered schema registration idempotent', function () {
+    it('applies the current filter each time discovered schemas are registered', function () {
         Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
 
         Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block'
@@ -142,20 +136,6 @@ describe('Craftile discovered schemas', function () {
         $registry = app(BlockSchemaRegistry::class);
 
         expect($registry->hasSchema('stub-test-block'))->toBeTrue()
-            ->and($registry->hasSchema(ContainerBlock::type()))->toBeFalse();
-    });
-
-    it('can refresh discovered schema registration', function () {
-        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
-
-        Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block'
-            && $entry['class'] === StubTestBlock::class);
-        Craftile::refreshDiscoveredSchemas(fn () => true);
-
-        $registry = app(BlockSchemaRegistry::class);
-
-        expect(Craftile::discoveredSchemasRegistered())->toBeTrue()
-            ->and($registry->hasSchema('stub-test-block'))->toBeTrue()
             ->and($registry->hasSchema(ContainerBlock::type()))->toBeTrue();
     });
 });
