@@ -1,3 +1,12 @@
+## [0.9.2](https://github.com/craftile/php/compare/v0.9.1...v0.9.2) (2026-06-21)
+
+
+### Bug Fixes
+
+* pass file path to user normalizer callback ([0dfcbac](https://github.com/craftile/php/commit/0dfcbacb793ba322cb2b86bb216b8dd42b18db32))
+
+
+
 ## [0.9.1](https://github.com/craftile/php/compare/v0.9.0...v0.9.1) (2026-06-16)
 
 
