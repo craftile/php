@@ -109,6 +109,16 @@ class Craftile
         $this->discoveredSchemasRegistered = true;
     }
 
+    /**
+     * Re-register deferred discovered block schemas and presets.
+     */
+    public function refreshDiscoveredSchemas(?callable $filter = null): void
+    {
+        $this->discoveredSchemasRegistered = false;
+
+        $this->registerDiscoveredSchemas($filter);
+    }
+
     public function filterDiscoveredSchemasUsing(?callable $filter): void
     {
         $this->discoveredSchemaFilter = $filter;

@@ -144,4 +144,18 @@ describe('Craftile discovered schemas', function () {
         expect($registry->hasSchema('stub-test-block'))->toBeTrue()
             ->and($registry->hasSchema(ContainerBlock::type()))->toBeFalse();
     });
+
+    it('can refresh discovered schema registration', function () {
+        Craftile::discoverBlocksIn('Tests\\Laravel\\Stubs\\Discovery', __DIR__.'/../Stubs/Discovery');
+
+        Craftile::registerDiscoveredSchemas(fn (array $entry, string $type) => $type === 'block'
+            && $entry['class'] === StubTestBlock::class);
+        Craftile::refreshDiscoveredSchemas(fn () => true);
+
+        $registry = app(BlockSchemaRegistry::class);
+
+        expect(Craftile::discoveredSchemasRegistered())->toBeTrue()
+            ->and($registry->hasSchema('stub-test-block'))->toBeTrue()
+            ->and($registry->hasSchema(ContainerBlock::type()))->toBeTrue();
+    });
 });

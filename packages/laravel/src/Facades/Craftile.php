@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void discoverBlocksIn(string $namespace, string $directory)
  * @method static void discoverPresetsIn(string $namespace, string $directory)
  * @method static void registerDiscoveredSchemas(?callable $filter = null)
+ * @method static void refreshDiscoveredSchemas(?callable $filter = null)
  * @method static void filterDiscoveredSchemasUsing(?callable $filter)
  * @method static bool discoveredSchemasRegistered()
  * @method static void registerBlock(string $blockClass)
