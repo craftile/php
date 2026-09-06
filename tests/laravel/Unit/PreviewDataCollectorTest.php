@@ -452,6 +452,81 @@ test('collects multiple unrendered static blocks', function () {
     expect($data['blocks'])->toHaveKey('static-3');
 });
 
+test('collects dynamic children of a disabled parent', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    // Disabled parent: its body never renders, so children never call startBlock.
+    // Only the parent itself is tracked (startBlock fires before the disabled guard).
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['dynamic-1', 'dynamic-2'],
+        'disabled' => true,
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    // Children exist in the datastore (from JSON) but were never rendered.
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('dynamic-1')
+        ->andReturn(BlockData::make([
+            'id' => 'dynamic-1',
+            'type' => 'button',
+            'parentId' => 'parent',
+        ]));
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('dynamic-2')
+        ->andReturn(BlockData::make([
+            'id' => 'dynamic-2',
+            'type' => 'button',
+            'parentId' => 'parent',
+        ]));
+
+    $data = $collector->getCollectedData();
+
+    // The complete tree must be present even though the parent is disabled.
+    expect($data['blocks'])->toHaveKey('dynamic-1');
+    expect($data['blocks'])->toHaveKey('dynamic-2');
+    expect($data['blocks']['parent']['children'])->toBe(['dynamic-1', 'dynamic-2']);
+});
+
+test('collects nested dynamic subtree of a disabled parent', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['child'],
+        'disabled' => true,
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('child')
+        ->andReturn(BlockData::make([
+            'id' => 'child',
+            'type' => 'container',
+            'parentId' => 'parent',
+            'children' => ['grandchild'],
+        ]));
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('grandchild')
+        ->andReturn(BlockData::make([
+            'id' => 'grandchild',
+            'type' => 'text',
+            'parentId' => 'child',
+        ]));
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks'])->toHaveKey('child');
+    expect($data['blocks'])->toHaveKey('grandchild');
+    expect($data['blocks']['child']['children'])->toBe(['grandchild']);
+});
+
 test('handles repeated blocks from empty loops', function () {
     $collector = app(PreviewDataCollector::class);
 

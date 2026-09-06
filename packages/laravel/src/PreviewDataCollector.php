@@ -146,6 +146,10 @@ class PreviewDataCollector
     /**
      * Collect all static/repeated children that may not have been rendered.
      * Groups them with other static/repeated blocks, or at the end if none rendered.
+     *
+     * Disabled blocks never render their body, so none of their children call
+     * startBlock. For those we recover the entire child subtree (not just
+     * static/repeated) so the editor sidebar still shows the complete tree.
      */
     private function collectUnrenderedStaticChildren(): void
     {
@@ -155,6 +159,8 @@ class PreviewDataCollector
             if (empty($childrenIds)) {
                 continue;
             }
+
+            $parentDisabled = $blockData['disabled'] ?? false;
 
             // Find unrendered static/repeated children from BlockDatastore
             $unrenderedStatic = [];
@@ -170,8 +176,7 @@ class PreviewDataCollector
                     continue;
                 }
 
-                // Only collect static or repeated blocks (and their entire tree)
-                if ($childBlock->static || $childBlock->repeated) {
+                if ($parentDisabled || $childBlock->static || $childBlock->repeated) {
                     $this->collectBlockTree($childId);
                     $unrenderedStatic[] = $childId;
                 }
