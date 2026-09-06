@@ -41,6 +41,12 @@ interface BlockInterface
     public static function accepts(): array;
 
     /**
+     * Define which child block types this block rejects, even if matched by accepts.
+     * Supports the same type strings and patterns as accepts.
+     */
+    public static function rejects(): array;
+
+    /**
      * Get the icon svg for this block.
      */
     public static function icon(): string;

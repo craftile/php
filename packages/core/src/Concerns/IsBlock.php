@@ -98,6 +98,14 @@ trait IsBlock
     }
 
     /**
+     * Get rejected child types from static property.
+     */
+    public static function rejects(): array
+    {
+        return static::$rejects ?? [];
+    }
+
+    /**
      * Get block icon from static property.
      */
     public static function icon(): string

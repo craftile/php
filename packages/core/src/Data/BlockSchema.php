@@ -28,6 +28,8 @@ class BlockSchema implements JsonSerializable
 
     public array $accepts = [];
 
+    public array $rejects = [];
+
     public ?string $wrapper;
 
     public ?string $previewImageUrl;
@@ -46,6 +48,7 @@ class BlockSchema implements JsonSerializable
         ?string $category = null,
         array $properties = [],
         array $accepts = [],
+        array $rejects = [],
         ?string $wrapper = null,
         ?string $previewImageUrl = null,
         array $presets = [],
@@ -59,7 +62,8 @@ class BlockSchema implements JsonSerializable
         $this->icon = $icon;
         $this->category = $category;
         $this->properties = $properties;
-        $this->accepts = static::normalizeAccepts($accepts);
+        $this->accepts = static::normalizeBlockTypes($accepts);
+        $this->rejects = static::normalizeBlockTypes($rejects);
         $this->wrapper = $wrapper;
         $this->previewImageUrl = $previewImageUrl;
         $this->presets = static::normalizePresets($presets);
@@ -67,12 +71,12 @@ class BlockSchema implements JsonSerializable
     }
 
     /**
-     * Normalize accepts array by converting class names to block types.
+     * Normalize a list of block references by converting class names to block types.
      *
-     * @param  array  $accepts  Raw accepts array (may contain class names)
-     * @return array Normalized accepts array (only type strings and '*')
+     * @param  array  $items  Raw list (may contain class names)
+     * @return array Normalized list (only type strings and patterns)
      */
-    protected static function normalizeAccepts(array $accepts): array
+    protected static function normalizeBlockTypes(array $items): array
     {
         return array_map(function ($item) {
             // If it's a class that exists and implements BlockInterface
@@ -83,9 +87,9 @@ class BlockSchema implements JsonSerializable
                 }
             }
 
-            // Otherwise return as-is (type string or '*')
+            // Otherwise return as-is (type string or pattern)
             return $item;
-        }, $accepts);
+        }, $items);
     }
 
     /**
@@ -148,6 +152,7 @@ class BlockSchema implements JsonSerializable
             category: $blockClass::category(),
             properties: $blockClass::properties(),
             accepts: $blockClass::accepts(),
+            rejects: $blockClass::rejects(),
             wrapper: $blockClass::wrapper(),
             previewImageUrl: $blockClass::previewImageUrl(),
             presets: $blockClass::presets(),
@@ -172,6 +177,7 @@ class BlockSchema implements JsonSerializable
                 return $prop instanceof Property ? $prop->toArray() : $prop;
             }, $this->properties),
             'accepts' => $this->accepts,
+            'rejects' => $this->rejects,
             'wrapper' => $this->wrapper,
             'previewImageUrl' => $this->previewImageUrl,
             'presets' => array_map(function ($preset) {
