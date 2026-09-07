@@ -1,3 +1,19 @@
+# [0.10.0](https://github.com/craftile/php/compare/v0.9.2...v0.10.0) (2026-09-07)
+
+
+### Bug Fixes
+
+* collect full child subtree of disabled blocks in preview data ([b1b69d4](https://github.com/craftile/php/commit/b1b69d41aebc2839a26253b7f2bb91b2fa0bd55d))
+* keep filtered blocks in their parent children list during preview collection ([b77db54](https://github.com/craftile/php/commit/b77db54f4e5499fec05e1aaf0aa07d19678ce92e))
+
+
+### Features
+
+* add keepInTree flag for static blocks hidden by templates ([19db907](https://github.com/craftile/php/commit/19db907b29c9c964a947ddc5cca4d69f3d56acdd))
+* add rejects to block schema ([746950e](https://github.com/craftile/php/commit/746950eecc3ca4cc843fa5e68c15af9713c80622))
+
+
+
 ## [0.9.2](https://github.com/craftile/php/compare/v0.9.1...v0.9.2) (2026-06-21)
 
 
