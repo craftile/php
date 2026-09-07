@@ -39,7 +39,7 @@ test('compileBlock passes custom attributes to compiler', function () {
     $compiled = $this->handler->testCompileBlock('text', 'test-id', $customAttrs, $node, null);
 
     // Verify custom attributes are in the compiled output
-    expect($compiled)->toContain('craftile()->filterContext(get_defined_vars(), ' . $customAttrs . ')');
+    expect($compiled)->toContain('craftile()->filterContext(get_defined_vars(), '.$customAttrs.')');
 });
 
 test('compileBlock uses empty array when no custom attributes provided', function () {
@@ -69,9 +69,9 @@ test('compileBlock creates unique variable names with hash', function () {
     $hash = hash('xxh128', 'unique-id-123');
 
     // Check that variables use the hash
-    expect($compiled)->toContain('$__blockId' . $hash);
-    expect($compiled)->toContain('$__blockParentId' . $hash);
-    expect($compiled)->toContain('$__blockData' . $hash);
+    expect($compiled)->toContain('$__blockId'.$hash);
+    expect($compiled)->toContain('$__blockParentId'.$hash);
+    expect($compiled)->toContain('$__blockData'.$hash);
 });
 
 test('compileBlock includes block data creation with custom attributes context', function () {
@@ -140,7 +140,7 @@ test('compileBlock cleans up block data variable', function () {
     $hash = hash('xxh128', 'cleanup-test');
 
     // Should unset block data variable
-    expect($compiled)->toContain('unset($__blockData' . $hash . ');');
+    expect($compiled)->toContain('unset($__blockData'.$hash.');');
 });
 
 test('compileBlock uses component compiler when set', function () {

@@ -2,6 +2,7 @@
 
 use Craftile\Laravel\BlockData;
 use Craftile\Laravel\Facades\BlockDatastore;
+use Craftile\Laravel\Facades\Craftile;
 use Craftile\Laravel\PreviewDataCollector;
 
 test('can track regions', function () {
@@ -671,4 +672,129 @@ test('recovers the subtree of a kept unrendered static child', function () {
     expect($data['blocks'])->toHaveKey('static-1');
     expect($data['blocks'])->toHaveKey('child');
     expect($data['blocks']['static-1']['keepInTree'])->toBeTrue();
+});
+
+test('keeps a filtered sibling in a rendered parent children list without collecting it', function () {
+    Craftile::checkIfBlockCanRenderUsing(fn (BlockData $block) => $block->id !== 'child-2');
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['child-1', 'child-2', 'child-3'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    foreach (['child-1', 'child-2', 'child-3'] as $childId) {
+        $child = BlockData::make([
+            'id' => $childId,
+            'type' => 'text',
+            'properties' => [],
+            'parentId' => 'parent',
+        ]);
+        $collector->startBlock($childId, $child);
+        $collector->endBlock($childId);
+    }
+
+    $collector->endBlock('parent');
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks']['parent']['children'])->toBe(['child-1', 'child-2', 'child-3']);
+    expect($data['blocks'])->toHaveKeys(['child-1', 'child-3']);
+    expect($data['blocks'])->not->toHaveKey('child-2');
+});
+
+test('keeps a filtered root block in the region list without collecting it', function () {
+    Craftile::checkIfBlockCanRenderUsing(fn (BlockData $block) => $block->id !== 'block-2');
+    $collector = app(PreviewDataCollector::class);
+
+    $collector->startRegion('content');
+
+    foreach (['block-1', 'block-2'] as $blockId) {
+        $block = BlockData::make([
+            'id' => $blockId,
+            'type' => 'text',
+            'properties' => [],
+        ]);
+        $collector->startBlock($blockId, $block);
+        $collector->endBlock($blockId);
+    }
+
+    $collector->endRegion('content');
+
+    $data = $collector->getCollectedData();
+
+    expect($data['regions'][0]['blocks'])->toBe(['block-1', 'block-2']);
+    expect($data['blocks'])->toHaveKey('block-1');
+    expect($data['blocks'])->not->toHaveKey('block-2');
+});
+
+test('does not recover a filtered static child that is kept in tree', function () {
+    Craftile::checkIfBlockCanRenderUsing(fn (BlockData $block) => $block->id !== 'static-1');
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['dynamic-1', 'static-1'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    $dynamic1 = BlockData::make([
+        'id' => 'dynamic-1',
+        'type' => 'button',
+        'properties' => [],
+        'parentId' => 'parent',
+    ]);
+    $collector->startBlock('dynamic-1', $dynamic1);
+    $collector->endBlock('dynamic-1');
+
+    $static1 = BlockData::make([
+        'id' => 'static-1',
+        'type' => 'text',
+        'properties' => [],
+        'parentId' => 'parent',
+        'static' => true,
+        'keepInTree' => true,
+    ]);
+    $collector->startBlock('static-1', $static1);
+    $collector->endBlock('static-1');
+    $collector->endBlock('parent');
+
+    BlockDatastore::shouldReceive('getBlock')->never();
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks']['parent']['children'])->toBe(['dynamic-1', 'static-1']);
+    expect($data['blocks'])->not->toHaveKey('static-1');
+});
+
+test('still collects disabled and ghost blocks the render checker rejects', function () {
+    Craftile::checkIfBlockCanRenderUsing(fn (BlockData $block) => false);
+    $collector = app(PreviewDataCollector::class);
+
+    $disabled = BlockData::make([
+        'id' => 'disabled-1',
+        'type' => 'text',
+        'properties' => [],
+        'disabled' => true,
+    ]);
+    $collector->startBlock('disabled-1', $disabled);
+    $collector->endBlock('disabled-1');
+
+    $ghost = BlockData::make([
+        'id' => 'ghost-1',
+        'type' => 'text',
+        'properties' => [],
+        'ghost' => true,
+    ]);
+    $collector->startBlock('ghost-1', $ghost);
+    $collector->endBlock('ghost-1');
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks'])->toHaveKeys(['disabled-1', 'ghost-1']);
 });

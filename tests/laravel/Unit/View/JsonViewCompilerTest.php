@@ -597,3 +597,24 @@ test('static block children file is cleaned up when children become empty', func
     // Children file should be cleaned up
     expect($this->files->exists($childrenPath))->toBeFalse();
 });
+
+test('tracks every block in preview and lets the render check decide the body', function () {
+    $templateData = [
+        'blocks' => [
+            'header' => [
+                'id' => 'header',
+                'type' => 'test',
+                'properties' => [],
+            ],
+        ],
+        'regions' => [
+            ['name' => 'main', 'blocks' => ['header']],
+        ],
+    ];
+
+    $compiled = $this->compiler->compileTemplate($templateData);
+
+    expect($compiled)->toContain('if (craftile()->inPreview()) {');
+    expect($compiled)->toContain('craftile()->startBlock("header"');
+    expect($compiled)->toContain('craftile()->shouldRenderBlock(');
+});
