@@ -198,3 +198,56 @@ test('compiled output correctly strips quotes from dynamic bindings', function (
     // Should NOT contain the outer wrapping quotes that Blade Parser adds
     expect($result->content)->not->toContain('"$myVariant"');
 });
+
+test('bare keep attribute compiles to a true keepInTree flag and stays out of properties', function () {
+    $transformer = new CraftileBlockTagTransformer;
+    $node = createMockComponentNode('craftile', 'block', [
+        'type' => 'text',
+        'id' => 'kept-block',
+        'keep' => '',
+    ]);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (true)");
+    expect($result->content)->not->toContain("'keep' =>");
+});
+
+test('dynamic keep binding passes the expression through', function () {
+    $transformer = new CraftileBlockTagTransformer;
+    $node = createMockComponentNode('craftile', 'block', [
+        'type' => 'text',
+        'id' => 'kept-block',
+        ':keep' => '$showInTree',
+    ]);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (\$showInTree)");
+    expect($result->content)->not->toContain("'keep' =>");
+});
+
+test('keep attribute set to false compiles to a false keepInTree flag', function () {
+    $transformer = new CraftileBlockTagTransformer;
+    $node = createMockComponentNode('craftile', 'block', [
+        'type' => 'text',
+        'id' => 'kept-block',
+        'keep' => 'false',
+    ]);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (false)");
+});
+
+test('keepInTree defaults to false when keep attribute is absent', function () {
+    $transformer = new CraftileBlockTagTransformer;
+    $node = createMockComponentNode('craftile', 'block', [
+        'type' => 'text',
+        'id' => 'plain-block',
+    ]);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (false)");
+});

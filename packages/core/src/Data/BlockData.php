@@ -24,6 +24,7 @@ class BlockData implements JsonSerializable
         public readonly bool $static = false,
         public readonly bool $repeated = false,
         public readonly bool $ghost = false,
+        public readonly bool $keepInTree = false,
         public readonly ?string $semanticId = null,
         public readonly ?int $index = null,
         mixed $resolveChildData = null,
@@ -50,6 +51,7 @@ class BlockData implements JsonSerializable
             static: $data['static'] ?? false,
             repeated: $data['repeated'] ?? false,
             ghost: $data['ghost'] ?? false,
+            keepInTree: $data['keepInTree'] ?? false,
             semanticId: $data['semanticId'] ?? null,
             index: $data['index'] ?? null,
             resolveChildData: $resolveChildData,
@@ -118,6 +120,14 @@ class BlockData implements JsonSerializable
     }
 
     /**
+     * Check if block should stay in the editor tree even when it was not rendered.
+     */
+    public function shouldKeepInTree(): bool
+    {
+        return $this->keepInTree;
+    }
+
+    /**
      * Get child data if resolver is available.
      */
     public function getChildData(): mixed
@@ -145,6 +155,7 @@ class BlockData implements JsonSerializable
             'static' => $this->static,
             'repeated' => $this->repeated,
             'ghost' => $this->ghost,
+            'keepInTree' => $this->keepInTree,
             'semanticId' => $this->semanticId,
             'index' => $this->index,
             'iteration' => $this->iteration,

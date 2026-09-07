@@ -34,6 +34,24 @@ describe('Block Preset Integration', function () {
         expect($array['presets'][0]['children'][0]['static'])->toBe(true);
     });
 
+    it('serializes keepInTree on preset children', function () {
+        $schema = new BlockSchema(
+            type: 'keep-test',
+            slug: 'keep-test',
+            class: ContainerBlock::class,
+            name: 'Keep Test',
+            presets: [
+                BlockPreset::make('Default')->blocks([
+                    PresetChild::make('text')->id('subtitle')->static()->keepInTree(),
+                ]),
+            ],
+        );
+
+        $child = $schema->toArray()['presets'][0]['children'][0];
+
+        expect($child['keepInTree'])->toBeTrue();
+    });
+
     it('supports fluent API presets', function () {
         // Create a test block class with fluent presets
         $testBlockClass = new class implements BlockInterface

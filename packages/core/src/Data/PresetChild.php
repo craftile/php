@@ -27,6 +27,8 @@ class PresetChild implements JsonSerializable
 
     public bool $repeated = false;
 
+    public bool $keepInTree = false;
+
     public array $children = [];
 
     public ?array $childrenOrder = null;
@@ -152,6 +154,16 @@ class PresetChild implements JsonSerializable
     public function repeated(bool $repeated = true): static
     {
         $this->repeated = $repeated;
+
+        return $this;
+    }
+
+    /**
+     * Keep the block in the editor tree even when it is not rendered.
+     */
+    public function keepInTree(bool $keepInTree = true): static
+    {
+        $this->keepInTree = $keepInTree;
 
         return $this;
     }
@@ -287,6 +299,10 @@ class PresetChild implements JsonSerializable
 
         if ($this->repeated) {
             $data['repeated'] = $this->repeated;
+        }
+
+        if ($this->keepInTree) {
+            $data['keepInTree'] = $this->keepInTree;
         }
 
         if (! empty($this->children)) {

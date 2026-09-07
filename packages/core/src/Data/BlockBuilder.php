@@ -47,6 +47,7 @@ class BlockBuilder extends PresetChild
         $instance->static = $child->static;
         $instance->ghost = $child->ghost;
         $instance->repeated = $child->repeated;
+        $instance->keepInTree = $child->keepInTree;
         $instance->children = $child->children;
         $instance->childrenOrder = $child->childrenOrder;
 

@@ -61,6 +61,30 @@ describe('PresetChild', function () {
         expect($array)->not()->toHaveKey('static');
     });
 
+    it('can mark as kept in tree', function () {
+        $block = PresetChild::make('text')->keepInTree();
+
+        $array = $block->toArray();
+        expect($array)->toHaveKey('keepInTree', true);
+    });
+
+    it('does not include keepInTree in array when false or unset', function () {
+        expect(PresetChild::make('text')->toArray())->not()->toHaveKey('keepInTree');
+        expect(PresetChild::make('text')->keepInTree(false)->toArray())->not()->toHaveKey('keepInTree');
+    });
+
+    it('supports fluent API with keepInTree()', function () {
+        $block = PresetChild::make('paragraph')
+            ->id('features-subtitle')
+            ->static()
+            ->keepInTree();
+
+        $array = $block->toArray();
+        expect($array['id'])->toBe('features-subtitle');
+        expect($array['static'])->toBeTrue();
+        expect($array['keepInTree'])->toBeTrue();
+    });
+
     it('can mark as repeated', function () {
         $block = PresetChild::make('text')->repeated();
 

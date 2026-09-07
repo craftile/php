@@ -254,6 +254,7 @@ describe('BlockBuilder', function () {
             ->static()
             ->ghost()
             ->repeated()
+            ->keepInTree()
             ->addBlocks([
                 PresetChild::make('text')->id('child'),
             ])
@@ -268,6 +269,7 @@ describe('BlockBuilder', function () {
         expect($block->static)->toBeTrue();
         expect($block->ghost)->toBeTrue();
         expect($block->repeated)->toBeTrue();
+        expect($block->keepInTree)->toBeTrue();
         expect($block->children)->toHaveCount(1);
         expect($block->childrenOrder)->toBe(['child']);
     });

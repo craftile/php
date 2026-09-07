@@ -1,9 +1,12 @@
 <?php
 
+use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\Contracts\NodeTransformerInterface;
 use Craftile\Laravel\View\NodeTransformers\CraftileBlockDirectiveTransformer;
 use Stillat\BladeParser\Nodes\ArgumentGroupNode;
 use Stillat\BladeParser\Nodes\DirectiveNode;
+use Stillat\BladeParser\Nodes\LiteralNode as BladeLiteralNode;
+use Stillat\BladeParser\Nodes\Position;
 
 beforeEach(function () {
     // Mock craftile configuration for testing
@@ -110,4 +113,50 @@ test('handles complex custom attributes expressions', function () {
 
     expect($node->arguments->getArgValues())->toHaveCount(3);
     expect($node->arguments->getArgValues()[2])->toBe($customAttrs);
+});
+
+test('compiles keep() fourth argument to a true keepInTree flag', function () {
+    app(BlockSchemaRegistry::class)->register(sampleBlockSchema());
+    $transformer = new CraftileBlockDirectiveTransformer;
+
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"', '[]', 'keep()']);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result)->toBeInstanceOf(BladeLiteralNode::class);
+    expect($result->content)->toContain("'keepInTree' => (bool) (true)");
+});
+
+test('compiles keep(expression) fourth argument with the inner expression', function () {
+    app(BlockSchemaRegistry::class)->register(sampleBlockSchema());
+    $transformer = new CraftileBlockDirectiveTransformer;
+
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"', '[]', 'keep($showInTree)']);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (\$showInTree)");
+});
+
+test('defaults keepInTree to false without a fourth argument', function () {
+    app(BlockSchemaRegistry::class)->register(sampleBlockSchema());
+    $transformer = new CraftileBlockDirectiveTransformer;
+
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"']);
+
+    $result = $transformer->transform($node, null);
+
+    expect($result->content)->toContain("'keepInTree' => (bool) (false)");
+});
+
+test('rejects a fourth argument that is not keep()', function () {
+    app(BlockSchemaRegistry::class)->register(sampleBlockSchema());
+    $transformer = new CraftileBlockDirectiveTransformer;
+
+    $node = createMockDirectiveNode('craftileBlock', ['"text"', '"test-id"', '[]', 'true']);
+    $node->position = new Position;
+    $node->position->startLine = 1;
+
+    expect(fn () => $transformer->transform($node, null))
+        ->toThrow(Exception::class, 'Fourth @craftileBlock argument must be keep() or keep(expression).');
 });

@@ -294,7 +294,7 @@ test('tracks children in visual order for nested parents', function () {
     expect($data['blocks']['grandparent']['children'])->toBe(['parent']);
 });
 
-test('groups unrendered static blocks with rendered statics', function () {
+test('groups kept unrendered static blocks with rendered statics', function () {
     $collector = app(PreviewDataCollector::class);
 
     // Create parent with children including an unrendered static block
@@ -332,6 +332,7 @@ test('groups unrendered static blocks with rendered statics', function () {
         'properties' => ['content' => 'Static 2'],
         'parentId' => 'parent',
         'static' => true,
+        'keepInTree' => true,
     ]);
     BlockDatastore::shouldReceive('getBlock')
         ->with('static-2')
@@ -345,7 +346,7 @@ test('groups unrendered static blocks with rendered statics', function () {
     expect($data['blocks'])->toHaveKey('static-2');
 });
 
-test('places unrendered static at end when no static rendered', function () {
+test('places kept unrendered static at end when no static rendered', function () {
     $collector = app(PreviewDataCollector::class);
 
     // Create parent with static and dynamic children
@@ -381,6 +382,7 @@ test('places unrendered static at end when no static rendered', function () {
         'properties' => ['content' => 'Static'],
         'parentId' => 'parent',
         'static' => true,
+        'keepInTree' => true,
     ]);
     BlockDatastore::shouldReceive('getBlock')
         ->with('static-1')
@@ -394,7 +396,7 @@ test('places unrendered static at end when no static rendered', function () {
     expect($data['blocks'])->toHaveKey('static-1');
 });
 
-test('collects multiple unrendered static blocks', function () {
+test('collects multiple kept unrendered static blocks', function () {
     $collector = app(PreviewDataCollector::class);
 
     // Create parent with mix of rendered and unrendered statics
@@ -431,6 +433,7 @@ test('collects multiple unrendered static blocks', function () {
             'id' => 'static-2',
             'type' => 'text',
             'static' => true,
+            'keepInTree' => true,
             'parentId' => 'parent',
         ]));
 
@@ -440,6 +443,7 @@ test('collects multiple unrendered static blocks', function () {
             'id' => 'static-3',
             'type' => 'text',
             'static' => true,
+            'keepInTree' => true,
             'parentId' => 'parent',
         ]));
 
@@ -527,7 +531,7 @@ test('collects nested dynamic subtree of a disabled parent', function () {
     expect($data['blocks']['child']['children'])->toBe(['grandchild']);
 });
 
-test('handles repeated blocks from empty loops', function () {
+test('keeps repeated blocks from empty loops when asked to stay in tree', function () {
     $collector = app(PreviewDataCollector::class);
 
     // Create parent with repeated block that wasn't rendered (empty loop)
@@ -555,6 +559,7 @@ test('handles repeated blocks from empty loops', function () {
             'id' => 'repeated-1',
             'type' => 'card',
             'repeated' => true,
+            'keepInTree' => true,
             'parentId' => 'parent',
         ]));
 
@@ -563,4 +568,107 @@ test('handles repeated blocks from empty loops', function () {
     // Expected: [dynamic-1, repeated-1] (at end since no repeated rendered)
     expect($data['blocks']['parent']['children'])->toBe(['dynamic-1', 'repeated-1']);
     expect($data['blocks'])->toHaveKey('repeated-1');
+});
+
+test('drops unrendered static children that are not kept in tree', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['static-1', 'static-2'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    // static-1 rendered, static-2 sits behind a false condition
+    $collector->startBlock('static-1', BlockData::make([
+        'id' => 'static-1',
+        'type' => 'text',
+        'parentId' => 'parent',
+        'static' => true,
+    ]));
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('static-2')
+        ->andReturn(BlockData::make([
+            'id' => 'static-2',
+            'type' => 'text',
+            'static' => true,
+            'parentId' => 'parent',
+        ]));
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks']['parent']['children'])->toBe(['static-1']);
+    expect($data['blocks'])->not->toHaveKey('static-2');
+});
+
+test('drops repeated blocks from empty loops that are not kept in tree', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['repeated-1', 'dynamic-1'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    $collector->startBlock('dynamic-1', BlockData::make([
+        'id' => 'dynamic-1',
+        'type' => 'button',
+        'parentId' => 'parent',
+    ]));
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('repeated-1')
+        ->andReturn(BlockData::make([
+            'id' => 'repeated-1',
+            'type' => 'card',
+            'repeated' => true,
+            'parentId' => 'parent',
+        ]));
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks']['parent']['children'])->toBe(['dynamic-1']);
+    expect($data['blocks'])->not->toHaveKey('repeated-1');
+});
+
+test('recovers the subtree of a kept unrendered static child', function () {
+    $collector = app(PreviewDataCollector::class);
+
+    $parent = BlockData::make([
+        'id' => 'parent',
+        'type' => 'container',
+        'properties' => [],
+        'children' => ['static-1'],
+    ]);
+    $collector->startBlock('parent', $parent);
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('static-1')
+        ->andReturn(BlockData::make([
+            'id' => 'static-1',
+            'type' => 'container',
+            'static' => true,
+            'keepInTree' => true,
+            'parentId' => 'parent',
+            'children' => ['child'],
+        ]));
+
+    BlockDatastore::shouldReceive('getBlock')
+        ->with('child')
+        ->andReturn(BlockData::make([
+            'id' => 'child',
+            'type' => 'text',
+            'parentId' => 'static-1',
+        ]));
+
+    $data = $collector->getCollectedData();
+
+    expect($data['blocks'])->toHaveKey('static-1');
+    expect($data['blocks'])->toHaveKey('child');
+    expect($data['blocks']['static-1']['keepInTree'])->toBeTrue();
 });

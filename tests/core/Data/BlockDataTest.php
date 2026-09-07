@@ -256,3 +256,21 @@ describe('BlockData', function () {
         expect($block->iteration)->toBe(4);
     });
 });
+
+describe('keepInTree', function () {
+    it('defaults to false', function () {
+        $block = BlockData::make(['id' => 'test', 'type' => 'text']);
+
+        expect($block->keepInTree)->toBeFalse();
+        expect($block->shouldKeepInTree())->toBeFalse();
+        expect($block->toArray())->toHaveKey('keepInTree', false);
+    });
+
+    it('round trips through make and toArray', function () {
+        $block = BlockData::make(['id' => 'test', 'type' => 'text', 'keepInTree' => true]);
+
+        expect($block->shouldKeepInTree())->toBeTrue();
+        expect($block->toArray()['keepInTree'])->toBeTrue();
+        expect(json_decode(json_encode($block), true)['keepInTree'])->toBeTrue();
+    });
+});

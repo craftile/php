@@ -150,6 +150,10 @@ class PreviewDataCollector
      * Disabled blocks never render their body, so none of their children call
      * startBlock. For those we recover the entire child subtree (not just
      * static/repeated) so the editor sidebar still shows the complete tree.
+     *
+     * Otherwise a missing static/repeated child was skipped by the template
+     * itself (a false condition, an empty loop). It is only recovered when the
+     * persisted data asks to keep it in the tree.
      */
     private function collectUnrenderedStaticChildren(): void
     {
@@ -176,7 +180,7 @@ class PreviewDataCollector
                     continue;
                 }
 
-                if ($parentDisabled || $childBlock->static || $childBlock->repeated) {
+                if ($parentDisabled || $this->shouldRecoverUnrenderedChild($childBlock)) {
                     $this->collectBlockTree($childId);
                     $unrenderedStatic[] = $childId;
                 }
@@ -209,6 +213,11 @@ class PreviewDataCollector
             array_splice($renderedChildren, $insertionIndex, 0, $unrenderedStatic);
             $this->renderedChildren[$blockId] = $renderedChildren;
         }
+    }
+
+    private function shouldRecoverUnrenderedChild(BlockData $childBlock): bool
+    {
+        return ($childBlock->static || $childBlock->repeated) && $childBlock->keepInTree;
     }
 
     /**
@@ -300,6 +309,7 @@ class PreviewDataCollector
         $this->regionsAfterContent = [];
         $this->currentLayer = 'beforeContent';
         $this->inContentRegion = false;
+        $this->renderedChildren = [];
     }
 
     /**
