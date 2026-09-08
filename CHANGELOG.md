@@ -1,3 +1,12 @@
+# [0.11.0](https://github.com/craftile/php/compare/v0.10.0...v0.11.0) (2026-09-08)
+
+
+### Features
+
+* add support for Laravel 13 ([b553256](https://github.com/craftile/php/commit/b5532565f34ef4bc291a5eba4708bfe08b3b832e))
+
+
+
 # [0.10.0](https://github.com/craftile/php/compare/v0.9.2...v0.10.0) (2026-09-07)
 
 
