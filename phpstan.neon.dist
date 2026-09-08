@@ -13,3 +13,8 @@ parameters:
 
     tmpDir: .phpstan
     treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        # Concerns are public API applied by packages that consume Craftile,
+        # so they are never used inside the analysed source paths.
+        - identifier: trait.unused

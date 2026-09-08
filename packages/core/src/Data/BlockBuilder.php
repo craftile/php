@@ -23,7 +23,6 @@ class BlockBuilder extends PresetChild
         }
 
         if (class_exists($type) && is_subclass_of($type, BlockPreset::class)) {
-            /** @var BlockPreset $type */
             return static::fromPresetChild($type::asChild(), $id);
         }
 
