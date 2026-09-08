@@ -48,4 +48,4 @@ jobs:
           php -r 'require "vendor/autoload.php"; printf("class_exists: %s\n", (int)class_exists("Tests\\\\Core\\\\TestCase"));'
 
       - name: Run tests
-        run: vendor/bin/pest --ci tests
+        run: vendor/bin/pest --ci
