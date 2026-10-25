@@ -1,5 +1,6 @@
 <?php
 
+use Craftile\Laravel\BlockData;
 use Craftile\Laravel\View\BlockCacheManager;
 use Illuminate\Filesystem\Filesystem;
 
@@ -109,16 +110,92 @@ test('handles cache directory creation', function () {
         ->not->toThrow(Exception::class);
 });
 
-test('flushBlock deletes children file even when no block cache files exist', function () {
+test('flushBlock keeps children files', function () {
     $blockId = 'static-block';
+    $childrenKey = $this->cacheManager->childrenKey([['id' => 'child', 'type' => 'test']]);
 
-    // Write a children file without any block cache files (simulates a static block)
-    $this->cacheManager->writeChildrenFile($blockId, '<?php echo "children"; ?>');
-    $childrenPath = $this->cacheManager->getChildrenFilePath($blockId);
-    expect($this->filesystem->exists($childrenPath))->toBeTrue();
+    $childrenPath = $this->cacheManager->writeChildrenFile($blockId, '<?php echo "children"; ?>', $childrenKey);
 
-    // flushBlock should still delete the children file
+    // Compiled views of other templates may still require this file
     $this->cacheManager->flushBlock($blockId);
 
-    expect($this->filesystem->exists($childrenPath))->toBeFalse();
+    expect($this->filesystem->exists($childrenPath))->toBeTrue();
+
+    $this->cacheManager->flushChildrenFile($blockId);
+});
+
+test('children key is stable for the same children', function () {
+    $children = [['id' => 'a', 'type' => 'text'], ['id' => 'b', 'type' => 'image']];
+
+    expect($this->cacheManager->childrenKey($children))->toBe($this->cacheManager->childrenKey($children));
+});
+
+test('children key changes with order, type, static and ghost', function () {
+    $base = [['id' => 'a', 'type' => 'text'], ['id' => 'b', 'type' => 'text']];
+    $key = $this->cacheManager->childrenKey($base);
+
+    $variants = [
+        'order' => [$base[1], $base[0]],
+        'type' => [['id' => 'a', 'type' => 'image'], $base[1]],
+        'static' => [['id' => 'a', 'type' => 'text', 'static' => true], $base[1]],
+        'ghost' => [['id' => 'a', 'type' => 'text', 'ghost' => true], $base[1]],
+        'added' => [...$base, ['id' => 'c', 'type' => 'text']],
+        'removed' => [$base[0]],
+    ];
+
+    foreach ($variants as $variant) {
+        expect($this->cacheManager->childrenKey($variant))->not->toBe($key);
+    }
+});
+
+test('children key ignores properties and other fields', function () {
+    $key = $this->cacheManager->childrenKey([['id' => 'a', 'type' => 'text', 'properties' => ['content' => 'v1']]]);
+
+    expect($this->cacheManager->childrenKey([
+        ['id' => 'a', 'type' => 'text', 'properties' => ['content' => 'v2'], 'disabled' => true, 'parentId' => 'p'],
+    ]))->toBe($key);
+});
+
+test('children file path is keyed by children key', function () {
+    $keyA = $this->cacheManager->childrenKey([['id' => 'a', 'type' => 'text']]);
+    $keyB = $this->cacheManager->childrenKey([['id' => 'b', 'type' => 'text']]);
+
+    expect($this->cacheManager->getChildrenFilePath('group', $keyA))
+        ->toEndWith("craftile-children-group-{$keyA}.php")
+        ->not->toBe($this->cacheManager->getChildrenFilePath('group', $keyB));
+});
+
+test('children file path without a key keeps the legacy name for previously compiled views', function () {
+    $hash = hash('xxh128', 'group');
+
+    expect($this->cacheManager->getChildrenFilePath('group'))->toEndWith("craftile-children-group-{$hash}.php");
+});
+
+test('children file path for a block matches the key of its resolved children', function () {
+    $loaded = [
+        'a' => BlockData::make(['id' => 'a', 'type' => 'text', 'properties' => ['content' => 'hello']]),
+        'b' => BlockData::make(['id' => 'b', 'type' => 'image', 'static' => true]),
+    ];
+    $group = BlockData::make(['id' => 'group', 'type' => 'group', 'children' => ['a', 'b']], fn ($id) => $loaded[$id] ?? null);
+
+    $expectedKey = $this->cacheManager->childrenKey([
+        ['id' => 'a', 'type' => 'text'],
+        ['id' => 'b', 'type' => 'image', 'static' => true],
+    ]);
+
+    expect($this->cacheManager->getChildrenFilePathForBlock($group))
+        ->toBe($this->cacheManager->getChildrenFilePath('group', $expectedKey));
+});
+
+test('children file path for a block is null without children', function () {
+    $group = BlockData::make(['id' => 'group', 'type' => 'group'], fn ($id) => null);
+
+    expect($this->cacheManager->getChildrenFilePathForBlock($group))->toBeNull();
+});
+
+test('children file path for a block is null when a child is not loaded', function () {
+    $loaded = ['a' => BlockData::make(['id' => 'a', 'type' => 'text'])];
+    $group = BlockData::make(['id' => 'group', 'type' => 'group', 'children' => ['a', 'missing']], fn ($id) => $loaded[$id] ?? null);
+
+    expect($this->cacheManager->getChildrenFilePathForBlock($group))->toBeNull();
 });

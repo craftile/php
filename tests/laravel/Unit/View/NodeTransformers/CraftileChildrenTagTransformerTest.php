@@ -73,8 +73,8 @@ test('transforms children tag to PHP code', function () {
     $result = $transformer->transform($node, null);
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
-    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePath($block->id)');
-    expect($result->content)->toContain('if(file_exists($__childrenFilePath))');
+    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePathForBlock($block)');
+    expect($result->content)->toContain('if($__childrenFilePath !== null && file_exists($__childrenFilePath))');
     expect($result->content)->toContain('require $__childrenFilePath');
 });
 
@@ -125,8 +125,8 @@ test('transforms @children directive to PHP code', function () {
     $result = $transformer->transform($node, null);
 
     expect($result)->toBeInstanceOf(LiteralNode::class);
-    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePath($block->id)');
-    expect($result->content)->toContain('if(file_exists($__childrenFilePath))');
+    expect($result->content)->toContain('app(\\Craftile\\Laravel\\View\\BlockCacheManager::class)->getChildrenFilePathForBlock($block)');
+    expect($result->content)->toContain('if($__childrenFilePath !== null && file_exists($__childrenFilePath))');
     expect($result->content)->toContain('require $__childrenFilePath');
 });
 

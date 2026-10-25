@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Craftile\Core\Data\BlockSchema;
+use Craftile\Laravel\BlockData;
 use Craftile\Laravel\BlockDatastore;
 use Craftile\Laravel\BlockSchemaRegistry;
 use Craftile\Laravel\View\BlockCacheManager;
@@ -564,25 +565,22 @@ test('assigns indices to blocks in regions', function () {
     $datastore->clear();
 });
 
-test('static block children file is cleaned up when children become empty', function () {
+test('static block without children does not resolve to a children file', function () {
     $cacheManager = $this->app[BlockCacheManager::class];
 
-    // Simulate a static block that previously had children
+    // The same static block in another template still has children
     $blockId = 'static-hero';
-    $cacheManager->writeChildrenFile($blockId, '<?php echo "old children"; ?>');
-    $childrenPath = $cacheManager->getChildrenFilePath($blockId);
-    expect($this->files->exists($childrenPath))->toBeTrue();
+    $otherKey = $cacheManager->childrenKey([['id' => 'child', 'type' => 'test']]);
+    $otherPath = $cacheManager->writeChildrenFile($blockId, '<?php echo "other children"; ?>', $otherKey);
 
-    // Template now has the static block with empty children
+    $blockData = [
+        'id' => $blockId,
+        'type' => 'test',
+        'properties' => [],
+        'static' => true,
+    ];
     $template = [
-        'blocks' => [
-            $blockId => [
-                'id' => $blockId,
-                'type' => 'test',
-                'properties' => [],
-                'static' => true,
-            ],
-        ],
+        'blocks' => [$blockId => $blockData],
         'regions' => [
             ['name' => 'main', 'blocks' => [$blockId]],
         ],
@@ -594,8 +592,11 @@ test('static block children file is cleaned up when children become empty', func
     $method->setAccessible(true);
     $method->invoke($this->compiler, $template, '');
 
-    // Children file should be cleaned up
-    expect($this->files->exists($childrenPath))->toBeFalse();
+    // This template renders no children, and the other template keeps its file
+    expect($cacheManager->getChildrenFilePathForBlock(BlockData::make($blockData)))->toBeNull();
+    expect($this->files->exists($otherPath))->toBeTrue();
+
+    $cacheManager->flushChildrenFile($blockId);
 });
 
 test('tracks every block in preview and lets the render check decide the body', function () {
