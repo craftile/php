@@ -1,3 +1,12 @@
+## [0.11.1](https://github.com/craftile/php/compare/v0.11.0...v0.11.1) (2026-10-25)
+
+
+### Bug Fixes
+
+* key compiled children files by their children so templates sharing block IDs stay isolated ([6c024a6](https://github.com/craftile/php/commit/6c024a6312371fbcb4d81f0d125a3d0d415f9fbd))
+
+
+
 # [0.11.0](https://github.com/craftile/php/compare/v0.10.0...v0.11.0) (2026-09-08)
 
 
