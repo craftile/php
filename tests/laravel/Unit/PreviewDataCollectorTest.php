@@ -4,6 +4,7 @@ use Craftile\Laravel\BlockData;
 use Craftile\Laravel\Facades\BlockDatastore;
 use Craftile\Laravel\Facades\Craftile;
 use Craftile\Laravel\PreviewDataCollector;
+use Craftile\Laravel\PreviewModeCache;
 
 test('can track regions', function () {
     $collector = app(PreviewDataCollector::class);
@@ -142,11 +143,7 @@ test('detects if currently collecting', function () {
 
     // Mock request with preview and clear Craftile cache
     request()->merge(['_preview' => 'true']);
-    $craftile = app('craftile');
-    $reflection = new ReflectionClass($craftile);
-    $property = $reflection->getProperty('previewModeCache');
-    $property->setAccessible(true);
-    $property->setValue($craftile, null);
+    app(PreviewModeCache::class)->forget();
 
     expect($collector->isCollecting())->toBeTrue();
 });
