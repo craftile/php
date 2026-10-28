@@ -1,3 +1,12 @@
+# [0.12.0](https://github.com/craftile/php/compare/v0.11.1...v0.12.0) (2026-10-28)
+
+
+### Features
+
+* reset per-request state between requests in long-lived workers ([ce462d7](https://github.com/craftile/php/commit/ce462d7bda0e538df4c305cac30f26f3ddfe64a4))
+
+
+
 ## [0.11.1](https://github.com/craftile/php/compare/v0.11.0...v0.11.1) (2026-10-25)
 
 
